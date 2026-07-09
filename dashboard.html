@@ -1,0 +1,98 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta name="color-scheme" content="light dark">
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="description" content="Vien portfolio content dashboard" />
+    <title>Vien - Dashboard</title>
+    <link rel="icon" type="image/x-icon" href="./assets/images/favicon.png" />
+    <link rel="stylesheet" href="./assets/fonts/remixicon.css" />
+  <link href="style.css" rel="stylesheet"></head>
+
+  <body class="dashboard-page">
+    <main class="dashboard-shell" data-dashboard-app>
+      <section class="dashboard-login">
+        <form class="dashboard-login__panel" data-dashboard-login>
+          <div class="dashboard-login__brand">
+            <img src="./assets/images/logo.png" alt="Vien" />
+          </div>
+          <h1>Sign in to your account</h1>
+          <p>Admin access for managing portfolio content.</p>
+          <div class="dashboard-login__field">
+            <label for="dashboard-username">Username</label>
+            <input id="dashboard-username" name="username" autocomplete="username" placeholder="admin" required />
+          </div>
+          <div class="dashboard-login__field">
+            <label for="dashboard-password">Password</label>
+            <input id="dashboard-password" name="password" autocomplete="current-password" placeholder="********" type="password" required />
+          </div>
+          <span data-dashboard-login-error></span>
+          <button class="dashboard-login__submit" type="submit">
+            Sign in
+          </button>
+        </form>
+      </section>
+
+      <aside class="dashboard-sidebar">
+        <div class="dashboard-sidebar__head">
+          <a class="dashboard-brand" href="index.html" aria-label="Back to home">
+            <img src="./assets/images/logo.png" alt="Vien" />
+          </a>
+          <button class="dashboard-menu-toggle" type="button" data-dashboard-menu-toggle aria-label="Toggle dashboard menu">
+            <i class="ri-menu-line"></i>
+          </button>
+        </div>
+
+        <nav class="dashboard-nav" data-dashboard-nav aria-label="Dashboard navigation"></nav>
+
+        <a class="dashboard-back" href="index.html">
+          <i class="ri-arrow-left-line"></i>
+          Back to website
+        </a>
+
+        <button class="dashboard-back" type="button" data-dashboard-logout>
+          <i class="ri-logout-box-line"></i>
+          Logout
+        </button>
+      </aside>
+
+      <section class="dashboard-main">
+        <div class="dashboard-topbar">
+          <label class="dashboard-search">
+            <i class="ri-search-line"></i>
+            <input data-dashboard-search type="search" placeholder="Search" />
+            <kbd>⌘</kbd>
+            <kbd>F</kbd>
+          </label>
+        </div>
+
+        <header class="dashboard-header">
+          <div>
+            <h1 data-dashboard-heading>Manage Projects</h1>
+            <span data-dashboard-helper>
+              Manage case studies, featured work, and portfolio project entries.
+            </span>
+          </div>
+          <button class="dashboard-button dashboard-button--primary" type="button" data-dashboard-add>
+            <i class="ri-add-line"></i>
+            <span>Add Project</span>
+          </button>
+          <a class="dashboard-button dashboard-button--secondary" href="projects.html" data-dashboard-page-link>
+            <span>Open Projects page</span>
+            <i class="ri-arrow-right-line"></i>
+          </a>
+        </header>
+
+        <section class="dashboard-toolbar">
+          <div class="dashboard-segments" data-dashboard-statuses aria-label="Filter by status"></div>
+        </section>
+
+        <section class="dashboard-card-grid" data-dashboard-list aria-label="Content list"></section>
+      </section>
+
+      <div class="dashboard-modal" data-dashboard-modal aria-live="polite"></div>
+    </main>
+  <script defer src="index.contact-dedupe.js"></script></body>
+</html>
