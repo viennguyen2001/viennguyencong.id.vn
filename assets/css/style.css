@@ -8143,3 +8143,34 @@ p.copy-left-text a:hover {
   object-fit: cover !important;
   width: 100% !important;
 }
+
+
+.dashboard-login__password {
+  position: relative;
+}
+
+.dashboard-login__password input {
+  padding-right: 58px !important;
+}
+
+.dashboard-login__password button {
+  align-items: center;
+  background: transparent;
+  border: 0;
+  color: #6f7480;
+  cursor: pointer;
+  display: inline-flex;
+  font-size: 22px;
+  height: 44px;
+  justify-content: center;
+  position: absolute;
+  right: 10px;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 44px;
+}
+
+.dashboard-login__password button:hover,
+.dashboard-login__password button:focus-visible {
+  color: #9c383c;
+}

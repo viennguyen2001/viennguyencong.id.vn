@@ -27,7 +27,12 @@
           </div>
           <div class="dashboard-login__field">
             <label for="dashboard-password">Password</label>
-            <input id="dashboard-password" name="password" autocomplete="current-password" placeholder="********" type="password" required />
+            <div class="dashboard-login__password">
+              <input id="dashboard-password" name="password" autocomplete="current-password" placeholder="********" type="password" required data-dashboard-password-input />
+              <button type="button" data-dashboard-password-toggle aria-label="Show password">
+                <i class="ri-eye-line"></i>
+              </button>
+            </div>
           </div>
           <span data-dashboard-login-error></span>
           <button class="dashboard-login__submit" type="submit">
@@ -95,5 +100,5 @@
 
       <div class="dashboard-modal" data-dashboard-modal aria-live="polite"></div>
     </main>
-  <script defer src="index.contact-dedupe.js"></script></body>
+  <script defer src="index.contact-dedupe.js?v=20260710-login-toggle"></script></body>
 </html>

@@ -797,12 +797,25 @@ function initDashboardAuth() {
 
   setAuthenticated(window.sessionStorage.getItem(dashboardAuthKey) === "true");
 
+  const passwordToggle = app.querySelector("[data-dashboard-password-toggle]");
+  const passwordInput = app.querySelector("[data-dashboard-password-input]");
+
+  passwordToggle?.addEventListener("click", () => {
+    if (!passwordInput) {
+      return;
+    }
+    const isHidden = passwordInput.type === "password";
+    passwordInput.type = isHidden ? "text" : "password";
+    passwordToggle.setAttribute("aria-label", isHidden ? "Hide password" : "Show password");
+    passwordToggle.innerHTML = isHidden ? '<i class="ri-eye-off-line"></i>' : '<i class="ri-eye-line"></i>';
+  });
+
   loginNode?.addEventListener("submit", (event) => {
     event.preventDefault();
 
     const formData = new FormData(loginNode);
     const username = String(formData.get("username") || "").trim();
-    const password = String(formData.get("password") || "");
+    const password = String(formData.get("password") || "").trim();
     const errorNode = loginNode.querySelector("[data-dashboard-login-error]");
 
     if (username === adminAccount.username && password === adminAccount.password) {
