@@ -8175,6 +8175,7 @@ p.copy-left-text a:hover {
   color: #9c383c;
 }
 
+
 /* Company and about section light background */
 .company-design-area,
 .about-area {
@@ -8190,10 +8191,6 @@ p.copy-left-text a:hover {
   color: #111111 !important;
 }
 
-.about-area .about-content-part p {
-  color: #111111 !important;
-}
-
 .company-design-area .company-list {
   background: transparent !important;
 }
@@ -8206,8 +8203,8 @@ p.copy-left-text a:hover {
 @media (prefers-color-scheme: dark) {
   .company-design-area,
   .about-area {
-    background: #f4f1ec !important;
-    color: #111111 !important;
+    background: #101010 !important;
+    color: #f7f2ec !important;
   }
 
   .company-design-area h2,
@@ -8215,7 +8212,7 @@ p.copy-left-text a:hover {
   .about-area .about-content-part p,
   .about-area .hero-counter-area .count-text,
   .about-area .hero-counter-area .counter-title {
-    color: #111111 !important;
+    color: #f7f2ec !important;
   }
 
   .company-design-area .company-list {
@@ -8224,6 +8221,6 @@ p.copy-left-text a:hover {
 
   .company-design-area .scroller__inner img {
     filter: none !important;
-    opacity: 1 !important;
+    opacity: 0.92 !important;
   }
 }
