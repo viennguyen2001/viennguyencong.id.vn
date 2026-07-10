@@ -8175,14 +8175,22 @@ p.copy-left-text a:hover {
   color: #9c383c;
 }
 
-
-/* Company section light background */
-.company-design-area {
+/* Company and about section light background */
+.company-design-area,
+.about-area {
   background: #f4f1ec !important;
   color: #111111 !important;
 }
 
-.company-design-area h2 {
+.company-design-area h2,
+.about-area .about-pre-title,
+.about-area .about-content-part p,
+.about-area .hero-counter-area .count-text,
+.about-area .hero-counter-area .counter-title {
+  color: #111111 !important;
+}
+
+.about-area .about-content-part p {
   color: #111111 !important;
 }
 
@@ -8196,12 +8204,17 @@ p.copy-left-text a:hover {
 }
 
 @media (prefers-color-scheme: dark) {
-  .company-design-area {
+  .company-design-area,
+  .about-area {
     background: #f4f1ec !important;
     color: #111111 !important;
   }
 
-  .company-design-area h2 {
+  .company-design-area h2,
+  .about-area .about-pre-title,
+  .about-area .about-content-part p,
+  .about-area .hero-counter-area .count-text,
+  .about-area .hero-counter-area .counter-title {
     color: #111111 !important;
   }
 
