@@ -441,7 +441,7 @@ const dashboardIcons = {
 };
 const adminAccount = {
   username: "admin",
-  password: "admin123",
+  password: "Huong1603",
 };
 
 function normalizeDashboardData(data) {
