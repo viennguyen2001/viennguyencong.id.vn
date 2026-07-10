@@ -1,3 +1,17 @@
+const firebaseConfig = {
+  apiKey: "AIzaSyC-sPiRNeOVvGuWm_OpAe7mHPm1QG05RVc",
+  authDomain: "vien-portfolio.firebaseapp.com",
+  projectId: "vien-portfolio",
+  storageBucket: "vien-portfolio.firebasestorage.app",
+  messagingSenderId: "533621720811",
+  appId: "1:533621720811:web:1b72ad2a581bd3565920ae",
+};
+const firebaseContentCollection = "portfolio";
+const firebaseContentDocument = "site-content";
+const firebaseSdkVersion = "10.12.5";
+let firebaseReadyPromise = null;
+let firebaseServices = null;
+
 const dashboardSeed = {
   hero: [
     {
@@ -444,6 +458,120 @@ const adminAccount = {
   password: "Huong1603",
 };
 
+
+function loadScriptOnce(src) {
+  return new Promise((resolve, reject) => {
+    const existing = document.querySelector(`script[src="${src}"]`);
+    if (existing) {
+      if (existing.dataset.loaded === "true") {
+        resolve();
+        return;
+      }
+      existing.addEventListener("load", () => resolve(), { once: true });
+      existing.addEventListener("error", reject, { once: true });
+      return;
+    }
+
+    const script = document.createElement("script");
+    script.src = src;
+    script.async = true;
+    script.onload = () => {
+      script.dataset.loaded = "true";
+      resolve();
+    };
+    script.onerror = reject;
+    document.head.appendChild(script);
+  });
+}
+
+async function initFirebaseServices() {
+  if (firebaseReadyPromise) {
+    return firebaseReadyPromise;
+  }
+
+  firebaseReadyPromise = (async () => {
+    await loadScriptOnce(`https://www.gstatic.com/firebasejs/${firebaseSdkVersion}/firebase-app-compat.js`);
+    await loadScriptOnce(`https://www.gstatic.com/firebasejs/${firebaseSdkVersion}/firebase-auth-compat.js`);
+    await loadScriptOnce(`https://www.gstatic.com/firebasejs/${firebaseSdkVersion}/firebase-firestore-compat.js`);
+
+    if (!window.firebase) {
+      throw new Error("Firebase SDK is not available.");
+    }
+
+    const app = window.firebase.apps?.length
+      ? window.firebase.app()
+      : window.firebase.initializeApp(firebaseConfig);
+    firebaseServices = {
+      app,
+      auth: window.firebase.auth(),
+      firestore: window.firebase.firestore(),
+    };
+    return firebaseServices;
+  })();
+
+  return firebaseReadyPromise;
+}
+
+function getFirebaseContentRef(firestore) {
+  return firestore.collection(firebaseContentCollection).doc(firebaseContentDocument);
+}
+
+async function loadDashboardDataFromFirebase() {
+  try {
+    const { firestore } = await initFirebaseServices();
+    const snapshot = await getFirebaseContentRef(firestore).get();
+    if (!snapshot.exists) {
+      return null;
+    }
+    const payload = snapshot.data() || {};
+    return payload.content || null;
+  } catch (error) {
+    console.warn("Firebase content load failed; using local data.", error);
+    return null;
+  }
+}
+
+async function persistDashboardDataToFirebase(data) {
+  try {
+    const { firestore } = await initFirebaseServices();
+    await getFirebaseContentRef(firestore).set(
+      {
+        content: normalizeDashboardData(data),
+        updatedAt: window.firebase.firestore.FieldValue.serverTimestamp(),
+      },
+      { merge: true }
+    );
+    window.dispatchEvent(new CustomEvent("nino-dashboard-cloud-saved", { detail: data }));
+    return true;
+  } catch (error) {
+    console.warn("Firebase content save failed.", error);
+    window.dispatchEvent(
+      new CustomEvent("nino-dashboard-save-error", {
+        detail: {
+          error,
+          message: "Dữ liệu đã lưu trên trình duyệt, nhưng chưa đồng bộ lên Firebase. Kiểm tra Auth/Firestore rules rồi thử lại.",
+        },
+      })
+    );
+    return false;
+  }
+}
+
+async function hydrateDashboardDataFromFirebase() {
+  const remoteData = await loadDashboardDataFromFirebase();
+  if (!remoteData) {
+    return getDashboardData();
+  }
+
+  const data = normalizeDashboardData({ ...dashboardSeed, ...remoteData });
+  try {
+    window.localStorage.setItem(dashboardVersionStorageKey, dashboardContentVersion);
+    window.localStorage.setItem(dashboardStorageKey, JSON.stringify(data));
+  } catch (error) {}
+  window.dispatchEvent(new CustomEvent("nino-dashboard-updated", { detail: data }));
+  return data;
+}
+
 function normalizeDashboardData(data) {
   return {
     ...data,
@@ -542,6 +670,7 @@ function setDashboardData(data) {
   try {
     window.localStorage.setItem(dashboardStorageKey, JSON.stringify(data));
     window.dispatchEvent(new CustomEvent("nino-dashboard-updated", { detail: data }));
+    persistDashboardDataToFirebase(data);
     return true;
   } catch (error) {
     const isQuotaError =
@@ -810,13 +939,31 @@ function initDashboardAuth() {
     passwordToggle.innerHTML = isHidden ? '<i class="ri-eye-off-line"></i>' : '<i class="ri-eye-line"></i>';
   });
 
-  loginNode?.addEventListener("submit", (event) => {
+  loginNode?.addEventListener("submit", async (event) => {
     event.preventDefault();
 
     const formData = new FormData(loginNode);
     const username = String(formData.get("username") || "").trim();
     const password = String(formData.get("password") || "").trim();
     const errorNode = loginNode.querySelector("[data-dashboard-login-error]");
+
+    try {
+      if (username.includes("@")) {
+        const { auth } = await initFirebaseServices();
+        await auth.signInWithEmailAndPassword(username, password);
+        if (errorNode) {
+          errorNode.textContent = "";
+        }
+        loginNode.reset();
+        setAuthenticated(true);
+        return;
+      }
+    } catch (error) {
+      if (errorNode) {
+        errorNode.textContent = "Sai email hoặc mật khẩu Firebase admin.";
+      }
+      return;
+    }
 
     if (username === adminAccount.username && password === adminAccount.password) {
       if (errorNode) {
@@ -839,7 +986,11 @@ function initDashboardAuth() {
     }
   });
 
-  logoutButton?.addEventListener("click", () => {
+  logoutButton?.addEventListener("click", async () => {
+    try {
+      const services = firebaseServices || (window.firebase ? await initFirebaseServices() : null);
+      await services?.auth?.signOut();
+    } catch (error) {}
     setAuthenticated(false);
   });
 }
@@ -2823,8 +2974,9 @@ function initManagedContentSections() {
   });
 }
 
-document.addEventListener("DOMContentLoaded", () => {
+document.addEventListener("DOMContentLoaded", async () => {
   applySiteBranding();
+  await hydrateDashboardDataFromFirebase();
   initDashboardAuth();
   initDashboard();
   initSiteHero();
