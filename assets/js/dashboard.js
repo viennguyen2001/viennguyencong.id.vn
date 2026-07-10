@@ -8,7 +8,7 @@ const dashboardSeed = {
       date: "2026-07-08",
       metric: "Hero",
       tags: "Get In touch",
-      link: "contact.html",
+      link: "/contact/",
       image: "assets/images/about/me.jpg",
       summary: "100+ reviews",
       detail: {
@@ -29,7 +29,7 @@ const dashboardSeed = {
       date: "2026-06-25",
       metric: "1200x1000",
       tags: "Figma, Photoshop, Illustrator",
-      link: "single-project.html",
+      link: "/single-project/",
       image: "https://images.unsplash.com/photo-1559028006-448665bd7c7f?q=80&w=1200&h=1000&auto=format&fit=crop",
       summary: "A product design project focused on clear user flows, polished UI, and a scalable visual system.",
       detail: {
@@ -45,7 +45,7 @@ const dashboardSeed = {
       date: "2024-01-01",
       metric: "1200x1000",
       tags: "Figma, Photoshop, Illustrator",
-      link: "single-project.html",
+      link: "/single-project/",
       image: "https://images.unsplash.com/photo-1522202176988-66273c2fd55f?q=80&w=1200&h=1000&auto=format&fit=crop",
       summary: "Standardized brand guidelines and digital interfaces for a stronger education technology presence.",
       detail: {
@@ -61,7 +61,7 @@ const dashboardSeed = {
       date: "2026-06-20",
       metric: "1200x1000",
       tags: "Photoshop, Illustrator, Branding",
-      link: "single-project.html",
+      link: "/single-project/",
       image: "https://images.unsplash.com/photo-1515886657613-9f3515b0c78f?q=80&w=1200&h=1000&auto=format&fit=crop",
       summary: "A premium brand identity and visual retouching project for a leather craft service positioned in the luxury market.",
       detail: {
@@ -77,7 +77,7 @@ const dashboardSeed = {
       date: "2026-06-18",
       metric: "1200x1000",
       tags: "Figma, Photoshop, Premiere Pro",
-      link: "single-project.html",
+      link: "/single-project/",
       image: "https://images.unsplash.com/photo-1535131749006-b7f58c99034b?q=80&w=1200&h=1000&auto=format&fit=crop",
       summary: "High-converting landing pages and marketing visuals for an elite golf community with a modern brand presence.",
       detail: {
@@ -95,7 +95,7 @@ const dashboardSeed = {
       date: "2026-06-25",
       metric: "Design process",
       tags: "UX Research, Strategy",
-      link: "blog-details.html",
+      link: "/blog-details/",
       image: "",
       summary: "Deep dive into goals, user needs, and market trends to build a solid foundation for every project.",
     },
@@ -107,7 +107,7 @@ const dashboardSeed = {
       date: "2026-06-25",
       metric: "Design process",
       tags: "Wireframing, Prototyping",
-      link: "blog-details.html",
+      link: "/blog-details/",
       image: "",
       summary: "Transforming concepts into high-fidelity wireframes and prototypes refined through constant feedback.",
     },
@@ -121,7 +121,7 @@ const dashboardSeed = {
       date: "2026-06-25",
       metric: "Client Review",
       tags: "Product Design, UX",
-      link: "index.html#testimonials",
+      link: "/#testimonials",
       image: "",
       summary: "Working with Vien was a game-changer for our digital product. His ability to merge high-end aesthetics with intuitive UX functionality resulted in a platform that not only looks cinematic but also significantly improved our user retention. A true professional.",
     },
@@ -133,7 +133,7 @@ const dashboardSeed = {
       date: "2026-06-25",
       metric: "Client Review",
       tags: "Brand Identity, Retouching",
-      link: "index.html#testimonials",
+      link: "/#testimonials",
       image: "",
       summary: "Working with Vien was a seamless experience. He successfully repositioned our brand identity to match the high-end luxury market. His Photoshop expertise brought our leather craft services to life with incredible detail and sophistication.",
     },
@@ -145,7 +145,7 @@ const dashboardSeed = {
       date: "2026-06-25",
       metric: "Client Review",
       tags: "Brand Guidelines, Digital Platform",
-      link: "index.html#testimonials",
+      link: "/#testimonials",
       image: "",
       summary: "Vien is more than just a designer; he is a strategic problem solver. He helped us standardize our Brand Guidelines across all digital platforms, elevating our brand presence in the education tech space.",
     },
@@ -157,7 +157,7 @@ const dashboardSeed = {
       date: "2026-06-25",
       metric: "Client Review",
       tags: "Landing Page, Marketing",
-      link: "index.html#testimonials",
+      link: "/#testimonials",
       image: "",
       summary: "Vien is a versatile powerhouse. From high-converting landing pages to creative marketing assets, he delivered everything with a modern and professional touch that resonates with our elite golf community.",
     },
@@ -171,7 +171,7 @@ const dashboardSeed = {
       date: "2026-06-28",
       metric: "1",
       tags: "Skill",
-      link: "about.html#skills",
+      link: "/about/#skills",
       image: "assets/images/skills/skill1.png",
       summary: "Vector illustration, icon systems, and brand assets.",
     },
@@ -183,7 +183,7 @@ const dashboardSeed = {
       date: "2026-06-28",
       metric: "2",
       tags: "Skill",
-      link: "about.html#skills",
+      link: "/about/#skills",
       image: "assets/images/skills/skill3.png",
       summary: "Image editing, retouching, and visual composition.",
     },
@@ -195,7 +195,7 @@ const dashboardSeed = {
       date: "2026-06-28",
       metric: "3",
       tags: "Skill",
-      link: "about.html#skills",
+      link: "/about/#skills",
       image: "assets/images/skills/skill2.png",
       summary: "Interface design, design systems, and prototyping.",
     },
@@ -207,7 +207,7 @@ const dashboardSeed = {
       date: "2026-06-28",
       metric: "4",
       tags: "Skill",
-      link: "about.html#skills",
+      link: "/about/#skills",
       image: "assets/images/skills/skill4.png",
       summary: "Short-form video editing and social content.",
     },
@@ -219,7 +219,7 @@ const dashboardSeed = {
       date: "2026-06-28",
       metric: "5",
       tags: "Skill",
-      link: "about.html#skills",
+      link: "/about/#skills",
       image: "assets/images/skills/skill5.png",
       summary: "Video editing, motion cuts, and timeline production.",
     },
@@ -356,55 +356,55 @@ const dashboardLabels = {
   hero: {
     label: "Avata",
     singular: "Avata",
-    page: "index.html#home",
+    page: "/#home",
     helper: "Update the home avata image, intro text, review, and review avatars.",
   },
   projects: {
     label: "Projects",
     singular: "Project",
-    page: "projects.html",
+    page: "/projects/",
     helper: "Manage case studies, project links, and 1200x1000px cover images.",
   },
   blog: {
     label: "Blog",
     singular: "Blog Post",
-    page: "blog.html",
+    page: "/blog/",
     helper: "Plan posts, update draft status, and connect each post to its page.",
   },
   testimonials: {
     label: "Testimonials",
     singular: "Testimonial",
-    page: "index.html#testimonials",
+    page: "/#testimonials",
     helper: "Curate feedback from clients, mentors, and collaborators.",
   },
   skills: {
     label: "Skills",
     singular: "Skill",
-    page: "about.html#skills",
+    page: "/about/#skills",
     helper: "Manage professional skills, icons, order, and active status.",
   },
   social: {
     label: "Social",
     singular: "Social Link",
-    page: "index.html#contact",
+    page: "/#contact",
     helper: "Manage social profile links and icons shown on the website.",
   },
   companies: {
     label: "Companies",
     singular: "Company",
-    page: "index.html",
+    page: "/",
     helper: "Manage logos shown in the Company I Worked With section.",
   },
   contact: {
     label: "Contact",
     singular: "Message",
-    page: "contact.html",
+    page: "/contact/",
     helper: "Review contact form messages, reply by email, and track unread requests.",
   },
   logo: {
     label: "Branding",
     singular: "Brand Asset",
-    page: "index.html",
+    page: "/",
     helper: "Update the logo and favicon displayed across the website.",
   },
 };
@@ -450,7 +450,7 @@ function normalizeDashboardData(data) {
     hero: (data.hero || dashboardSeed.hero).map((item) => ({
       ...item,
       status: item.status || "Active",
-      link: item.link || "contact.html",
+      link: item.link || "/contact/",
       image: item.image || "assets/images/about/me.jpg",
       tags: item.tags || "Get In touch",
       detail: {
@@ -463,13 +463,13 @@ function normalizeDashboardData(data) {
     })),
     testimonials: (data.testimonials || []).map((item) => ({
       ...item,
-      link: item.link === "about.html#testimonials" ? "index.html#testimonials" : item.link,
+      link: item.link === "/about/#testimonials" ? "/#testimonials" : item.link,
       status:
         item.status === "Published" ? "Active" : item.status === "Review" ? "Disabled" : item.status,
     })),
     projects: (data.projects || []).map((item) => ({
       ...item,
-      link: item.link && item.link !== "single-project.html" ? item.link : getProjectDetailLink(item),
+      link: item.link && item.link !== "/single-project/" ? item.link : getProjectDetailLink(item),
       detail: getProjectDetailDefaults(item),
       status:
         item.status === "Published" ? "Active" : item.status === "Review" ? "Disabled" : item.status,
@@ -479,7 +479,7 @@ function normalizeDashboardData(data) {
       owner: item.owner || "Skill",
       status:
         item.status === "Published" ? "Active" : item.status === "Review" ? "Disabled" : item.status || "Active",
-      link: item.link || "about.html#skills",
+      link: item.link || "/about/#skills",
     })),
     blog: (data.blog || []).map((item) => ({
       ...item,
@@ -503,7 +503,7 @@ function normalizeDashboardData(data) {
     contact: (data.contact || []).map((item) => ({
       ...item,
       status: item.status === "Active" || item.status === "Draft" ? "Unread" : item.status || "Unread",
-      link: item.link || (item.email ? `mailto:${item.email}` : "contact.html"),
+      link: item.link || (item.email ? `mailto:${item.email}` : "/contact/"),
     })),
     logo: data.logo || [],
   };
@@ -592,11 +592,11 @@ function getSkillIconClass(item = {}) {
 }
 
 function getDefaultItemLink(type) {
-  return dashboardLabels[type]?.page || "index.html";
+  return dashboardLabels[type]?.page || "/";
 }
 
 function getProjectDetailLink(project) {
-  return `single-project.html?id=${encodeURIComponent(project.id)}`;
+  return `/single-project/?id=${encodeURIComponent(project.id)}`;
 }
 
 function getProjectDetailDefaults(item = {}) {
@@ -966,7 +966,7 @@ function initDashboard() {
             <p>${escapeHtml(heroItem.owner)}</p>
           </div>
           <div class="dashboard-content-card__actions">
-            <a href="index.html#home">Open <i class="ri-arrow-right-line"></i></a>
+            <a href="/#home">Open <i class="ri-arrow-right-line"></i></a>
             <button type="button" aria-label="Edit Avata content" data-dashboard-edit="${heroItem.id}" data-dashboard-hero-section="content">
               <i class="ri-edit-line"></i>
             </button>
@@ -1095,7 +1095,7 @@ function initDashboard() {
               </p>
               <p class="dashboard-contact-card__message">${escapeHtml(item.summary || "No message content.")}</p>
               <div class="dashboard-content-card__actions">
-                <a href="${escapeHtml(item.link || (item.email ? `mailto:${item.email}` : "contact.html"))}">Reply <i class="ri-arrow-right-line"></i></a>
+                <a href="${escapeHtml(item.link || (item.email ? `mailto:${item.email}` : "/contact/"))}">Reply <i class="ri-arrow-right-line"></i></a>
                 <button type="button" aria-label="Mark message as read" data-dashboard-read="${item.id}">
                   <i class="ri-mail-check-line"></i>
                 </button>
@@ -1167,11 +1167,11 @@ function initDashboard() {
               <div>
                 <span class="dashboard-status dashboard-status--${String(item.status).toLowerCase()}">${escapeHtml(item.status)}</span>
                 <h3>${escapeHtml(item.title)}</h3>
-                <a href="${escapeHtml(item.link || "about.html#skills")}">${escapeHtml(item.owner || "Skill")}</a>
+                <a href="${escapeHtml(item.link || "/about/#skills")}">${escapeHtml(item.owner || "Skill")}</a>
                 <p>Order ${escapeHtml(item.metric || "99")} · ${escapeHtml(item.summary || "Professional skill")}</p>
               </div>
               <div class="dashboard-content-card__actions">
-                <a href="${escapeHtml(item.link || "about.html#skills")}">Open <i class="ri-arrow-right-line"></i></a>
+                <a href="${escapeHtml(item.link || "/about/#skills")}">Open <i class="ri-arrow-right-line"></i></a>
                 <button type="button" aria-label="Edit ${escapeHtml(item.title)}" data-dashboard-edit="${item.id}">
                   <i class="ri-edit-line"></i>
                 </button>
@@ -1594,7 +1594,7 @@ function initDashboard() {
                 <input type="hidden" name="title" value="${escapeHtml(editingItem.title || "Vien Nguyen")}" />
                 <input type="hidden" name="owner" value="${escapeHtml(editingItem.owner || "")}" />
                 <input type="hidden" name="tags" value="${escapeHtml(editingItem.tags || "Get In touch")}" />
-                <input type="hidden" name="link" value="${escapeHtml(editingItem.link || "contact.html")}" />
+                <input type="hidden" name="link" value="${escapeHtml(editingItem.link || "/contact/")}" />
               `
               : `
                 <div class="dashboard-form-section dashboard-form__wide">
@@ -1604,7 +1604,7 @@ function initDashboard() {
                 <label>Avata title<input name="title" value="${escapeHtml(editingItem.title)}" required /></label>
                 <label>Button text<input name="tags" value="${escapeHtml(editingItem.tags || "Get In touch")}" /></label>
                 <label class="dashboard-form__wide">Intro text<textarea name="owner" rows="4">${escapeHtml(editingItem.owner)}</textarea></label>
-                <label class="dashboard-form__wide">Button link<input name="link" value="${escapeHtml(editingItem.link || "contact.html")}" /></label>
+                <label class="dashboard-form__wide">Button link<input name="link" value="${escapeHtml(editingItem.link || "/contact/")}" /></label>
                 ${mediaFields}
                 <input type="hidden" name="summary" value="${escapeHtml(editingItem.summary || "100+ reviews")}" />
                 <input type="hidden" name="heroReviewScore" value="${escapeHtml(editingItem.detail?.reviewScore || "(4.96 of 5)")}" />
@@ -2219,7 +2219,7 @@ function saveContactMessage(message) {
     date: new Date().toISOString().slice(0, 10),
     metric: "Contact form",
     tags: "Contact",
-    link: message.email ? `mailto:${message.email}` : "contact.html",
+    link: message.email ? `mailto:${message.email}` : "/contact/",
     image: "",
     summary: message.message || "",
   };
@@ -2359,7 +2359,7 @@ function renderSiteHero() {
 
   if (buttonNode) {
     buttonNode.textContent = hero.tags || "Get In touch";
-    buttonNode.href = hero.link || "contact.html";
+    buttonNode.href = hero.link || "/contact/";
   }
 
   if (reviewNode) {
@@ -2512,9 +2512,9 @@ function renderProjectDetailPage() {
   const hasDemoLink =
     demoLink &&
     demoLink !== "#" &&
-    demoLink !== "single-project.html" &&
+    demoLink !== "/single-project/" &&
     demoLink !== projectDetailLink &&
-    !demoLink.startsWith("single-project.html?");
+    !demoLink.startsWith("/single-project/?");
   const demoHref = hasDemoLink ? demoLink : "#";
   const demoLinkAttrs = /^https?:\/\//i.test(demoHref)
     ? ' target="_blank" rel="noopener noreferrer"'
@@ -2642,7 +2642,7 @@ function initProjectCards() {
     viewAllWrap.className = "project-card-actions";
     viewAllWrap.setAttribute("data-project-view-all", "");
     viewAllWrap.innerHTML = `
-      <a class="theme-btn project-card-view-all" href="projects.html">
+      <a class="theme-btn project-card-view-all" href="/projects/">
         View all project <i class="ri-arrow-right-line"></i>
       </a>
     `;
@@ -2725,24 +2725,24 @@ function initManagedContentSections() {
         (post, index) => `
           <article class="postbox__item format-image transition-3 mb-12">
             <div class="postbox__thumb w-img">
-              <a href="${escapeHtml(post.link || "blog-details.html")}">
+              <a href="${escapeHtml(post.link || "/blog-details/")}">
                 <img src="${escapeHtml(post.image || blogImages[index % blogImages.length])}" alt="${escapeHtml(post.title)}" />
               </a>
             </div>
             <div class="postbox__content">
               <div class="postbox__meta">
-                <span><a href="${escapeHtml(post.link || "blog-details.html")}"><i class="fa-light fa-user"></i>${escapeHtml(post.owner)}</a></span>
-                <span><a href="${escapeHtml(post.link || "blog-details.html")}"><i class="fa-light fa-clock"></i>${escapeHtml(post.date)}</a></span>
-                <span><a href="${escapeHtml(post.link || "blog-details.html")}"><i class="fa-sharp fa-thin fa-comments"></i>${escapeHtml(post.metric)}</a></span>
+                <span><a href="${escapeHtml(post.link || "/blog-details/")}"><i class="fa-light fa-user"></i>${escapeHtml(post.owner)}</a></span>
+                <span><a href="${escapeHtml(post.link || "/blog-details/")}"><i class="fa-light fa-clock"></i>${escapeHtml(post.date)}</a></span>
+                <span><a href="${escapeHtml(post.link || "/blog-details/")}"><i class="fa-sharp fa-thin fa-comments"></i>${escapeHtml(post.metric)}</a></span>
               </div>
               <h3 class="postbox__title">
-                <a href="${escapeHtml(post.link || "blog-details.html")}">${escapeHtml(post.title)}</a>
+                <a href="${escapeHtml(post.link || "/blog-details/")}">${escapeHtml(post.title)}</a>
               </h3>
               <div class="postbox__text">
                 <p>${escapeHtml(post.summary)}</p>
               </div>
               <div class="postbox__read-more">
-                <a href="${escapeHtml(post.link || "blog-details.html")}" class="theme-btn">Read more</a>
+                <a href="${escapeHtml(post.link || "/blog-details/")}" class="theme-btn">Read more</a>
               </div>
             </div>
           </article>
@@ -2766,7 +2766,7 @@ function initManagedContentSections() {
     const testimonials = getPublishedItems("testimonials");
     const renderCard = (testimonial, index, isMarquee = false) => `
       <div class="${isMarquee ? "testimonial-marquee__item" : "col-span-12 md:col-span-6 lg:col-span-4"}">
-        <a class="testimonial-link" href="${escapeHtml(testimonial.link || "index.html#testimonials")}">
+        <a class="testimonial-link" href="${escapeHtml(testimonial.link || "/#testimonials")}">
           <div class="testimonial-item wow fadeInUp delay-0-2s">
             <div class="author">
               <img src="${escapeHtml(testimonial.image || avatars[index % avatars.length])}" alt="${escapeHtml(testimonial.owner)}" />
