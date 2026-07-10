@@ -9702,6 +9702,42 @@ p.copy-left-text a:hover {
   color: #9c383c;
 }
 
+/* Company section light background */
+.company-design-area {
+  background: #f4f1ec !important;
+  color: #111111 !important;
+}
+
+.company-design-area h2 {
+  color: #111111 !important;
+}
+
+.company-design-area .company-list {
+  background: transparent !important;
+}
+
+.company-design-area .scroller__inner img {
+  filter: none !important;
+  opacity: 1 !important;
+}
+
+@media (prefers-color-scheme: dark) {
+  .company-design-area {
+    background: #f4f1ec !important;
+    color: #111111 !important;
+  }
+  .company-design-area h2 {
+    color: #111111 !important;
+  }
+  .company-design-area .company-list {
+    background: transparent !important;
+  }
+  .company-design-area .scroller__inner img {
+    filter: none !important;
+    opacity: 1 !important;
+  }
+}
+
 .hover\:cursor-pointer:hover{
   cursor: pointer;
 }
