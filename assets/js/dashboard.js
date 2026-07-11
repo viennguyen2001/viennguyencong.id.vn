@@ -453,10 +453,6 @@ const dashboardIcons = {
   contact: "ri-mail-line",
   logo: "ri-image-edit-line",
 };
-const adminAccount = {
-  username: "admin",
-  password: "Huong1603",
-};
 
 
 function loadScriptOnce(src) {
@@ -1043,31 +1039,17 @@ function initDashboardAuth() {
     const errorNode = loginNode.querySelector("[data-dashboard-login-error]");
 
     try {
-      if (username.includes("@")) {
-        const { auth } = await initFirebaseServices();
-        await auth.signInWithEmailAndPassword(username, password);
-        if (errorNode) {
-          errorNode.textContent = "";
-        }
-        loginNode.reset();
-        setAuthenticated(true);
-        return;
-      }
-    } catch (error) {
-      if (errorNode) {
-        errorNode.textContent = "Sai email hoặc mật khẩu Firebase admin.";
-      }
-      return;
-    }
-
-    if (username === adminAccount.username && password === adminAccount.password) {
+      const { auth } = await initFirebaseServices();
+      await auth.signInWithEmailAndPassword(username, password);
       if (errorNode) {
         errorNode.textContent = "";
       }
       loginNode.reset();
       setAuthenticated(true);
-    } else if (errorNode) {
-      errorNode.textContent = "Sai tài khoản hoặc mật khẩu admin.";
+    } catch (error) {
+      if (errorNode) {
+        errorNode.textContent = "Sai email hoặc mật khẩu Firebase admin.";
+      }
     }
   });
 
