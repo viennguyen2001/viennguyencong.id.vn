@@ -2639,7 +2639,11 @@ function initContactCapture() {
         form.reset();
       } catch (error) {
         console.warn("Contact message save failed.", error);
-        setContactFeedback(false, "Message was not sent. Please try again later.");
+        const detail = String(error?.message || error || "").toLowerCase();
+        const feedback = detail.includes("permission") || detail.includes("permission-denied")
+          ? "The contact form is not enabled in Firebase yet. Please publish the Firestore Rules."
+          : "Message was not sent. Please try again later.";
+        setContactFeedback(false, feedback);
       }
     },
     true
