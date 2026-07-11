@@ -531,12 +531,43 @@ async function loadDashboardDataFromFirebase() {
   }
 }
 
+
+function stripInlineImagesForFirebase(value) {
+  if (Array.isArray(value)) {
+    return value.map(stripInlineImagesForFirebase);
+  }
+
+  if (value && typeof value === "object") {
+    return Object.fromEntries(
+      Object.entries(value).map(([key, itemValue]) => {
+        if (typeof itemValue === "string" && itemValue.startsWith("data:image/")) {
+          return [key, ""];
+        }
+        return [key, stripInlineImagesForFirebase(itemValue)];
+      })
+    );
+  }
+
+  return value;
+}
+
+function getFirebaseSaveErrorMessage(error) {
+  const text = String(error?.message || error || "").toLowerCase();
+  if (text.includes("permission") || text.includes("permission-denied")) {
+    return "Firebase chưa cho phép ghi dữ liệu. Kiểm tra Firestore Rules và đăng nhập dashboard bằng email Firebase.";
+  }
+  if (text.includes("size") || text.includes("maximum") || text.includes("too large")) {
+    return "Dữ liệu có ảnh quá nặng nên Firestore không nhận. Mình đã bỏ ảnh base64 khi sync, hãy lưu lại lần nữa.";
+  }
+  return "Dữ liệu đã lưu trên trình duyệt, nhưng chưa đồng bộ lên Firebase. Kiểm tra Auth/Firestore rules rồi thử lại.";
+}
+
 async function persistDashboardDataToFirebase(data) {
   try {
     const { firestore } = await initFirebaseServices();
     await getFirebaseContentRef(firestore).set(
       {
-        content: normalizeDashboardData(data),
+        content: stripInlineImagesForFirebase(normalizeDashboardData(data)),
         updatedAt: window.firebase.firestore.FieldValue.serverTimestamp(),
       },
       { merge: true }
@@ -549,10 +580,13 @@ async function persistDashboardDataToFirebase(data) {
       new CustomEvent("nino-dashboard-save-error", {
         detail: {
           error,
-          message: "Dữ liệu đã lưu trên trình duyệt, nhưng chưa đồng bộ lên Firebase. Kiểm tra Auth/Firestore rules rồi thử lại.",
+          message: getFirebaseSaveErrorMessage(error),
         },
       })
     );
+    if (document.querySelector("[data-dashboard-app]")) {
+      window.alert(getFirebaseSaveErrorMessage(error));
+    }
     return false;
   }
 }
