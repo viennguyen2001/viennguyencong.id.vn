@@ -351,6 +351,10 @@ Version      : 1.0
     return pattern.test(emailAddress);
   }
   $("#contactForm").on("submit", function (e) {
+    if (window.__ninoFirestoreContactForm) {
+      e.preventDefault();
+      return false;
+    }
     e.preventDefault();
     var data = {
       name: $("#name").val(),

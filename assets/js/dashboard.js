@@ -3175,6 +3175,8 @@ function initManagedContentSections() {
 }
 
 document.addEventListener("DOMContentLoaded", async () => {
+  window.__ninoFirestoreContactForm = true;
+  initContactCapture();
   applySiteBranding(defaultSiteLogo, defaultSiteFavicon);
   await hydrateDashboardDataFromFirebase();
   setSiteBranding("", "");
@@ -3187,5 +3189,4 @@ document.addEventListener("DOMContentLoaded", async () => {
   renderProjectDetailPage();
   initProjectCards();
   initManagedContentSections();
-  initContactCapture();
 });
