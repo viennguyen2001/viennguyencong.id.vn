@@ -3,7 +3,7 @@
 /*==============================================================*/
 (function ($) {
     "use strict"; // Start of use strict
-    $("#contactForm").validator().on("submit", function (event) {
+    $("#legacyContactForm").validator().on("submit", function (event) {
         if (event.isDefaultPrevented()) {
             // handle the invalid form...
             formError();
@@ -41,12 +41,12 @@
     }
 
     function formSuccess(){
-        $("#contactForm")[0].reset();
+        $("#legacyContactForm")[0].reset();
         submitMSG(true, "Message Submitted!")
     }
 
     function formError(){
-        $("#contactForm").removeClass().addClass('shake animated').one('webkitAnimationEnd mozAnimationEnd MSAnimationEnd oanimationend animationend', function(){
+        $("#legacyContactForm").removeClass().addClass('shake animated').one('webkitAnimationEnd mozAnimationEnd MSAnimationEnd oanimationend animationend', function(){
             $(this).removeClass();
         });
     }
