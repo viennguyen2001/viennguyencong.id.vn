@@ -3183,4 +3183,5 @@ document.addEventListener("DOMContentLoaded", async () => {
   renderProjectDetailPage();
   initProjectCards();
   initManagedContentSections();
+  initContactCapture();
 });
