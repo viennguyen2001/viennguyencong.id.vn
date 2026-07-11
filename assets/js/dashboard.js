@@ -9,6 +9,8 @@ const firebaseConfig = {
 const firebaseContentCollection = "portfolio";
 const firebaseContentDocument = "site-content";
 const firebaseSdkVersion = "10.12.5";
+const cloudinaryCloudName = "tpwni7f3";
+const cloudinaryUploadPreset = "vien_portfolio_unsigned";
 let firebaseReadyPromise = null;
 let firebaseServices = null;
 
@@ -489,7 +491,6 @@ async function initFirebaseServices() {
     await loadScriptOnce(`https://www.gstatic.com/firebasejs/${firebaseSdkVersion}/firebase-app-compat.js`);
     await loadScriptOnce(`https://www.gstatic.com/firebasejs/${firebaseSdkVersion}/firebase-auth-compat.js`);
     await loadScriptOnce(`https://www.gstatic.com/firebasejs/${firebaseSdkVersion}/firebase-firestore-compat.js`);
-    await loadScriptOnce(`https://www.gstatic.com/firebasejs/${firebaseSdkVersion}/firebase-storage-compat.js`);
 
     if (!window.firebase) {
       throw new Error("Firebase SDK is not available.");
@@ -502,7 +503,6 @@ async function initFirebaseServices() {
       app,
       auth: window.firebase.auth(),
       firestore: window.firebase.firestore(),
-      storage: window.firebase.storage(),
     };
     return firebaseServices;
   })();
@@ -547,22 +547,32 @@ function getImageExtension(dataUrl) {
   return mime === "jpeg" ? "jpg" : mime.replace(/[^a-z0-9]/gi, "").toLowerCase();
 }
 
-async function uploadInlineImageToFirebaseStorage(dataUrl, pathHint = "image") {
-  const { storage } = await initFirebaseServices();
-  const extension = getImageExtension(dataUrl);
-  const safeHint = String(pathHint || "image").replace(/[^a-z0-9-]/gi, "-").toLowerCase();
-  const filePath = `portfolio-media/${safeHint}-${Date.now()}-${Math.random().toString(36).slice(2)}.${extension}`;
-  const reference = storage.ref().child(filePath);
-  const blob = dataUrlToBlob(dataUrl);
-  await reference.put(blob, { contentType: blob.type });
-  return reference.getDownloadURL();
+async function uploadInlineImageToCloudinary(dataUrl, pathHint = "image") {
+  const endpoint = `https://api.cloudinary.com/v1_1/${cloudinaryCloudName}/image/upload`;
+  const formData = new FormData();
+  formData.append("file", dataUrl);
+  formData.append("upload_preset", cloudinaryUploadPreset);
+  formData.append("folder", "vien-portfolio");
+  formData.append("public_id", String(pathHint || "image").replace(/[^a-z0-9-]/gi, "-").toLowerCase());
+
+  const response = await fetch(endpoint, {
+    method: "POST",
+    body: formData,
+  });
+
+  const payload = await response.json().catch(() => ({}));
+  if (!response.ok) {
+    throw new Error(payload.error?.message || "Cloudinary upload failed.");
+  }
+
+  return payload.secure_url;
 }
 
-async function uploadInlineImagesForFirebase(value, pathHint = "content") {
+async function uploadInlineImagesForCloud(value, pathHint = "content") {
   if (Array.isArray(value)) {
     const items = [];
     for (let index = 0; index < value.length; index += 1) {
-      items.push(await uploadInlineImagesForFirebase(value[index], `${pathHint}-${index}`));
+      items.push(await uploadInlineImagesForCloud(value[index], `${pathHint}-${index}`));
     }
     return items;
   }
@@ -570,13 +580,13 @@ async function uploadInlineImagesForFirebase(value, pathHint = "content") {
   if (value && typeof value === "object") {
     const entries = [];
     for (const [key, itemValue] of Object.entries(value)) {
-      entries.push([key, await uploadInlineImagesForFirebase(itemValue, `${pathHint}-${key}`)]);
+      entries.push([key, await uploadInlineImagesForCloud(itemValue, `${pathHint}-${key}`)]);
     }
     return Object.fromEntries(entries);
   }
 
   if (typeof value === "string" && value.startsWith("data:image/")) {
-    return uploadInlineImageToFirebaseStorage(value, pathHint);
+    return uploadInlineImageToCloudinary(value, pathHint);
   }
 
   return value;
@@ -603,8 +613,8 @@ function stripInlineImagesForFirebase(value) {
 
 function getFirebaseSaveErrorMessage(error) {
   const text = String(error?.message || error || "").toLowerCase();
-  if (text.includes("storage") || text.includes("bucket")) {
-    return "Firebase Storage chưa bật hoặc rules chưa cho phép upload ảnh. Bật Storage rồi thêm rule cho admin upload.";
+  if (text.includes("cloudinary") || text.includes("upload preset") || text.includes("upload failed")) {
+    return "Cloudinary chưa upload được ảnh. Kiểm tra Cloud name, unsigned upload preset và preset phải ở chế độ Unsigned.";
   }
   if (text.includes("permission") || text.includes("permission-denied")) {
     return "Firebase chưa cho phép ghi dữ liệu. Kiểm tra Firestore/Storage Rules và đăng nhập dashboard bằng email Firebase.";
@@ -618,7 +628,7 @@ function getFirebaseSaveErrorMessage(error) {
 async function persistDashboardDataToFirebase(data) {
   try {
     const { firestore } = await initFirebaseServices();
-    const content = await uploadInlineImagesForFirebase(normalizeDashboardData(data), "site-content");
+    const content = await uploadInlineImagesForCloud(normalizeDashboardData(data), "site-content");
     await getFirebaseContentRef(firestore).set(
       {
         content: stripInlineImagesForFirebase(content),
