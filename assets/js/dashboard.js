@@ -493,6 +493,7 @@ async function initFirebaseServices() {
     await loadScriptOnce(`https://www.gstatic.com/firebasejs/${firebaseSdkVersion}/firebase-app-compat.js`);
     await loadScriptOnce(`https://www.gstatic.com/firebasejs/${firebaseSdkVersion}/firebase-auth-compat.js`);
     await loadScriptOnce(`https://www.gstatic.com/firebasejs/${firebaseSdkVersion}/firebase-firestore-compat.js`);
+    await loadScriptOnce(`https://www.gstatic.com/firebasejs/${firebaseSdkVersion}/firebase-storage-compat.js`);
 
     if (!window.firebase) {
       throw new Error("Firebase SDK is not available.");
@@ -505,6 +506,7 @@ async function initFirebaseServices() {
       app,
       auth: window.firebase.auth(),
       firestore: window.firebase.firestore(),
+      storage: window.firebase.storage(),
     };
     return firebaseServices;
   })();
@@ -532,6 +534,58 @@ async function loadDashboardDataFromFirebase() {
 }
 
 
+
+function dataUrlToBlob(dataUrl) {
+  const [meta, base64] = String(dataUrl || "").split(",");
+  const mime = meta.match(/data:([^;]+)/)?.[1] || "image/jpeg";
+  const binary = window.atob(base64 || "");
+  const bytes = new Uint8Array(binary.length);
+  for (let index = 0; index < binary.length; index += 1) {
+    bytes[index] = binary.charCodeAt(index);
+  }
+  return new Blob([bytes], { type: mime });
+}
+
+function getImageExtension(dataUrl) {
+  const mime = String(dataUrl || "").match(/data:image\/([^;]+)/)?.[1] || "jpg";
+  return mime === "jpeg" ? "jpg" : mime.replace(/[^a-z0-9]/gi, "").toLowerCase();
+}
+
+async function uploadInlineImageToFirebaseStorage(dataUrl, pathHint = "image") {
+  const { storage } = await initFirebaseServices();
+  const extension = getImageExtension(dataUrl);
+  const safeHint = String(pathHint || "image").replace(/[^a-z0-9-]/gi, "-").toLowerCase();
+  const filePath = `portfolio-media/${safeHint}-${Date.now()}-${Math.random().toString(36).slice(2)}.${extension}`;
+  const reference = storage.ref().child(filePath);
+  const blob = dataUrlToBlob(dataUrl);
+  await reference.put(blob, { contentType: blob.type });
+  return reference.getDownloadURL();
+}
+
+async function uploadInlineImagesForFirebase(value, pathHint = "content") {
+  if (Array.isArray(value)) {
+    const items = [];
+    for (let index = 0; index < value.length; index += 1) {
+      items.push(await uploadInlineImagesForFirebase(value[index], `${pathHint}-${index}`));
+    }
+    return items;
+  }
+
+  if (value && typeof value === "object") {
+    const entries = [];
+    for (const [key, itemValue] of Object.entries(value)) {
+      entries.push([key, await uploadInlineImagesForFirebase(itemValue, `${pathHint}-${key}`)]);
+    }
+    return Object.fromEntries(entries);
+  }
+
+  if (typeof value === "string" && value.startsWith("data:image/")) {
+    return uploadInlineImageToFirebaseStorage(value, pathHint);
+  }
+
+  return value;
+}
+
 function stripInlineImagesForFirebase(value) {
   if (Array.isArray(value)) {
     return value.map(stripInlineImagesForFirebase);
@@ -553,8 +607,11 @@ function stripInlineImagesForFirebase(value) {
 
 function getFirebaseSaveErrorMessage(error) {
   const text = String(error?.message || error || "").toLowerCase();
+  if (text.includes("storage") || text.includes("bucket")) {
+    return "Firebase Storage chưa bật hoặc rules chưa cho phép upload ảnh. Bật Storage rồi thêm rule cho admin upload.";
+  }
   if (text.includes("permission") || text.includes("permission-denied")) {
-    return "Firebase chưa cho phép ghi dữ liệu. Kiểm tra Firestore Rules và đăng nhập dashboard bằng email Firebase.";
+    return "Firebase chưa cho phép ghi dữ liệu. Kiểm tra Firestore/Storage Rules và đăng nhập dashboard bằng email Firebase.";
   }
   if (text.includes("size") || text.includes("maximum") || text.includes("too large")) {
     return "Dữ liệu có ảnh quá nặng nên Firestore không nhận. Mình đã bỏ ảnh base64 khi sync, hãy lưu lại lần nữa.";
@@ -565,13 +622,17 @@ function getFirebaseSaveErrorMessage(error) {
 async function persistDashboardDataToFirebase(data) {
   try {
     const { firestore } = await initFirebaseServices();
+    const content = await uploadInlineImagesForFirebase(normalizeDashboardData(data), "site-content");
     await getFirebaseContentRef(firestore).set(
       {
-        content: stripInlineImagesForFirebase(normalizeDashboardData(data)),
+        content: stripInlineImagesForFirebase(content),
         updatedAt: window.firebase.firestore.FieldValue.serverTimestamp(),
       },
       { merge: true }
     );
+    try {
+      window.localStorage.setItem(dashboardStorageKey, JSON.stringify(content));
+    } catch (error) {}
     window.dispatchEvent(new CustomEvent("nino-dashboard-cloud-saved", { detail: data }));
     return true;
   } catch (error) {
