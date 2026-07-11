@@ -367,8 +367,8 @@ const dashboardSeed = {
   contact: [],
   logo: [],
   branding: {
-    logo: "./assets/images/logo.png",
-    favicon: "./assets/images/favicon.png",
+    logo: "./assets/images/logo.png?v=20260711-vien-brand-assets-v1",
+    favicon: "./assets/images/favicon.png?v=20260711-vien-brand-assets-v1",
   },
 };
 
@@ -434,8 +434,8 @@ const dashboardVersionStorageKey = "nino-dashboard-content-version";
 const dashboardStorageKey = "nino-dashboard-content";
 const siteLogoStorageKey = "nino-site-logo";
 const siteFaviconStorageKey = "nino-site-favicon";
-const defaultSiteLogo = "./assets/images/logo.png";
-const defaultSiteFavicon = "./assets/images/favicon.png";
+const defaultSiteLogo = "./assets/images/logo.png?v=20260711-vien-brand-assets-v1";
+const defaultSiteFavicon = "./assets/images/favicon.png?v=20260711-vien-brand-assets-v1";
 const dashboardAuthKey = "nino-dashboard-authenticated";
 const dashboardStatuses = [
   { label: "All Projects", value: "All" },
@@ -3078,9 +3078,9 @@ function initManagedContentSections() {
 }
 
 document.addEventListener("DOMContentLoaded", async () => {
-  applySiteBranding();
-  const hydratedData = await hydrateDashboardDataFromFirebase();
-  setSiteBranding(hydratedData?.branding?.logo || "", hydratedData?.branding?.favicon || "");
+  applySiteBranding(defaultSiteLogo, defaultSiteFavicon);
+  await hydrateDashboardDataFromFirebase();
+  setSiteBranding("", "");
   initDashboardAuth();
   initDashboard();
   initSiteHero();
