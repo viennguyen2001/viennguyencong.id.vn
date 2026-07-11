@@ -8,6 +8,7 @@ const firebaseConfig = {
 };
 const firebaseContentCollection = "portfolio";
 const firebaseContentDocument = "site-content";
+const firebaseContactCollection = "contact-messages";
 const firebaseSdkVersion = "10.12.5";
 const cloudinaryCloudName = "tpwni7f3";
 const cloudinaryUploadPreset = "vien_portfolio_unsigned";
@@ -516,6 +517,71 @@ async function initFirebaseServices() {
 
 function getFirebaseContentRef(firestore) {
   return firestore.collection(firebaseContentCollection).doc(firebaseContentDocument);
+}
+
+function getFirebaseContactMessagesRef(firestore) {
+  return firestore.collection(firebaseContactCollection);
+}
+
+function normalizeContactMessage(message = {}, id = Date.now()) {
+  const createdDate = message.createdAt?.toDate ? message.createdAt.toDate() : null;
+  const fallbackDate = new Date().toISOString().slice(0, 10);
+  return {
+    id: Number(message.id) || Number(String(id).replace(/\D/g, "").slice(-12)) || Date.now(),
+    firebaseId: String(message.firebaseId || id || ""),
+    title: message.subject || message.title || "New contact message",
+    owner: message.name || message.owner || "Visitor",
+    email: message.email || "",
+    status: message.status || "Unread",
+    date: message.date || (createdDate ? createdDate.toISOString().slice(0, 10) : fallbackDate),
+    metric: message.metric || "Contact form",
+    tags: message.tags || "Contact",
+    link: message.email ? `mailto:${message.email}` : "/contact/",
+    image: "",
+    summary: message.message || message.summary || "",
+  };
+}
+
+async function submitContactMessageToFirebase(message) {
+  const { firestore } = await initFirebaseServices();
+  const payload = {
+    name: message.name,
+    email: message.email,
+    subject: message.subject,
+    message: message.message,
+    status: "Unread",
+    date: new Date().toISOString().slice(0, 10),
+    source: window.location.href,
+    createdAt: window.firebase.firestore.FieldValue.serverTimestamp(),
+  };
+  const doc = await getFirebaseContactMessagesRef(firestore).add(payload);
+  return normalizeContactMessage({ ...payload, id: Date.now() }, doc.id);
+}
+
+async function loadContactMessagesFromFirebase() {
+  try {
+    const { firestore } = await initFirebaseServices();
+    const snapshot = await getFirebaseContactMessagesRef(firestore)
+      .orderBy("createdAt", "desc")
+      .limit(100)
+      .get();
+    return snapshot.docs.map((doc) => normalizeContactMessage(doc.data(), doc.id));
+  } catch (error) {
+    console.warn("Firebase contact messages load failed.", error);
+    return null;
+  }
+}
+
+async function updateContactMessageInFirebase(item, updates) {
+  if (!item?.firebaseId) return;
+  const { firestore } = await initFirebaseServices();
+  await getFirebaseContactMessagesRef(firestore).doc(item.firebaseId).set(updates, { merge: true });
+}
+
+async function deleteContactMessageFromFirebase(item) {
+  if (!item?.firebaseId) return;
+  const { firestore } = await initFirebaseServices();
+  await getFirebaseContactMessagesRef(firestore).doc(item.firebaseId).delete();
 }
 
 async function loadDashboardDataFromFirebase() {
@@ -1066,6 +1132,7 @@ function initDashboardAuth() {
       }
       loginNode.reset();
       setAuthenticated(true);
+      window.dispatchEvent(new CustomEvent("nino-dashboard-authenticated"));
     } catch (error) {
       if (errorNode) {
         errorNode.textContent = "Sai email hoặc mật khẩu Firebase admin.";
@@ -1107,6 +1174,19 @@ function initDashboard() {
   let editingImage = "";
   let editingImageMessage = "";
   let editingHeroSection = "";
+
+  async function refreshContactMessages() {
+    const messages = await loadContactMessagesFromFirebase();
+    if (!messages) return;
+    data = {
+      ...getDashboardData(),
+      contact: messages,
+    };
+    try {
+      window.localStorage.setItem(dashboardStorageKey, JSON.stringify(data));
+    } catch (error) {}
+    render();
+  }
 
   const listNode = app.querySelector("[data-dashboard-list]");
   const navNode = app.querySelector("[data-dashboard-nav]");
@@ -2065,23 +2145,29 @@ function initDashboard() {
 
     if (deleteButton) {
       const itemId = Number(deleteButton.dataset.dashboardDelete);
+      const selectedItem = (data[activeType] || []).find((item) => item.id === itemId);
       data = {
         ...data,
         [activeType]: data[activeType].filter((item) => item.id !== itemId),
       };
-      setDashboardData(data);
+      if (activeType === "contact") {
+        deleteContactMessageFromFirebase(selectedItem).catch((error) => console.warn("Contact delete failed.", error));
+      } else {
+        setDashboardData(data);
+      }
       render();
     }
 
     if (readButton) {
       const itemId = Number(readButton.dataset.dashboardRead);
+      const selectedItem = (data.contact || []).find((item) => item.id === itemId);
       data = {
         ...data,
         contact: (data.contact || []).map((item) =>
           item.id === itemId ? { ...item, status: "Read" } : item
         ),
       };
-      setDashboardData(data);
+      updateContactMessageInFirebase(selectedItem, { status: "Read" }).catch((error) => console.warn("Contact update failed.", error));
       render();
     }
 
@@ -2473,28 +2559,29 @@ function initDashboard() {
   });
 
   render();
+  refreshContactMessages();
+  window.addEventListener("nino-dashboard-authenticated", refreshContactMessages);
+  initFirebaseServices()
+    .then(({ auth }) => auth.onAuthStateChanged((user) => {
+      if (user) refreshContactMessages();
+    }))
+    .catch(() => {});
 }
 
-function saveContactMessage(message) {
+async function saveContactMessage(message) {
+  const nextMessage = await submitContactMessageToFirebase(message);
   const data = getDashboardData();
-  const nextMessage = {
-    id: Date.now(),
-    title: message.subject || "New contact message",
-    owner: message.name || "Visitor",
-    email: message.email || "",
-    status: "Unread",
-    date: new Date().toISOString().slice(0, 10),
-    metric: "Contact form",
-    tags: "Contact",
-    link: message.email ? `mailto:${message.email}` : "/contact/",
-    image: "",
-    summary: message.message || "",
-  };
-
-  setDashboardData({
-    ...data,
-    contact: [nextMessage, ...(data.contact || [])],
-  });
+  const contactMessages = data.contact || [];
+  try {
+    window.localStorage.setItem(
+      dashboardStorageKey,
+      JSON.stringify({
+        ...data,
+        contact: [nextMessage, ...contactMessages],
+      })
+    );
+  } catch (error) {}
+  window.dispatchEvent(new CustomEvent("nino-dashboard-updated", { detail: { ...data, contact: [nextMessage, ...contactMessages] } }));
 }
 
 function initContactCapture() {
@@ -2529,7 +2616,9 @@ function initContactCapture() {
 
   form.addEventListener(
     "submit",
-    () => {
+    async (event) => {
+      event.preventDefault();
+      event.stopImmediatePropagation();
       const getValue = (selector) => form.querySelector(selector)?.value?.trim() || "";
       const message = {
         name: getValue("#name"),
@@ -2543,11 +2632,15 @@ function initContactCapture() {
         return;
       }
 
-      saveContactMessage(message);
-      window.setTimeout(() => {
-        setContactFeedback(true, "Message saved. I will get back to you soon!");
+      try {
+        setContactFeedback(true, "Sending message...");
+        await saveContactMessage(message);
+        setContactFeedback(true, "Message sent. I will get back to you soon!");
         form.reset();
-      }, 150);
+      } catch (error) {
+        console.warn("Contact message save failed.", error);
+        setContactFeedback(false, "Message was not sent. Please try again later.");
+      }
     },
     true
   );
