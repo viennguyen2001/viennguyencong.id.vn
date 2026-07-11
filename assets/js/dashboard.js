@@ -366,6 +366,10 @@ const dashboardSeed = {
   ],
   contact: [],
   logo: [],
+  branding: {
+    logo: "./assets/images/logo.png",
+    favicon: "./assets/images/favicon.png",
+  },
 };
 
 const dashboardLabels = {
@@ -669,6 +673,7 @@ async function hydrateDashboardDataFromFirebase() {
     window.localStorage.setItem(dashboardVersionStorageKey, dashboardContentVersion);
     window.localStorage.setItem(dashboardStorageKey, JSON.stringify(data));
   } catch (error) {}
+  setSiteBranding(data.branding?.logo || "", data.branding?.favicon || "");
   window.dispatchEvent(new CustomEvent("nino-dashboard-updated", { detail: data }));
   return data;
 }
@@ -735,6 +740,10 @@ function normalizeDashboardData(data) {
       link: item.link || (item.email ? `mailto:${item.email}` : "/contact/"),
     })),
     logo: data.logo || [],
+    branding: {
+      logo: data.branding?.logo || data.logo?.[0]?.image || getSiteLogo(),
+      favicon: data.branding?.favicon || data.logo?.[0]?.summary || getSiteFavicon(),
+    },
   };
 }
 
@@ -754,6 +763,7 @@ function getDashboardData() {
             companies: parsedData?.companies || dashboardSeed.companies,
             contact: parsedData?.contact || [],
             logo: parsedData?.logo || [],
+            branding: parsedData?.branding || dashboardSeed.branding,
           };
 
     if (storedVersion !== dashboardContentVersion) {
@@ -2304,9 +2314,15 @@ function initDashboard() {
       const logoInput = logoForm.querySelector("[data-dashboard-logo-url]");
       const faviconInput = logoForm.querySelector("[data-dashboard-favicon-url]");
       const logoMessage = logoForm.querySelector("[data-dashboard-logo-message]");
-      setSiteBranding(logoInput?.value?.trim() || "", faviconInput?.value?.trim() || "");
+      const data = getDashboardData();
+      data.branding = {
+        logo: logoInput?.value?.trim() || "",
+        favicon: faviconInput?.value?.trim() || "",
+      };
+      setSiteBranding(data.branding.logo, data.branding.favicon);
+      setDashboardData(data);
       if (logoMessage) {
-        logoMessage.textContent = "Logo and favicon updated across this browser.";
+        logoMessage.textContent = "Logo and favicon saved across the website.";
       }
       renderList();
       return;
@@ -3063,7 +3079,8 @@ function initManagedContentSections() {
 
 document.addEventListener("DOMContentLoaded", async () => {
   applySiteBranding();
-  await hydrateDashboardDataFromFirebase();
+  const hydratedData = await hydrateDashboardDataFromFirebase();
+  setSiteBranding(hydratedData?.branding?.logo || "", hydratedData?.branding?.favicon || "");
   initDashboardAuth();
   initDashboard();
   initSiteHero();
