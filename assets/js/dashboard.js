@@ -1090,6 +1090,17 @@ function initDashboardAuth() {
   const loginNode = app.querySelector("[data-dashboard-login]");
   const logoutButton = app.querySelector("[data-dashboard-logout]");
   const menuToggleButton = app.querySelector("[data-dashboard-menu-toggle]");
+  const sidebarCollapsedStorageKey = "nino-dashboard-sidebar-collapsed";
+
+  function updateSidebarToggle() {
+    if (!menuToggleButton) return;
+    const collapsed = app.classList.contains("is-sidebar-collapsed");
+    menuToggleButton.setAttribute("aria-label", collapsed ? "Open sidebar" : "Close sidebar");
+    menuToggleButton.setAttribute("title", collapsed ? "Open sidebar" : "Close sidebar");
+    menuToggleButton.innerHTML = collapsed
+      ? '<i class="ri-menu-unfold-line"></i>'
+      : '<i class="ri-menu-fold-line"></i>';
+  }
 
   function setAuthenticated(isAuthenticated) {
     if (isAuthenticated) {
@@ -1102,6 +1113,10 @@ function initDashboardAuth() {
   }
 
   setAuthenticated(window.sessionStorage.getItem(dashboardAuthKey) === "true");
+  if (window.localStorage.getItem(sidebarCollapsedStorageKey) === "true") {
+    app.classList.add("is-sidebar-collapsed");
+  }
+  updateSidebarToggle();
 
   const passwordToggle = app.querySelector("[data-dashboard-password-toggle]");
   const passwordInput = app.querySelector("[data-dashboard-password-input]");
@@ -1141,7 +1156,16 @@ function initDashboardAuth() {
   });
 
   menuToggleButton?.addEventListener("click", () => {
-    app.classList.toggle("is-menu-open");
+    if (window.matchMedia("(max-width: 760px)").matches) {
+      app.classList.toggle("is-menu-open");
+      return;
+    }
+    app.classList.toggle("is-sidebar-collapsed");
+    window.localStorage.setItem(
+      sidebarCollapsedStorageKey,
+      String(app.classList.contains("is-sidebar-collapsed"))
+    );
+    updateSidebarToggle();
   });
 
   app.addEventListener("click", (event) => {
@@ -1633,7 +1657,7 @@ function initDashboard() {
       ? `${dashboardLabels[activeType].helper} You have ${unreadMessages} unread contact message${unreadMessages > 1 ? "s" : ""}.`
       : dashboardLabels[activeType].helper;
     addButton.querySelector("span").textContent = `Add ${dashboardLabels[activeType].singular}`;
-    addButton.hidden = activeType === "contact" || activeType === "logo";
+    addButton.hidden = activeType === "hero" || activeType === "contact" || activeType === "logo";
     searchNode.placeholder =
       activeType === "contact" ? "Search messages" : activeType === "social" ? "Search social links" : "Search";
     searchNode.disabled = activeType === "logo";
@@ -2529,7 +2553,7 @@ function initDashboard() {
   });
 
   addButton.addEventListener("click", () => {
-    if (activeType === "contact") {
+    if (activeType === "hero" || activeType === "contact") {
       return;
     }
 

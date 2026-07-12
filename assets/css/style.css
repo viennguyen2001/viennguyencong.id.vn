@@ -7635,6 +7635,77 @@ body *:not(i):not(.fa):not(.fas):not(.far):not(.fal):not(.fab):not(.fa-brands):n
   }
 }
 
+/* Desktop sidebar collapse control. Mobile keeps the existing expandable menu. */
+@media (min-width: 761px) {
+  .dashboard-menu-toggle {
+    background: #f0efed;
+    border: 1px solid #dedbd7;
+    color: #3b3937;
+    display: inline-flex;
+    transition: background 180ms ease, color 180ms ease, transform 180ms ease;
+  }
+
+  .dashboard-menu-toggle:hover {
+    background: #9c383c;
+    color: #ffffff;
+  }
+
+  .dashboard-shell {
+    transition: grid-template-columns 220ms ease;
+  }
+
+  .dashboard-sidebar {
+    transition: padding 220ms ease;
+  }
+
+  .dashboard-shell.is-sidebar-collapsed {
+    grid-template-columns: 64px minmax(0, 1fr) !important;
+  }
+
+  .dashboard-shell.is-sidebar-collapsed .dashboard-sidebar {
+    align-items: center;
+    padding: 18px 10px;
+  }
+
+  .dashboard-shell.is-sidebar-collapsed .dashboard-sidebar__head {
+    justify-content: center;
+  }
+
+  .dashboard-shell.is-sidebar-collapsed .dashboard-brand,
+  .dashboard-shell.is-sidebar-collapsed .dashboard-nav::before,
+  .dashboard-shell.is-sidebar-collapsed .dashboard-nav__item span,
+  .dashboard-shell.is-sidebar-collapsed .dashboard-nav__item strong,
+  .dashboard-shell.is-sidebar-collapsed .dashboard-back span,
+  .dashboard-shell.is-sidebar-collapsed .dashboard-sidebar__foot {
+    display: none !important;
+  }
+
+  .dashboard-shell.is-sidebar-collapsed .dashboard-nav,
+  .dashboard-shell.is-sidebar-collapsed .dashboard-back {
+    width: 100%;
+  }
+
+  .dashboard-shell.is-sidebar-collapsed .dashboard-nav__item,
+  .dashboard-shell.is-sidebar-collapsed .dashboard-back {
+    grid-template-columns: 1fr !important;
+    justify-items: center;
+    padding: 0;
+  }
+
+  .dashboard-shell.is-sidebar-collapsed .dashboard-nav__item i,
+  .dashboard-shell.is-sidebar-collapsed .dashboard-back i {
+    font-size: 20px;
+  }
+}
+
+@media (prefers-color-scheme: dark) and (min-width: 761px) {
+  .dashboard-menu-toggle {
+    background: #2a2826;
+    border-color: #3d3935;
+    color: #f4efe9;
+  }
+}
+
 /* Company logos should move continuously at a readable, brisk pace. */
 .company-design-area .scroller[data-animated="true"] .scroller__inner {
   animation-duration: 16s;
