@@ -7667,7 +7667,12 @@ body.loaded {
   width: 100% !important;
 }
 
-.dashboard-sidebar .dashboard-nav__item,
+.dashboard-sidebar .dashboard-nav__item {
+  grid-template-columns: 24px minmax(0, 1fr) auto !important;
+  justify-content: start !important;
+  width: 100% !important;
+}
+
 .dashboard-sidebar .dashboard-back {
   grid-template-columns: 24px minmax(0, 1fr) !important;
   justify-content: start !important;
