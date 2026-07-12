@@ -1350,11 +1350,11 @@ Version      : 1.0
   }
 
   .testimonial-item .author {
-    @apply mb-[25px] inline-block;
+    @apply mb-[25px] inline-flex h-[72px] w-[72px] items-center justify-center overflow-hidden rounded-[12px] bg-[#f4f1ec];
   }
 
   .testimonial-item .author img {
-    @apply inline-block h-[60px] w-[60px] rounded-full;
+    @apply h-full w-full object-contain;
   }
 
   .testimonial-item .text {
@@ -4217,9 +4217,9 @@ Version      : 1.0
 }
 
 .dashboard-testimonial-card .testimonial-item .author img {
-  height: 60px;
-  object-fit: cover;
-  width: 60px;
+  height: 100%;
+  object-fit: contain;
+  width: 100%;
 }
 
 .dashboard-testimonial-card .testimonial-item .text {

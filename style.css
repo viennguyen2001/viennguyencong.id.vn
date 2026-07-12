@@ -2281,13 +2281,22 @@ h2.about-pre-title{
 }
 .testimonial-item .author{
   margin-bottom: 25px;
-  display: inline-block;
+  display: inline-flex;
+  height: 72px;
+  width: 72px;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  border-radius: 12px;
+  --tw-bg-opacity: 1;
+  background-color: rgba(244, 241, 236, 1);
+  background-color: rgba(244, 241, 236, var(--tw-bg-opacity));
 }
 .testimonial-item .author img{
-  display: inline-block;
-  height: 60px;
-  width: 60px;
-  border-radius: 9999px;
+  height: 100%;
+  width: 100%;
+  -o-object-fit: contain;
+     object-fit: contain;
 }
 .testimonial-item .text{
   margin-bottom: 30px;
@@ -6518,10 +6527,10 @@ a.meanmenu-reveal{
 }
 
 .dashboard-testimonial-card .testimonial-item .author img {
-  height: 60px;
-  -o-object-fit: cover;
-     object-fit: cover;
-  width: 60px;
+  height: 100%;
+  -o-object-fit: contain;
+     object-fit: contain;
+  width: 100%;
 }
 
 .dashboard-testimonial-card .testimonial-item .text {
