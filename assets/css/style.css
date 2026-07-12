@@ -7748,6 +7748,11 @@ body *:not(i):not(.fa):not(.fas):not(.far):not(.fal):not(.fab):not(.fa-brands):n
   color: #9c383c;
 }
 
+/* Header actions without a supported workflow must not reserve space. */
+.dashboard-header [data-dashboard-add][hidden] {
+  display: none !important;
+}
+
 @media (prefers-color-scheme: dark) {
   .dashboard-sidebar .dashboard-nav__item strong {
     background: #e07b80;
