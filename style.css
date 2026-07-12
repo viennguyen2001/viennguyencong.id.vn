@@ -9239,6 +9239,29 @@ body *:not(i):not(.fa):not(.fas):not(.far):not(.fal):not(.fab):not(.fa-brands):n
     transform: translateX(calc(-50% - 12px));
   }
 }
+/* Contact unread counter: visible against the light dashboard sidebar. */
+.dashboard-sidebar .dashboard-nav__item strong {
+  background: #9c383c;
+  box-shadow: 0 2px 8px rgba(156, 56, 60, 0.26);
+  color: #ffffff;
+  font-weight: 700;
+}
+
+.dashboard-sidebar .dashboard-nav__item.is-active strong {
+  background: #ffffff;
+  color: #9c383c;
+}
+
+@media (prefers-color-scheme: dark) {
+  .dashboard-sidebar .dashboard-nav__item strong {
+    background: #e07b80;
+    color: #1b1010;
+  }
+  .dashboard-sidebar .dashboard-nav__item.is-active strong {
+    background: #ffffff;
+    color: #9c383c;
+  }
+}
 /* Contact section dark mode contrast fix */
 @media (prefers-color-scheme: dark) {
   .contact-area {
