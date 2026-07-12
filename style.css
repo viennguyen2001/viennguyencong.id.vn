@@ -9201,6 +9201,31 @@ body *:not(i):not(.fa):not(.fas):not(.far):not(.fal):not(.fab):not(.fa-brands):n
     filter: none;
   }
 }
+/* Company logos should move continuously at a readable, brisk pace. */
+.company-design-area .scroller[data-animated=true] .scroller__inner {
+  animation-duration: 16s;
+  will-change: transform;
+}
+
+/* Dynamic testimonial cards are injected after WOW initializes, so they must
+   not inherit its hidden pre-animation state on small screens. */
+@media (max-width: 640px) {
+  .testimonial-marquee__track {
+    animation-name: testimonial-scroll-mobile;
+    animation-duration: 26s;
+  }
+  .testimonial-marquee__item {
+    flex-basis: calc(100vw - 40px);
+  }
+}
+@keyframes testimonial-scroll-mobile {
+  from {
+    transform: translateX(0);
+  }
+  to {
+    transform: translateX(calc(-50% - 12px));
+  }
+}
 /* Contact section dark mode contrast fix */
 @media (prefers-color-scheme: dark) {
   .contact-area {

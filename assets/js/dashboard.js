@@ -2640,9 +2640,12 @@ function initContactCapture() {
       } catch (error) {
         console.warn("Contact message save failed.", error);
         const detail = String(error?.message || error || "").toLowerCase();
-        const feedback = detail.includes("permission") || detail.includes("permission-denied")
-          ? "The contact form is not enabled in Firebase yet. Please publish the Firestore Rules."
-          : "Message was not sent. Please try again later.";
+        const code = String(error?.code || "").toLowerCase();
+        const feedback = detail.includes("permission") || code.includes("permission-denied")
+          ? "Contact is blocked by Firebase Rules. Publish the contact-messages Rules, then try again."
+          : detail.includes("network") || code.includes("unavailable")
+            ? "Unable to connect to Firebase. Please check your internet connection and try again."
+            : "Message was not sent. Firebase error: " + (code || "unknown") + ".";
         setContactFeedback(false, feedback);
       }
     },
@@ -3131,7 +3134,7 @@ function initManagedContentSections() {
     const renderCard = (testimonial, index, isMarquee = false) => `
       <div class="${isMarquee ? "testimonial-marquee__item" : "col-span-12 md:col-span-6 lg:col-span-4"}">
         <a class="testimonial-link" href="${escapeHtml(testimonial.link || "/#testimonials")}">
-          <div class="testimonial-item wow fadeInUp delay-0-2s">
+          <div class="testimonial-item">
             <div class="author">
               <img src="${escapeHtml(testimonial.image || avatars[index % avatars.length])}" alt="${escapeHtml(testimonial.owner)}" />
             </div>
