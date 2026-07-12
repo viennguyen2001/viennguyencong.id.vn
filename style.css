@@ -2295,8 +2295,10 @@ h2.about-pre-title{
 .testimonial-item .author img{
   height: 100%;
   width: 100%;
-  -o-object-fit: contain;
-     object-fit: contain;
+  -o-object-fit: cover;
+     object-fit: cover;
+  -o-object-position: center;
+     object-position: center;
 }
 .testimonial-item .text{
   margin-bottom: 30px;
@@ -6528,8 +6530,10 @@ a.meanmenu-reveal{
 
 .dashboard-testimonial-card .testimonial-item .author img {
   height: 100%;
-  -o-object-fit: contain;
-     object-fit: contain;
+  -o-object-fit: cover;
+     object-fit: cover;
+  -o-object-position: center;
+     object-position: center;
   width: 100%;
 }
 
