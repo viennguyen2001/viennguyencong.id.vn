@@ -386,12 +386,6 @@ const dashboardLabels = {
     page: "/projects/",
     helper: "Manage case studies, project links, and 1200x1000px cover images.",
   },
-  blog: {
-    label: "Blog",
-    singular: "Blog Post",
-    page: "/blog/",
-    helper: "Plan posts, update draft status, and connect each post to its page.",
-  },
   testimonials: {
     label: "Testimonials",
     singular: "Testimonial",
@@ -452,7 +446,6 @@ const contactStatuses = [
 const dashboardIcons = {
   hero: "ri-home-5-line",
   projects: "ri-folder-line",
-  blog: "ri-article-line",
   testimonials: "ri-chat-quote-line",
   skills: "ri-tools-line",
   social: "ri-share-line",
@@ -1224,7 +1217,9 @@ function initDashboard() {
   const modalNode = app.querySelector("[data-dashboard-modal]");
 
   function getAllItems() {
-    return Object.values(data).flat();
+    return Object.entries(data)
+      .filter(([type]) => type !== "blog")
+      .flatMap(([, items]) => items);
   }
 
   function renderNav() {
