@@ -6045,8 +6045,19 @@ body.loaded {
   display: grid;
   flex: 0 0 100%;
   gap: 20px;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
+  grid-template-columns: minmax(0, 1fr);
   scroll-snap-align: start;
+}
+
+.project-case-snapshot-empty {
+  align-items: center;
+  aspect-ratio: 1 / 1;
+  background: #edeae5;
+  border-radius: 22px;
+  color: #756e67;
+  display: flex;
+  justify-content: center;
+  margin: 0;
 }
 
 .project-case-snapshot-carousel__dots {
@@ -6260,7 +6271,6 @@ body.loaded {
 
   .project-case-info-grid,
   .project-case-snapshot-grid,
-  .project-case-snapshot-carousel__slide,
   .project-case-snapshot-gallery,
   .project-case-story {
     grid-template-columns: minmax(0, 1fr);

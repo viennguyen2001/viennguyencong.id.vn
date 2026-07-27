@@ -3131,34 +3131,24 @@ function renderProjectDetailPage() {
     .split(",")
     .map((tag) => tag.trim())
     .filter(Boolean);
-  const legacySnapshotImages = [
-    ...(detail.researchImages || []),
-    detail.researchImageOne,
-    detail.researchImageTwo,
-    detail.wireframeImage,
-    detail.mockupImageOne,
-    detail.mockupImageTwo,
-    detail.mockupImageThree,
-    detail.mockupImageFour,
-  ].filter((image, index, list) => image && list.indexOf(image) === index);
-  const snapshotImages = [...legacySnapshotImages, ...(detail.galleryImages || [])]
+  const configuredResearchImages = Array.isArray(project.detail?.researchImages)
+    ? project.detail.researchImages
+    : [project.detail?.researchImageOne, project.detail?.researchImageTwo];
+  const snapshotImages = configuredResearchImages
     .filter((image, index, list) => image && list.indexOf(image) === index);
-  const snapshotSlides = Array.from(
-    { length: Math.ceil(snapshotImages.length / 2) },
-    (_, index) => snapshotImages.slice(index * 2, index * 2 + 2)
-  );
+  const snapshotSlides = snapshotImages.map((image) => [image]);
   const renderSnapshot = (snapshot, index) =>
     `<figure class="project-case-snapshot-grid__item project-case-snapshot-grid__item--${index + 1}"><img src="${escapeHtml(snapshot)}" alt="${escapeHtml(project.title)} design snapshot ${index + 1}" /></figure>`;
-  const snapshotMedia = snapshotImages.length > 2
+  const snapshotMedia = snapshotImages.length > 1
     ? `<div class="project-case-snapshot-carousel" data-project-snapshot-carousel>
         <div class="project-case-snapshot-carousel__track" data-project-snapshot-track>
-          ${snapshotSlides.map((slide, slideIndex) => `<div class="project-case-snapshot-carousel__slide">${slide.map((snapshot, imageIndex) => renderSnapshot(snapshot, slideIndex * 2 + imageIndex)).join("")}</div>`).join("")}
+          ${snapshotSlides.map((slide, slideIndex) => `<div class="project-case-snapshot-carousel__slide">${slide.map((snapshot, imageIndex) => renderSnapshot(snapshot, slideIndex + imageIndex)).join("")}</div>`).join("")}
         </div>
         <div class="project-case-snapshot-carousel__dots" aria-label="Project image gallery">
           ${snapshotSlides.map((_, index) => `<button type="button" data-project-snapshot-dot aria-label="Show image group ${index + 1}"${index === 0 ? ' aria-current="true"' : ""}></button>`).join("")}
         </div>
       </div>`
-    : `<div class="project-case-snapshot-grid">${snapshotImages.map(renderSnapshot).join("")}</div>`;
+    : `<div class="project-case-snapshot-grid">${snapshotImages.map(renderSnapshot).join("") || '<p class="project-case-snapshot-empty">No research images added yet.</p>'}</div>`;
   const designSteps = [
     { title: "Design concept", text: detail.research, icon: "ri-layout-4-line" },
     { title: "Information architecture", text: detail.wireframes, icon: "ri-node-tree" },
@@ -3238,8 +3228,10 @@ function renderProjectDetailPage() {
   const snapshotDots = Array.from(page.querySelectorAll("[data-project-snapshot-dot]"));
 
   if (snapshotTrack && snapshotDots.length) {
+    let activeIndex = 0;
+    let autoAdvance;
     const updateSnapshotDots = () => {
-      const activeIndex = Math.min(
+      activeIndex = Math.min(
         snapshotDots.length - 1,
         Math.max(0, Math.round(snapshotTrack.scrollLeft / snapshotTrack.clientWidth))
       );
@@ -3254,6 +3246,20 @@ function renderProjectDetailPage() {
         snapshotTrack.scrollTo({ left: snapshotTrack.clientWidth * index, behavior: "smooth" });
       });
     });
+
+    const startAutoAdvance = () => {
+      window.clearInterval(autoAdvance);
+      autoAdvance = window.setInterval(() => {
+        const nextIndex = (activeIndex + 1) % snapshotDots.length;
+        snapshotTrack.scrollTo({ left: snapshotTrack.clientWidth * nextIndex, behavior: "smooth" });
+      }, 4200);
+    };
+
+    snapshotTrack.addEventListener("mouseenter", () => window.clearInterval(autoAdvance));
+    snapshotTrack.addEventListener("mouseleave", startAutoAdvance);
+    snapshotTrack.addEventListener("focusin", () => window.clearInterval(autoAdvance));
+    snapshotTrack.addEventListener("focusout", startAutoAdvance);
+    startAutoAdvance();
   }
 }
 
