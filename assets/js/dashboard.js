@@ -3136,22 +3136,17 @@ function renderProjectDetailPage() {
     : [project.detail?.researchImageOne, project.detail?.researchImageTwo];
   const snapshotImages = configuredResearchImages
     .filter((image, index, list) => image && list.indexOf(image) === index);
-  // Each carousel page contains two research images, matching the visual layout.
-  // Keeping the pair together also means every dot maps to a reachable scroll position.
-  const snapshotSlides = snapshotImages.reduce((slides, image, index) => {
-    if (index % 2 === 0) {
-      slides.push([image]);
-    } else {
-      slides[slides.length - 1].push(image);
-    }
-    return slides;
-  }, []);
+  // Each page keeps two images visible, but advances one image at a time:
+  // 1+2, 2+3 ... and the last image continues with the first.
+  const snapshotSlides = snapshotImages.length > 1
+    ? snapshotImages.map((image, index) => [image, snapshotImages[(index + 1) % snapshotImages.length]])
+    : snapshotImages.map((image) => [image]);
   const renderSnapshot = (snapshot, index) =>
     `<figure class="project-case-snapshot-grid__item project-case-snapshot-grid__item--${index + 1}"><img src="${escapeHtml(snapshot)}" alt="${escapeHtml(project.title)} design snapshot ${index + 1}" /></figure>`;
   const snapshotMedia = snapshotImages.length > 1
     ? `<div class="project-case-snapshot-carousel" data-project-snapshot-carousel>
         <div class="project-case-snapshot-carousel__track" data-project-snapshot-track>
-          ${snapshotSlides.map((slide, slideIndex) => `<div class="project-case-snapshot-carousel__slide">${slide.map((snapshot, imageIndex) => renderSnapshot(snapshot, slideIndex * 2 + imageIndex)).join("")}</div>`).join("")}
+          ${snapshotSlides.map((slide, slideIndex) => `<div class="project-case-snapshot-carousel__slide">${slide.map((snapshot, imageIndex) => renderSnapshot(snapshot, (slideIndex + imageIndex) % snapshotImages.length)).join("")}</div>`).join("")}
         </div>
         <div class="project-case-snapshot-carousel__dots" aria-label="Project image gallery">
           ${snapshotSlides.map((_, index) => `<button type="button" data-project-snapshot-dot aria-label="Show image group ${index + 1}"${index === 0 ? ' aria-current="true"' : ""}></button>`).join("")}
