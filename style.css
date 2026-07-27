@@ -7726,17 +7726,17 @@ body.loaded {
 
 .project-case-story h2 {
   color: #2a1608;
-  font-size: max(45px, min(6vw, 90px));
+  font-size: max(34px, min(3.9vw, 62px));
   font-weight: 500;
-  line-height: 1;
+  line-height: 1.05;
   margin: 0;
 }
 
 .project-case-story p {
   color: #504842;
-  font-size: max(20px, min(2.25vw, 35px));
-  line-height: 1.38;
-  margin: 0 0 34px;
+  font-size: max(18px, min(1.55vw, 25px));
+  line-height: 1.5;
+  margin: 0 0 28px;
 }
 
 .project-case-story p:last-child {
@@ -7773,7 +7773,7 @@ body.loaded {
 
 .project-case-deliverables h3 {
   color: #2a1608;
-  font-size: max(27px, min(3.2vw, 47px));
+  font-size: max(24px, min(2.5vw, 38px));
   font-weight: 500;
   line-height: 1.1;
   margin: 0 0 14px;
@@ -7781,8 +7781,8 @@ body.loaded {
 
 .project-case-deliverables p {
   color: #504842;
-  font-size: max(17px, min(1.65vw, 25px));
-  line-height: 1.48;
+  font-size: max(16px, min(1.3vw, 21px));
+  line-height: 1.52;
   margin: 0;
 }
 
