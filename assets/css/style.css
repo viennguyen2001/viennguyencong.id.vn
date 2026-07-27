@@ -6033,7 +6033,7 @@ body.loaded {
   display: flex;
   gap: 20px;
   overflow-x: auto;
-  padding: 0 clamp(20px, 5vw, 72px);
+  padding: 0;
   scroll-behavior: smooth;
   scroll-snap-type: x mandatory;
   scrollbar-width: none;
@@ -6279,10 +6279,6 @@ body.loaded {
 
   .project-case-story {
     gap: 28px;
-  }
-
-  .project-case-snapshot-carousel__track {
-    padding: 0 10vw;
   }
 
   .project-case-snapshot-carousel__slide {
