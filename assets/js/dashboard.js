@@ -3230,10 +3230,18 @@ function renderProjectDetailPage() {
   if (snapshotTrack && snapshotDots.length) {
     let activeIndex = 0;
     let autoAdvance;
+    const getSlideStep = () => {
+      const firstSlide = snapshotTrack.querySelector(".project-case-snapshot-carousel__slide");
+      if (!firstSlide) {
+        return snapshotTrack.clientWidth;
+      }
+      const gap = Number.parseFloat(window.getComputedStyle(snapshotTrack).gap) || 0;
+      return firstSlide.getBoundingClientRect().width + gap;
+    };
     const updateSnapshotDots = () => {
       activeIndex = Math.min(
         snapshotDots.length - 1,
-        Math.max(0, Math.round(snapshotTrack.scrollLeft / snapshotTrack.clientWidth))
+        Math.max(0, Math.round(snapshotTrack.scrollLeft / getSlideStep()))
       );
       snapshotDots.forEach((dot, index) => {
         dot.toggleAttribute("aria-current", index === activeIndex);
@@ -3243,7 +3251,7 @@ function renderProjectDetailPage() {
     snapshotTrack.addEventListener("scroll", updateSnapshotDots, { passive: true });
     snapshotDots.forEach((dot, index) => {
       dot.addEventListener("click", () => {
-        snapshotTrack.scrollTo({ left: snapshotTrack.clientWidth * index, behavior: "smooth" });
+        snapshotTrack.scrollTo({ left: getSlideStep() * index, behavior: "smooth" });
       });
     });
 
@@ -3251,7 +3259,7 @@ function renderProjectDetailPage() {
       window.clearInterval(autoAdvance);
       autoAdvance = window.setInterval(() => {
         const nextIndex = (activeIndex + 1) % snapshotDots.length;
-        snapshotTrack.scrollTo({ left: snapshotTrack.clientWidth * nextIndex, behavior: "smooth" });
+        snapshotTrack.scrollTo({ left: getSlideStep() * nextIndex, behavior: "smooth" });
       }, 4200);
     };
 

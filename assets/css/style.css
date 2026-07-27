@@ -6031,7 +6031,9 @@ body.loaded {
 
 .project-case-snapshot-carousel__track {
   display: flex;
+  gap: 20px;
   overflow-x: auto;
+  padding: 0 clamp(20px, 5vw, 72px);
   scroll-behavior: smooth;
   scroll-snap-type: x mandatory;
   scrollbar-width: none;
@@ -6043,10 +6045,9 @@ body.loaded {
 
 .project-case-snapshot-carousel__slide {
   display: grid;
-  flex: 0 0 100%;
-  gap: 20px;
+  flex: 0 0 calc((100% - 20px) / 2);
   grid-template-columns: minmax(0, 1fr);
-  scroll-snap-align: start;
+  scroll-snap-align: center;
 }
 
 .project-case-snapshot-empty {
@@ -6278,6 +6279,14 @@ body.loaded {
 
   .project-case-story {
     gap: 28px;
+  }
+
+  .project-case-snapshot-carousel__track {
+    padding: 0 10vw;
+  }
+
+  .project-case-snapshot-carousel__slide {
+    flex-basis: 80%;
   }
 
   .project-case-deliverables article {
