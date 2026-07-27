@@ -1081,6 +1081,30 @@ function optimizeImageForStorage(file, options = {}) {
   });
 }
 
+function cropImageToSquare(file, size = 1000, quality = 0.84) {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onload = () => {
+      const image = new Image();
+      image.onload = () => {
+        const sourceSize = Math.min(image.naturalWidth, image.naturalHeight);
+        const sourceX = Math.max(0, (image.naturalWidth - sourceSize) / 2);
+        const sourceY = Math.max(0, (image.naturalHeight - sourceSize) / 2);
+        const canvas = document.createElement("canvas");
+        canvas.width = size;
+        canvas.height = size;
+        const context = canvas.getContext("2d");
+        context.drawImage(image, sourceX, sourceY, sourceSize, sourceSize, 0, 0, size, size);
+        resolve(canvas.toDataURL("image/jpeg", quality));
+      };
+      image.onerror = () => reject(new Error("Không đọc được ảnh đã chọn."));
+      image.src = String(reader.result || "");
+    };
+    reader.onerror = reject;
+    reader.readAsDataURL(file);
+  });
+}
+
 function initDashboardAuth() {
   const app = document.querySelector("[data-dashboard-app]");
 
@@ -1694,7 +1718,7 @@ function initDashboard() {
     return `
       <article class="dashboard-project-gallery-image" data-dashboard-gallery-image="${key}">
         <header>
-          <strong>Project image ${index + 1}</strong>
+          <strong>Project image ${index + 1} <small>1000 x 1000px</small></strong>
           <button type="button" data-dashboard-remove-gallery-image aria-label="Remove project image" title="Remove image">
             <i class="ri-delete-bin-line"></i>
           </button>
@@ -2262,7 +2286,7 @@ function initDashboard() {
 
     if (galleryUploadInput && galleryUploadInput.files?.length) {
       const fieldName = galleryUploadInput.dataset.dashboardGalleryImageUpload;
-      const dataUrl = await readFileAsDataUrl(galleryUploadInput.files[0]);
+      const dataUrl = await cropImageToSquare(galleryUploadInput.files[0]);
       const urlInput = app.querySelector(`[data-dashboard-gallery-image-url="${fieldName}"]`);
       const preview = app.querySelector(`[data-dashboard-gallery-image-preview="${fieldName}"]`);
 
