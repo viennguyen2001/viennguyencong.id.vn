@@ -894,8 +894,18 @@ function getDefaultItemLink(type) {
   return dashboardLabels[type]?.page || "/";
 }
 
+function getProjectSlug(project = {}) {
+  return String(project.slug || project.title || project.id || "project")
+    .toLocaleLowerCase()
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .replace(/[đĐ]/g, "d")
+    .replace(/[^a-z0-9]+/g, "-")
+    .replace(/^-+|-+$/g, "") || "project";
+}
+
 function getProjectDetailLink(project) {
-  return `/single-project/?id=${encodeURIComponent(project.id)}`;
+  return `/projectdetail/${getProjectSlug(project)}/`;
 }
 
 function getProjectDetailDefaults(item = {}) {
@@ -3085,9 +3095,12 @@ function renderProjectDetailPage() {
   const data = getDashboardData();
   const params = new URLSearchParams(window.location.search);
   const selectedId = Number(params.get("id"));
+  const projectPathMatch = window.location.pathname.match(/\/projectdetail\/([^/]+)/i);
+  const selectedSlug = projectPathMatch ? decodeURIComponent(projectPathMatch[1]) : "";
   const projects = data.projects || [];
   const project =
     projects.find((item) => Number(item.id) === selectedId) ||
+    projects.find((item) => getProjectSlug(item) === selectedSlug) ||
     projects.find((item) => item.status === "Active") ||
     projects[0] ||
     dashboardSeed.projects[0];
