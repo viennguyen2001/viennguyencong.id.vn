@@ -762,7 +762,7 @@ function normalizeDashboardData(data) {
     })),
     projects: (data.projects || []).map((item) => ({
       ...item,
-      link: item.link && item.link !== "/single-project/" ? item.link : getProjectDetailLink(item),
+      link: item.link && !/^\/?single-project(?:\.html)?\/?(?:\?id=\d+)?$/i.test(item.link) ? item.link : getProjectDetailLink(item),
       detail: getProjectDetailDefaults(item),
       status:
         item.status === "Published" ? "Active" : item.status === "Review" ? "Disabled" : item.status,
@@ -3104,6 +3104,10 @@ function renderProjectDetailPage() {
     projects.find((item) => item.status === "Active") ||
     projects[0] ||
     dashboardSeed.projects[0];
+  const isLegacyProjectUrl = /\/single-project\/?$/i.test(window.location.pathname);
+  if (selectedId && isLegacyProjectUrl && project) {
+    window.history.replaceState(null, "", getProjectDetailLink(project));
+  }
   const detail = getProjectDetailDefaults(project);
   const image = project.image || "assets/images/projects/work2.jpg";
   const projectDetailLink = getProjectDetailLink(project);
