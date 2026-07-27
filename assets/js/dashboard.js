@@ -948,6 +948,14 @@ function getProjectDetailDefaults(item = {}) {
     mockupImageTwo: item.detail?.mockupImageTwo || "assets/images/blog/blog1.jpg",
     mockupImageThree: item.detail?.mockupImageThree || "assets/images/blog/blog2.jpg",
     mockupImageFour: item.detail?.mockupImageFour || "assets/images/blog/blog3.jpg",
+    galleryImages: Array.isArray(item.detail?.galleryImages)
+      ? item.detail.galleryImages.filter(Boolean)
+      : [
+          item.detail?.mockupImageOne || item.image || "assets/images/projects/work5.jpg",
+          item.detail?.mockupImageTwo || "assets/images/blog/blog1.jpg",
+          item.detail?.mockupImageThree || "assets/images/blog/blog2.jpg",
+          item.detail?.mockupImageFour || "assets/images/blog/blog3.jpg",
+        ].filter(Boolean),
     blocks: Array.isArray(item.detail?.blocks) ? item.detail.blocks : [],
   };
 }
@@ -1678,6 +1686,28 @@ function initDashboard() {
     `;
   }
 
+  function renderProjectGalleryImageField(value = "", key = Date.now(), index = 0) {
+    const preview = value
+      ? '<img src="' + escapeHtml(value) + '" alt="Project image ' + (index + 1) + '" />'
+      : "<small>No image selected</small>";
+
+    return `
+      <article class="dashboard-project-gallery-image" data-dashboard-gallery-image="${key}">
+        <header>
+          <strong>Project image ${index + 1}</strong>
+          <button type="button" data-dashboard-remove-gallery-image aria-label="Remove project image" title="Remove image">
+            <i class="ri-delete-bin-line"></i>
+          </button>
+        </header>
+        <input type="file" accept="image/*" data-dashboard-gallery-image-upload="${key}" />
+        <input name="detailGalleryImage" value="${escapeHtml(value)}" placeholder="Paste image URL" data-dashboard-gallery-image-url="${key}" />
+        <div class="dashboard-detail-image-preview" data-dashboard-gallery-image-preview="${key}">
+          ${preview}
+        </div>
+      </article>
+    `;
+  }
+
 
   function renderProjectFlexibleBlock(block = {}, key = Date.now()) {
     const type = block.type === "image" ? "image" : "text";
@@ -1742,11 +1772,17 @@ function initDashboard() {
         <label>Wireframes<textarea name="detailWireframes" rows="4">${escapeHtml(detail.wireframes)}</textarea></label>
         ${renderProjectImageField("Wireframe image", "detailWireframeImage", detail.wireframeImage)}
         <label>Design<textarea name="detailDesign" rows="4">${escapeHtml(detail.design)}</textarea></label>
-        <div class="dashboard-detail-editor__grid dashboard-detail-editor__grid--mockups">
-          ${renderProjectImageField("Mockup image 1", "detailMockupImageOne", detail.mockupImageOne)}
-          ${renderProjectImageField("Mockup image 2", "detailMockupImageTwo", detail.mockupImageTwo)}
-          ${renderProjectImageField("Mockup image 3", "detailMockupImageThree", detail.mockupImageThree)}
-          ${renderProjectImageField("Mockup image 4", "detailMockupImageFour", detail.mockupImageFour)}
+        <div class="dashboard-project-gallery">
+          <div class="dashboard-flex-blocks__head">
+            <div>
+              <h4>Project image gallery</h4>
+              <small>Add, replace, or remove project images. Their order is used on the project detail page.</small>
+            </div>
+            <button type="button" data-dashboard-add-gallery-image>Add image</button>
+          </div>
+          <div class="dashboard-detail-editor__grid dashboard-detail-editor__grid--mockups" data-dashboard-gallery-images>
+            ${detail.galleryImages.map((image, index) => renderProjectGalleryImageField(image, `saved-gallery-${index}`, index)).join("")}
+          </div>
         </div>
         <div class="dashboard-flex-blocks">
           <div class="dashboard-flex-blocks__head">
@@ -2105,6 +2141,22 @@ function initDashboard() {
     const toolRemoveButton = event.target.closest("[data-dashboard-tool-remove]");
     const addDetailBlockButton = event.target.closest("[data-dashboard-add-detail-block]");
     const removeDetailBlockButton = event.target.closest("[data-dashboard-remove-detail-block]");
+    const addGalleryImageButton = event.target.closest("[data-dashboard-add-gallery-image]");
+    const removeGalleryImageButton = event.target.closest("[data-dashboard-remove-gallery-image]");
+
+    if (addGalleryImageButton) {
+      const galleryNode = app.querySelector("[data-dashboard-gallery-images]");
+      if (galleryNode) {
+        const index = galleryNode.querySelectorAll("[data-dashboard-gallery-image]").length;
+        galleryNode.insertAdjacentHTML("beforeend", renderProjectGalleryImageField("", `gallery-${Date.now()}`, index));
+      }
+      return;
+    }
+
+    if (removeGalleryImageButton) {
+      removeGalleryImageButton.closest("[data-dashboard-gallery-image]")?.remove();
+      return;
+    }
 
     if (addDetailBlockButton) {
       const blocksNode = app.querySelector("[data-dashboard-flex-blocks]");
@@ -2206,6 +2258,23 @@ function initDashboard() {
   });
 
   app.addEventListener("change", async (event) => {
+    const galleryUploadInput = event.target.closest("[data-dashboard-gallery-image-upload]");
+
+    if (galleryUploadInput && galleryUploadInput.files?.length) {
+      const fieldName = galleryUploadInput.dataset.dashboardGalleryImageUpload;
+      const dataUrl = await readFileAsDataUrl(galleryUploadInput.files[0]);
+      const urlInput = app.querySelector(`[data-dashboard-gallery-image-url="${fieldName}"]`);
+      const preview = app.querySelector(`[data-dashboard-gallery-image-preview="${fieldName}"]`);
+
+      if (urlInput) {
+        urlInput.value = dataUrl;
+      }
+      if (preview) {
+        preview.innerHTML = `<img src="${dataUrl}" alt="Project gallery preview" />`;
+      }
+      return;
+    }
+
     const flexibleUploadInput = event.target.closest("[data-dashboard-flex-image-upload]");
 
     if (flexibleUploadInput && flexibleUploadInput.files?.length) {
@@ -2338,6 +2407,20 @@ function initDashboard() {
   });
 
   app.addEventListener("input", (event) => {
+    const galleryImageUrlInput = event.target.closest("[data-dashboard-gallery-image-url]");
+
+    if (galleryImageUrlInput) {
+      const fieldName = galleryImageUrlInput.dataset.dashboardGalleryImageUrl;
+      const preview = app.querySelector(`[data-dashboard-gallery-image-preview="${fieldName}"]`);
+
+      if (preview) {
+        preview.innerHTML = galleryImageUrlInput.value
+          ? `<img src="${escapeHtml(galleryImageUrlInput.value)}" alt="Project gallery preview" />`
+          : "<small>No image selected</small>";
+      }
+      return;
+    }
+
     const heroAvatarUrlInput = event.target.closest("[data-dashboard-hero-avatar-url]");
 
     if (heroAvatarUrlInput) {
@@ -2464,6 +2547,10 @@ function initDashboard() {
       const blockTitles = formData.getAll("detailBlockTitle");
       const blockTexts = formData.getAll("detailBlockText");
       const blockImages = formData.getAll("detailBlockImage");
+      const galleryImages = formData
+        .getAll("detailGalleryImage")
+        .map((image) => String(image || "").trim())
+        .filter(Boolean);
       const detailBlocks = blockTypes
         .map((type, index) => ({
           type: String(type || "text") === "image" ? "image" : "text",
@@ -2497,6 +2584,7 @@ function initDashboard() {
         mockupImageTwo: String(formData.get("detailMockupImageTwo") || "").trim(),
         mockupImageThree: String(formData.get("detailMockupImageThree") || "").trim(),
         mockupImageFour: String(formData.get("detailMockupImageFour") || "").trim(),
+        galleryImages,
         blocks: detailBlocks,
       };
     }
@@ -2931,7 +3019,7 @@ function renderProjectDetailPage() {
     .split(",")
     .map((tag) => tag.trim())
     .filter(Boolean);
-  const snapshotImages = [
+  const legacySnapshotImages = [
     detail.researchImageOne,
     detail.researchImageTwo,
     detail.wireframeImage,
@@ -2940,6 +3028,8 @@ function renderProjectDetailPage() {
     detail.mockupImageThree,
     detail.mockupImageFour,
   ].filter((image, index, list) => image && list.indexOf(image) === index);
+  const snapshotImages = [...legacySnapshotImages, ...(detail.galleryImages || [])]
+    .filter((image, index, list) => image && list.indexOf(image) === index);
   const designSteps = [
     { title: "Design concept", text: detail.research, icon: "ri-layout-4-line" },
     { title: "Information architecture", text: detail.wireframes, icon: "ri-node-tree" },
