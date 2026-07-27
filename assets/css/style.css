@@ -6076,6 +6076,10 @@ body.loaded {
   min-width: 0;
 }
 
+.project-case-snapshot-carousel__blank {
+  aspect-ratio: 1 / 1;
+}
+
 .project-case-snapshot-empty {
   align-items: center;
   aspect-ratio: 1 / 1;

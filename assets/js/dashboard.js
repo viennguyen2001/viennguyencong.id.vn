@@ -3136,13 +3136,14 @@ function renderProjectDetailPage() {
     : [project.detail?.researchImageOne, project.detail?.researchImageTwo];
   const snapshotImages = configuredResearchImages
     .filter((image, index, list) => image && list.indexOf(image) === index);
-  const carouselImages = snapshotImages;
+  // The final empty tile lets the last image complete the same leftward movement.
+  const carouselImages = snapshotImages.length > 1 ? [...snapshotImages, null] : snapshotImages;
   const renderSnapshot = (snapshot, index) =>
     `<figure class="project-case-snapshot-grid__item project-case-snapshot-grid__item--${index + 1}"><img src="${escapeHtml(snapshot)}" alt="${escapeHtml(project.title)} design snapshot ${index + 1}" /></figure>`;
   const snapshotMedia = snapshotImages.length > 1
     ? `<div class="project-case-snapshot-carousel" data-project-snapshot-carousel>
         <div class="project-case-snapshot-carousel__track" data-project-snapshot-track>
-          ${carouselImages.map((snapshot, index) => `<div class="project-case-snapshot-carousel__slide">${renderSnapshot(snapshot, index % snapshotImages.length)}</div>`).join("")}
+          ${carouselImages.map((snapshot, index) => `<div class="project-case-snapshot-carousel__slide">${snapshot ? renderSnapshot(snapshot, index % snapshotImages.length) : '<div class="project-case-snapshot-carousel__blank" aria-hidden="true"></div>'}</div>`).join("")}
         </div>
         <div class="project-case-snapshot-carousel__dots" aria-label="Project image gallery">
           ${snapshotImages.map((_, index) => `<button type="button" data-project-snapshot-dot aria-label="Show research image ${index + 1}"${index === 0 ? ' aria-current="true"' : ""}></button>`).join("")}
@@ -3258,7 +3259,7 @@ function renderProjectDetailPage() {
     }, { passive: true });
     snapshotDots.forEach((dot, index) => {
       dot.addEventListener("click", () => {
-        const maxIndex = Math.max(0, snapshotDots.length - 2);
+        const maxIndex = Math.max(0, snapshotDots.length - 1);
         const targetIndex = Math.min(index, maxIndex);
         updateSnapshotDots(targetIndex);
         snapshotTrack.scrollTo({ left: getSlideStep() * targetIndex, behavior: "smooth" });
@@ -3268,7 +3269,7 @@ function renderProjectDetailPage() {
     const startAutoAdvance = () => {
       window.clearInterval(autoAdvance);
       autoAdvance = window.setInterval(() => {
-        const maxIndex = Math.max(0, snapshotDots.length - 2);
+        const maxIndex = Math.max(0, snapshotDots.length - 1);
         if (activeIndex >= maxIndex) {
           snapshotTrack.scrollTo({ left: 0, behavior: "auto" });
           updateSnapshotDots(0);
