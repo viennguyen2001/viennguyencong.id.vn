@@ -2927,69 +2927,78 @@ function renderProjectDetailPage() {
     }
     return `<article class="project-case-flex-block project-case-flex-block--text">${block.title ? `<h3>${escapeHtml(block.title)}</h3>` : ""}${block.text ? `<p>${escapeHtml(block.text)}</p>` : ""}${block.image ? `<img src="${escapeHtml(block.image)}" alt="${escapeHtml(title)}" />` : ""}</article>`;
   };
+  const tags = String(project.tags || detail.service || "Design Snapshot")
+    .split(",")
+    .map((tag) => tag.trim())
+    .filter(Boolean);
+  const snapshotImages = [
+    detail.researchImageOne,
+    detail.researchImageTwo,
+    detail.wireframeImage,
+    detail.mockupImageOne,
+    detail.mockupImageTwo,
+    detail.mockupImageThree,
+    detail.mockupImageFour,
+  ].filter((image, index, list) => image && list.indexOf(image) === index);
+  const designSteps = [
+    { title: "Design concept", text: detail.research, icon: "ri-layout-4-line" },
+    { title: "Information architecture", text: detail.wireframes, icon: "ri-node-tree" },
+    { title: "Prototyping", text: detail.prototype, icon: "ri-cursor-line" },
+    { title: "Design proposal", text: detail.design, icon: "ri-presentation-line" },
+  ];
 
   page.innerHTML = `
-    <section class="project-case-hero" id="overview">
+    <section class="project-case-hero project-case-hero--snapshot" id="overview">
       <div class="container">
-        <div class="project-case-kicker">${escapeHtml(project.tags || "Project case study")}</div>
-        <div class="project-case-hero__grid">
+        <div class="project-case-snapshot__top">
+          <p>${escapeHtml(project.title)}</p>
+          <a href="/projects/" class="project-case-close" aria-label="Back to projects" title="Back to projects"><i class="ri-close-line"></i></a>
+        </div>
+        <h1>${escapeHtml(project.summary || detail.overview)}</h1>
+        <div class="project-case-tags">${tags.map((tag) => `<span>${escapeHtml(tag)}</span>`).join("")}</div>
+        <div class="project-case-info-grid" aria-label="Project information">
+          <article><span>Project type</span><strong>${escapeHtml(detail.service)}</strong></article>
+          <article><span>Timeframe</span><strong>${escapeHtml(detail.year)}</strong></article>
+          <article><span>Role</span><strong>${escapeHtml(detail.role)}</strong></article>
+          <article><span>Region</span><strong>${escapeHtml(detail.region)}</strong></article>
+        </div>
+        <div class="project-case-snapshot-grid">
+          ${snapshotImages.slice(0, 2).map((snapshot, index) => `<figure class="project-case-snapshot-grid__item project-case-snapshot-grid__item--${index + 1}"><img src="${escapeHtml(snapshot)}" alt="${escapeHtml(project.title)} design snapshot ${index + 1}" /></figure>`).join("")}
+        </div>
+      </div>
+    </section>
+    <section class="project-case-section project-case-section--overview">
+      <div class="container">
+        <div class="project-case-story">
+          <h2>Project Overview</h2>
           <div>
-            <h1>${escapeHtml(project.title)}</h1>
-            <p>${escapeHtml(project.summary || detail.overview)}</p>
-            <div class="project-case-actions"><a class="theme-btn project-case-demo${hasDemoLink ? "" : " is-disabled"}" href="${escapeHtml(demoHref)}"${demoLinkAttrs}>Demo Project <i class="ri-arrow-right-line"></i></a></div>
-          </div>
-          <div class="project-case-meta" aria-label="Project information">
-            <article><span>Region</span><strong>${escapeHtml(detail.region)}</strong></article>
-            <article><span>Year</span><strong>${escapeHtml(detail.year)}</strong></article>
-            <article><span>Role</span><strong>${escapeHtml(detail.role)}</strong></article>
-            <article><span>Service</span><strong>${escapeHtml(detail.service)}</strong></article>
-          </div>
-        </div>
-        <div class="project-case-hero__media"><img src="${escapeHtml(image)}" alt="${escapeHtml(project.title)}" /></div>
-      </div>
-    </section>
-    <section class="project-case-section project-case-section--intro">
-      <div class="container">
-        <div class="project-case-copy-grid">
-          <div><p class="project-case-eyebrow">The project itself</p><h2>Project Overview</h2></div>
-          <div class="project-case-richtext">
             <p>${escapeHtml(detail.overview)}</p>
-            <div class="project-case-two-col">
-              <article><h3>Problem</h3><p>${escapeHtml(detail.problem)}</p></article>
-              <article><h3>Goal</h3><p>${escapeHtml(detail.goal)}</p></article>
-            </div>
-            <div class="project-case-role-list"><h3>Responsibilities</h3><ul>${responsibilities.map((item) => `<li>${escapeHtml(item)}</li>`).join("")}</ul></div>
+            <p>${escapeHtml(detail.problem)}</p>
           </div>
         </div>
       </div>
     </section>
-    <section class="project-case-section" id="research">
+    <section class="project-case-section project-case-section--role" id="research">
       <div class="container">
-        <p class="project-case-eyebrow">All about the user</p><h2>User Research</h2>
-        <p class="project-case-lead">${escapeHtml(detail.research)}</p>
-        <div class="project-case-card-grid">${painPoints.map((point, index) => `<article><span>${String(index + 1).padStart(2, "0")}</span><h3>${escapeHtml(point)}</h3><p>Key insight identified during research and translated into a design decision.</p></article>`).join("")}</div>
-        <div class="project-case-image-row"><img src="${escapeHtml(detail.researchImageOne)}" alt="${escapeHtml(project.title)} research" /><img src="${escapeHtml(detail.researchImageTwo)}" alt="${escapeHtml(project.title)} user journey" /></div>
-      </div>
-    </section>
-    <section class="project-case-section" id="wireframes">
-      <div class="container">
-        <p class="project-case-eyebrow">The project schematically</p><h2>Starting the Design</h2>
-        <p class="project-case-lead">${escapeHtml(detail.wireframes)}</p>
-        <div class="project-case-timeline">
-          <article><h3>App map</h3><p>Define the main screens, page hierarchy, and navigation logic.</p></article>
-          <article><h3>Paper wireframes</h3><p>Explore early layout ideas quickly before committing to digital screens.</p></article>
-          <article><h3>Digital wireframes</h3><p>Turn structure into a clearer flow that can be reviewed and tested.</p></article>
-          <article><h3>Usability studies</h3><p>Identify friction and refine the product direction before visual polish.</p></article>
+        <div class="project-case-story">
+          <h2>My role</h2>
+          <div><p>${escapeHtml(detail.goal)}</p></div>
         </div>
-        <div class="project-case-wide-image"><img src="${escapeHtml(detail.wireframeImage)}" alt="Wireframe planning screens" /></div>
+        <div class="project-case-deliverables">
+          ${designSteps.map((step) => `<article><i class="${step.icon}"></i><div><h3>${escapeHtml(step.title)}</h3><p>${escapeHtml(step.text)}</p></div></article>`).join("")}
+        </div>
       </div>
     </section>
-    <section class="project-case-section" id="design">
+    <section class="project-case-section project-case-section--showcase" id="wireframes">
       <div class="container">
-        <p class="project-case-eyebrow">The clear version</p><h2>Refining Design</h2>
-        <p class="project-case-lead">${escapeHtml(detail.design)}</p>
-        <div class="project-case-mockups"><img src="${escapeHtml(detail.mockupImageOne)}" alt="${escapeHtml(project.title)} mockup" /><img src="${escapeHtml(detail.mockupImageTwo)}" alt="Detail mockup" /><img src="${escapeHtml(detail.mockupImageThree)}" alt="Interface mockup" /><img src="${escapeHtml(detail.mockupImageFour)}" alt="Profile mockup" /></div>
-        <div class="project-case-prototype"><div><h3>High-fidelity prototype</h3><p>${escapeHtml(detail.prototype)}</p></div><ol>${nextSteps.map((item) => `<li>${escapeHtml(item)}</li>`).join("")}</ol></div>
+        <figure class="project-case-showcase-image"><img src="${escapeHtml(snapshotImages[2] || image)}" alt="${escapeHtml(project.title)} product showcase" /></figure>
+      </div>
+    </section>
+    <section class="project-case-section project-case-section--snapshot-gallery" id="design">
+      <div class="container">
+        <div class="project-case-snapshot-gallery">
+          ${snapshotImages.slice(3).map((snapshot, index) => `<figure><img src="${escapeHtml(snapshot)}" alt="${escapeHtml(project.title)} interface ${index + 1}" /></figure>`).join("")}
+        </div>
       </div>
     </section>
     ${flexibleBlocks.length ? `
@@ -3000,14 +3009,10 @@ function renderProjectDetailPage() {
         </div>
       </div>
     </section>` : ""}
-    <section class="project-case-section project-case-section--outcome" id="outcome">
+    <section class="project-case-section project-case-section--quote" id="outcome">
       <div class="container">
-        <p class="project-case-eyebrow">The result</p><h2>Outcome</h2>
-        <div class="project-case-outcome-grid">
-          <article><h3>Impact</h3><p>${escapeHtml(detail.impact)}</p></article>
-          <article><h3>What I learned</h3><p>${escapeHtml(detail.learned)}</p></article>
-          <article><h3>Next steps</h3><p>${nextSteps.map(escapeHtml).join(". ")}</p></article>
-        </div>
+        <blockquote>${escapeHtml(detail.impact)}</blockquote>
+        <div class="project-case-quote__footer"><p>${escapeHtml(detail.learned)}</p><a class="theme-btn project-case-demo${hasDemoLink ? "" : " is-disabled"}" href="${escapeHtml(demoHref)}"${demoLinkAttrs}>Demo Project <i class="ri-arrow-right-line"></i></a></div>
       </div>
     </section>
   `;
