@@ -3136,10 +3136,7 @@ function renderProjectDetailPage() {
     : [project.detail?.researchImageOne, project.detail?.researchImageTwo];
   const snapshotImages = configuredResearchImages
     .filter((image, index, list) => image && list.indexOf(image) === index);
-  // Add two copies at the end so the final image can slide naturally into the first.
-  const carouselImages = snapshotImages.length > 1
-    ? [...snapshotImages, snapshotImages[0], snapshotImages[1]]
-    : snapshotImages;
+  const carouselImages = snapshotImages;
   const renderSnapshot = (snapshot, index) =>
     `<figure class="project-case-snapshot-grid__item project-case-snapshot-grid__item--${index + 1}"><img src="${escapeHtml(snapshot)}" alt="${escapeHtml(project.title)} design snapshot ${index + 1}" /></figure>`;
   const snapshotMedia = snapshotImages.length > 1
@@ -3234,7 +3231,6 @@ function renderProjectDetailPage() {
   if (snapshotTrack && snapshotDots.length) {
     let activeIndex = 0;
     let autoAdvance;
-    let seamlessReset;
     const getSlideStep = () => {
       const firstSlide = snapshotTrack.querySelector(".project-case-snapshot-carousel__slide");
       if (!firstSlide) {
@@ -3262,29 +3258,25 @@ function renderProjectDetailPage() {
     }, { passive: true });
     snapshotDots.forEach((dot, index) => {
       dot.addEventListener("click", () => {
-        window.clearTimeout(seamlessReset);
-        updateSnapshotDots(index);
-        snapshotTrack.scrollTo({ left: getSlideStep() * index, behavior: "smooth" });
+        const maxIndex = Math.max(0, snapshotDots.length - 2);
+        const targetIndex = Math.min(index, maxIndex);
+        updateSnapshotDots(targetIndex);
+        snapshotTrack.scrollTo({ left: getSlideStep() * targetIndex, behavior: "smooth" });
       });
     });
 
     const startAutoAdvance = () => {
       window.clearInterval(autoAdvance);
       autoAdvance = window.setInterval(() => {
-        const nextIndex = activeIndex + 1;
-        if (nextIndex < snapshotDots.length) {
-          updateSnapshotDots(nextIndex);
-          snapshotTrack.scrollTo({ left: getSlideStep() * nextIndex, behavior: "smooth" });
-          return;
-        }
-
-        // Move from the final image to the cloned first image, then reset invisibly.
-        snapshotTrack.scrollTo({ left: getSlideStep() * snapshotDots.length, behavior: "smooth" });
-        window.clearTimeout(seamlessReset);
-        seamlessReset = window.setTimeout(() => {
+        const maxIndex = Math.max(0, snapshotDots.length - 2);
+        if (activeIndex >= maxIndex) {
           snapshotTrack.scrollTo({ left: 0, behavior: "auto" });
           updateSnapshotDots(0);
-        }, 620);
+          return;
+        }
+        const nextIndex = activeIndex + 1;
+        updateSnapshotDots(nextIndex);
+        snapshotTrack.scrollTo({ left: getSlideStep() * nextIndex, behavior: "smooth" });
       }, 4200);
     };
 
