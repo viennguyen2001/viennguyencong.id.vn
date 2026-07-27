@@ -7615,20 +7615,27 @@ body.loaded {
 
 .project-case-hero--snapshot h1 {
   color: #2a1608;
-  font-size: max(48px, min(7.7vw, 122px));
-  font-weight: 500;
+  font-size: max(42px, min(5.2vw, 80px));
+  font-weight: 600;
   letter-spacing: 0;
-  line-height: 0.98;
-  margin: 0;
-  max-width: 1200px;
-  text-wrap: balance;
+  line-height: 1;
+  margin: 18px 0 0;
+  max-width: 960px;
+}
+
+.project-case-lead {
+  color: #574c43;
+  font-size: max(19px, min(2vw, 29px));
+  line-height: 1.45;
+  margin: 26px 0 0;
+  max-width: 900px;
 }
 
 .project-case-tags {
   display: flex;
   flex-wrap: wrap;
   gap: 8px;
-  margin-top: max(26px, min(4vw, 50px));
+  margin-top: 30px;
 }
 
 .project-case-tags span {
@@ -7645,7 +7652,7 @@ body.loaded {
   grid-gap: 26px 42px;
   gap: 26px 42px;
   grid-template-columns: repeat(2, minmax(0, 1fr));
-  margin-top: max(44px, min(6vw, 82px));
+  margin-top: max(36px, min(5vw, 64px));
   padding-top: 32px;
 }
 

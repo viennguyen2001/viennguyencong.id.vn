@@ -2951,10 +2951,10 @@ function renderProjectDetailPage() {
     <section class="project-case-hero project-case-hero--snapshot" id="overview">
       <div class="container">
         <div class="project-case-snapshot__top">
-          <p>${escapeHtml(project.title)}</p>
-          <a href="/projects/" class="project-case-close" aria-label="Back to projects" title="Back to projects"><i class="ri-close-line"></i></a>
+          <p>Project case study</p>
         </div>
-        <h1>${escapeHtml(project.summary || detail.overview)}</h1>
+        <h1>${escapeHtml(project.title)}</h1>
+        <p class="project-case-lead">${escapeHtml(project.summary || detail.overview)}</p>
         <div class="project-case-tags">${tags.map((tag) => `<span>${escapeHtml(tag)}</span>`).join("")}</div>
         <div class="project-case-info-grid" aria-label="Project information">
           <article><span>Project type</span><strong>${escapeHtml(detail.service)}</strong></article>
