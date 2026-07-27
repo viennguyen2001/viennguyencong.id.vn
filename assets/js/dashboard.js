@@ -943,6 +943,12 @@ function getProjectDetailDefaults(item = {}) {
       "Validate with more users\nExpand edge cases\nRefine analytics and content states",
     researchImageOne: item.detail?.researchImageOne || item.image || "assets/images/projects/work1.jpg",
     researchImageTwo: item.detail?.researchImageTwo || "assets/images/projects/work3.jpg",
+    researchImages: Array.isArray(item.detail?.researchImages)
+      ? item.detail.researchImages.filter(Boolean)
+      : [
+          item.detail?.researchImageOne || item.image || "assets/images/projects/work1.jpg",
+          item.detail?.researchImageTwo || "assets/images/projects/work3.jpg",
+        ].filter(Boolean),
     wireframeImage: item.detail?.wireframeImage || "assets/images/projects/work4.jpg",
     mockupImageOne: item.detail?.mockupImageOne || item.image || "assets/images/projects/work5.jpg",
     mockupImageTwo: item.detail?.mockupImageTwo || "assets/images/blog/blog1.jpg",
@@ -1732,6 +1738,28 @@ function initDashboard() {
     `;
   }
 
+  function renderProjectResearchImageField(value = "", key = Date.now(), index = 0) {
+    const preview = value
+      ? '<img src="' + escapeHtml(value) + '" alt="Research image ' + (index + 1) + '" />'
+      : "<small>No image selected</small>";
+
+    return `
+      <article class="dashboard-project-gallery-image" data-dashboard-research-image="${key}">
+        <header>
+          <strong>Research image ${index + 1} <small>1000 x 1000px</small></strong>
+          <button type="button" data-dashboard-remove-research-image aria-label="Remove research image" title="Remove image">
+            <i class="ri-delete-bin-line"></i>
+          </button>
+        </header>
+        <input type="file" accept="image/*" data-dashboard-research-image-upload="${key}" />
+        <input name="detailResearchImage" value="${escapeHtml(value)}" placeholder="Paste image URL" data-dashboard-research-image-url="${key}" />
+        <div class="dashboard-detail-image-preview" data-dashboard-research-image-preview="${key}">
+          ${preview}
+        </div>
+      </article>
+    `;
+  }
+
 
   function renderProjectFlexibleBlock(block = {}, key = Date.now()) {
     const type = block.type === "image" ? "image" : "text";
@@ -1789,9 +1817,17 @@ function initDashboard() {
         <label>Responsibilities <small>One item per line</small><textarea name="detailResponsibilities" rows="5">${escapeHtml(detail.responsibilities)}</textarea></label>
         <label>User research<textarea name="detailResearch" rows="4">${escapeHtml(detail.research)}</textarea></label>
         <label>Pain points <small>One item per line</small><textarea name="detailPainPoints" rows="4">${escapeHtml(detail.painPoints)}</textarea></label>
-        <div class="dashboard-detail-editor__grid">
-          ${renderProjectImageField("Research image 1", "detailResearchImageOne", detail.researchImageOne)}
-          ${renderProjectImageField("Research image 2", "detailResearchImageTwo", detail.researchImageTwo)}
+        <div class="dashboard-project-gallery dashboard-project-gallery--research">
+          <div class="dashboard-flex-blocks__head">
+            <div>
+              <h4>Research images</h4>
+              <small>Start with one or two images, then add or remove images as needed.</small>
+            </div>
+            <button type="button" data-dashboard-add-research-image>Add research image</button>
+          </div>
+          <div class="dashboard-detail-editor__grid dashboard-detail-editor__grid--mockups" data-dashboard-research-images>
+            ${detail.researchImages.map((image, index) => renderProjectResearchImageField(image, `saved-research-${index}`, index)).join("")}
+          </div>
         </div>
         <label>Wireframes<textarea name="detailWireframes" rows="4">${escapeHtml(detail.wireframes)}</textarea></label>
         ${renderProjectImageField("Wireframe image", "detailWireframeImage", detail.wireframeImage)}
@@ -2167,6 +2203,22 @@ function initDashboard() {
     const removeDetailBlockButton = event.target.closest("[data-dashboard-remove-detail-block]");
     const addGalleryImageButton = event.target.closest("[data-dashboard-add-gallery-image]");
     const removeGalleryImageButton = event.target.closest("[data-dashboard-remove-gallery-image]");
+    const addResearchImageButton = event.target.closest("[data-dashboard-add-research-image]");
+    const removeResearchImageButton = event.target.closest("[data-dashboard-remove-research-image]");
+
+    if (addResearchImageButton) {
+      const researchNode = app.querySelector("[data-dashboard-research-images]");
+      if (researchNode) {
+        const index = researchNode.querySelectorAll("[data-dashboard-research-image]").length;
+        researchNode.insertAdjacentHTML("beforeend", renderProjectResearchImageField("", `research-${Date.now()}`, index));
+      }
+      return;
+    }
+
+    if (removeResearchImageButton) {
+      removeResearchImageButton.closest("[data-dashboard-research-image]")?.remove();
+      return;
+    }
 
     if (addGalleryImageButton) {
       const galleryNode = app.querySelector("[data-dashboard-gallery-images]");
@@ -2282,6 +2334,23 @@ function initDashboard() {
   });
 
   app.addEventListener("change", async (event) => {
+    const researchUploadInput = event.target.closest("[data-dashboard-research-image-upload]");
+
+    if (researchUploadInput && researchUploadInput.files?.length) {
+      const fieldName = researchUploadInput.dataset.dashboardResearchImageUpload;
+      const dataUrl = await cropImageToSquare(researchUploadInput.files[0]);
+      const urlInput = app.querySelector(`[data-dashboard-research-image-url="${fieldName}"]`);
+      const preview = app.querySelector(`[data-dashboard-research-image-preview="${fieldName}"]`);
+
+      if (urlInput) {
+        urlInput.value = dataUrl;
+      }
+      if (preview) {
+        preview.innerHTML = `<img src="${dataUrl}" alt="Research image preview" />`;
+      }
+      return;
+    }
+
     const galleryUploadInput = event.target.closest("[data-dashboard-gallery-image-upload]");
 
     if (galleryUploadInput && galleryUploadInput.files?.length) {
@@ -2431,6 +2500,20 @@ function initDashboard() {
   });
 
   app.addEventListener("input", (event) => {
+    const researchImageUrlInput = event.target.closest("[data-dashboard-research-image-url]");
+
+    if (researchImageUrlInput) {
+      const fieldName = researchImageUrlInput.dataset.dashboardResearchImageUrl;
+      const preview = app.querySelector(`[data-dashboard-research-image-preview="${fieldName}"]`);
+
+      if (preview) {
+        preview.innerHTML = researchImageUrlInput.value
+          ? `<img src="${escapeHtml(researchImageUrlInput.value)}" alt="Research image preview" />`
+          : "<small>No image selected</small>";
+      }
+      return;
+    }
+
     const galleryImageUrlInput = event.target.closest("[data-dashboard-gallery-image-url]");
 
     if (galleryImageUrlInput) {
@@ -2571,6 +2654,10 @@ function initDashboard() {
       const blockTitles = formData.getAll("detailBlockTitle");
       const blockTexts = formData.getAll("detailBlockText");
       const blockImages = formData.getAll("detailBlockImage");
+      const researchImages = formData
+        .getAll("detailResearchImage")
+        .map((image) => String(image || "").trim())
+        .filter(Boolean);
       const galleryImages = formData
         .getAll("detailGalleryImage")
         .map((image) => String(image || "").trim())
@@ -2603,6 +2690,7 @@ function initDashboard() {
         nextSteps: String(formData.get("detailNextSteps") || "").trim(),
         researchImageOne: String(formData.get("detailResearchImageOne") || "").trim(),
         researchImageTwo: String(formData.get("detailResearchImageTwo") || "").trim(),
+        researchImages,
         wireframeImage: String(formData.get("detailWireframeImage") || "").trim(),
         mockupImageOne: String(formData.get("detailMockupImageOne") || "").trim(),
         mockupImageTwo: String(formData.get("detailMockupImageTwo") || "").trim(),
@@ -3044,6 +3132,7 @@ function renderProjectDetailPage() {
     .map((tag) => tag.trim())
     .filter(Boolean);
   const legacySnapshotImages = [
+    ...(detail.researchImages || []),
     detail.researchImageOne,
     detail.researchImageTwo,
     detail.wireframeImage,
