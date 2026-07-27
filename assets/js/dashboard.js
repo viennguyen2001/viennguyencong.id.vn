@@ -3136,20 +3136,19 @@ function renderProjectDetailPage() {
     : [project.detail?.researchImageOne, project.detail?.researchImageTwo];
   const snapshotImages = configuredResearchImages
     .filter((image, index, list) => image && list.indexOf(image) === index);
-  // Each page keeps two images visible, but advances one image at a time:
-  // 1+2, 2+3 ... and the last image continues with the first.
-  const snapshotSlides = snapshotImages.length > 1
-    ? snapshotImages.map((image, index) => [image, snapshotImages[(index + 1) % snapshotImages.length]])
-    : snapshotImages.map((image) => [image]);
+  // Add two copies at the end so the final image can slide naturally into the first.
+  const carouselImages = snapshotImages.length > 1
+    ? [...snapshotImages, snapshotImages[0], snapshotImages[1]]
+    : snapshotImages;
   const renderSnapshot = (snapshot, index) =>
     `<figure class="project-case-snapshot-grid__item project-case-snapshot-grid__item--${index + 1}"><img src="${escapeHtml(snapshot)}" alt="${escapeHtml(project.title)} design snapshot ${index + 1}" /></figure>`;
   const snapshotMedia = snapshotImages.length > 1
     ? `<div class="project-case-snapshot-carousel" data-project-snapshot-carousel>
         <div class="project-case-snapshot-carousel__track" data-project-snapshot-track>
-          ${snapshotSlides.map((slide, slideIndex) => `<div class="project-case-snapshot-carousel__slide">${slide.map((snapshot, imageIndex) => renderSnapshot(snapshot, (slideIndex + imageIndex) % snapshotImages.length)).join("")}</div>`).join("")}
+          ${carouselImages.map((snapshot, index) => `<div class="project-case-snapshot-carousel__slide">${renderSnapshot(snapshot, index % snapshotImages.length)}</div>`).join("")}
         </div>
         <div class="project-case-snapshot-carousel__dots" aria-label="Project image gallery">
-          ${snapshotSlides.map((_, index) => `<button type="button" data-project-snapshot-dot aria-label="Show image group ${index + 1}"${index === 0 ? ' aria-current="true"' : ""}></button>`).join("")}
+          ${snapshotImages.map((_, index) => `<button type="button" data-project-snapshot-dot aria-label="Show research image ${index + 1}"${index === 0 ? ' aria-current="true"' : ""}></button>`).join("")}
         </div>
       </div>`
     : `<div class="project-case-snapshot-grid">${snapshotImages.map(renderSnapshot).join("") || '<p class="project-case-snapshot-empty">No research images added yet.</p>'}</div>`;
@@ -3235,6 +3234,7 @@ function renderProjectDetailPage() {
   if (snapshotTrack && snapshotDots.length) {
     let activeIndex = 0;
     let autoAdvance;
+    let seamlessReset;
     const getSlideStep = () => {
       const firstSlide = snapshotTrack.querySelector(".project-case-snapshot-carousel__slide");
       if (!firstSlide) {
@@ -3243,11 +3243,8 @@ function renderProjectDetailPage() {
       const gap = Number.parseFloat(window.getComputedStyle(snapshotTrack).gap) || 0;
       return firstSlide.getBoundingClientRect().width + gap;
     };
-    const updateSnapshotDots = () => {
-      activeIndex = Math.min(
-        snapshotDots.length - 1,
-        Math.max(0, Math.round(snapshotTrack.scrollLeft / getSlideStep()))
-      );
+    const updateSnapshotDots = (index = activeIndex) => {
+      activeIndex = Math.min(snapshotDots.length - 1, Math.max(0, index));
       snapshotDots.forEach((dot, index) => {
         if (index === activeIndex) {
           dot.setAttribute("aria-current", "true");
@@ -3257,11 +3254,16 @@ function renderProjectDetailPage() {
       });
     };
 
-    snapshotTrack.addEventListener("scroll", updateSnapshotDots, { passive: true });
+    snapshotTrack.addEventListener("scroll", () => {
+      const index = Math.round(snapshotTrack.scrollLeft / getSlideStep());
+      if (index < snapshotDots.length) {
+        updateSnapshotDots(index);
+      }
+    }, { passive: true });
     snapshotDots.forEach((dot, index) => {
       dot.addEventListener("click", () => {
-        activeIndex = index;
-        updateSnapshotDots();
+        window.clearTimeout(seamlessReset);
+        updateSnapshotDots(index);
         snapshotTrack.scrollTo({ left: getSlideStep() * index, behavior: "smooth" });
       });
     });
@@ -3269,8 +3271,20 @@ function renderProjectDetailPage() {
     const startAutoAdvance = () => {
       window.clearInterval(autoAdvance);
       autoAdvance = window.setInterval(() => {
-        const nextIndex = (activeIndex + 1) % snapshotDots.length;
-        snapshotTrack.scrollTo({ left: getSlideStep() * nextIndex, behavior: "smooth" });
+        const nextIndex = activeIndex + 1;
+        if (nextIndex < snapshotDots.length) {
+          updateSnapshotDots(nextIndex);
+          snapshotTrack.scrollTo({ left: getSlideStep() * nextIndex, behavior: "smooth" });
+          return;
+        }
+
+        // Move from the final image to the cloned first image, then reset invisibly.
+        snapshotTrack.scrollTo({ left: getSlideStep() * snapshotDots.length, behavior: "smooth" });
+        window.clearTimeout(seamlessReset);
+        seamlessReset = window.setTimeout(() => {
+          snapshotTrack.scrollTo({ left: 0, behavior: "auto" });
+          updateSnapshotDots(0);
+        }, 620);
       }, 4200);
     };
 
