@@ -3161,6 +3161,7 @@ function renderProjectDetailPage() {
       <div class="container">
         <div class="project-case-snapshot__top">
           <p>Project case study</p>
+          ${hasDemoLink ? `<a class="project-case-demo project-case-demo--hero" href="${escapeHtml(demoHref)}"${demoLinkAttrs}>Demo Project <i class="ri-arrow-right-up-line"></i></a>` : ""}
         </div>
         <h1>${escapeHtml(project.title)}</h1>
         <p class="project-case-lead">${escapeHtml(project.summary || detail.overview)}</p>
@@ -3219,7 +3220,7 @@ function renderProjectDetailPage() {
     <section class="project-case-section project-case-section--quote" id="outcome">
       <div class="container">
         <blockquote>${escapeHtml(detail.impact)}</blockquote>
-        <div class="project-case-quote__footer"><p>${escapeHtml(detail.learned)}</p><a class="theme-btn project-case-demo${hasDemoLink ? "" : " is-disabled"}" href="${escapeHtml(demoHref)}"${demoLinkAttrs}>Demo Project <i class="ri-arrow-right-line"></i></a></div>
+        <div class="project-case-quote__footer"><p>${escapeHtml(detail.learned)}</p></div>
       </div>
     </section>
   `;
