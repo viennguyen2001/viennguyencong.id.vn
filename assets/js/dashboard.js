@@ -3244,13 +3244,19 @@ function renderProjectDetailPage() {
         Math.max(0, Math.round(snapshotTrack.scrollLeft / getSlideStep()))
       );
       snapshotDots.forEach((dot, index) => {
-        dot.toggleAttribute("aria-current", index === activeIndex);
+        if (index === activeIndex) {
+          dot.setAttribute("aria-current", "true");
+        } else {
+          dot.removeAttribute("aria-current");
+        }
       });
     };
 
     snapshotTrack.addEventListener("scroll", updateSnapshotDots, { passive: true });
     snapshotDots.forEach((dot, index) => {
       dot.addEventListener("click", () => {
+        activeIndex = index;
+        updateSnapshotDots();
         snapshotTrack.scrollTo({ left: getSlideStep() * index, behavior: "smooth" });
       });
     });
