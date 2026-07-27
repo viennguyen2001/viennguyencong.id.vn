@@ -6025,7 +6025,59 @@ body.loaded {
   margin-top: clamp(40px, 5vw, 70px);
 }
 
+.project-case-snapshot-carousel {
+  margin-top: clamp(40px, 5vw, 70px);
+}
+
+.project-case-snapshot-carousel__track {
+  display: flex;
+  overflow-x: auto;
+  scroll-behavior: smooth;
+  scroll-snap-type: x mandatory;
+  scrollbar-width: none;
+}
+
+.project-case-snapshot-carousel__track::-webkit-scrollbar {
+  display: none;
+}
+
+.project-case-snapshot-carousel__slide {
+  display: grid;
+  flex: 0 0 100%;
+  gap: 20px;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  scroll-snap-align: start;
+}
+
+.project-case-snapshot-carousel__dots {
+  align-items: center;
+  background: rgba(46, 39, 32, 0.68);
+  border-radius: 999px;
+  display: flex;
+  gap: 7px;
+  margin: 16px auto 0;
+  padding: 8px 11px;
+  width: max-content;
+}
+
+.project-case-snapshot-carousel__dots button {
+  background: rgba(255, 255, 255, 0.35);
+  border: 0;
+  border-radius: 50%;
+  cursor: pointer;
+  height: 11px;
+  padding: 0;
+  transition: background 0.2s ease, transform 0.2s ease;
+  width: 11px;
+}
+
+.project-case-snapshot-carousel__dots button[aria-current="true"] {
+  background: #ffffff;
+  transform: scale(1.08);
+}
+
 .project-case-snapshot-grid__item {
+  aspect-ratio: 1 / 1;
   background: #edeae5;
   border-radius: 22px;
   margin: 0;
@@ -6037,7 +6089,7 @@ body.loaded {
 }
 
 .project-case-snapshot-grid img {
-  aspect-ratio: 1.22 / 1;
+  aspect-ratio: 1 / 1;
   display: block;
   height: 100%;
   object-fit: cover;
@@ -6146,14 +6198,14 @@ body.loaded {
 }
 
 .project-case-snapshot-gallery img {
-  aspect-ratio: 1.3 / 1;
+  aspect-ratio: 1 / 1;
   display: block;
   object-fit: cover;
   width: 100%;
 }
 
 .project-case-snapshot-gallery figure:first-child img {
-  aspect-ratio: 16 / 8;
+  aspect-ratio: 1 / 1;
 }
 
 .project-case-section--quote {
@@ -6208,6 +6260,7 @@ body.loaded {
 
   .project-case-info-grid,
   .project-case-snapshot-grid,
+  .project-case-snapshot-carousel__slide,
   .project-case-snapshot-gallery,
   .project-case-story {
     grid-template-columns: minmax(0, 1fr);
@@ -6993,10 +7046,16 @@ body *:not(i):not(.fa):not(.fas):not(.far):not(.fal):not(.fab):not(.fa-brands):n
   color: #8b3036;
   cursor: pointer;
   display: inline-flex;
-  font-size: 18px;
+  font-size: 14px;
+  font-weight: 600;
+  gap: 6px;
   height: 36px;
   justify-content: center;
-  width: 36px;
+  padding: 0 10px;
+}
+
+.dashboard-project-gallery-image header button i {
+  font-size: 17px;
 }
 
 .dashboard-project-gallery-image input[data-dashboard-gallery-image-url] {

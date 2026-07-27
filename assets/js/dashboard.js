@@ -1726,7 +1726,7 @@ function initDashboard() {
         <header>
           <strong>Project image ${index + 1} <small>1000 x 1000px</small></strong>
           <button type="button" data-dashboard-remove-gallery-image aria-label="Remove project image" title="Remove image">
-            <i class="ri-delete-bin-line"></i>
+            <i class="ri-delete-bin-line"></i><span>Remove</span>
           </button>
         </header>
         <input type="file" accept="image/*" data-dashboard-gallery-image-upload="${key}" />
@@ -1748,7 +1748,7 @@ function initDashboard() {
         <header>
           <strong>Research image ${index + 1} <small>1000 x 1000px</small></strong>
           <button type="button" data-dashboard-remove-research-image aria-label="Remove research image" title="Remove image">
-            <i class="ri-delete-bin-line"></i>
+            <i class="ri-delete-bin-line"></i><span>Remove</span>
           </button>
         </header>
         <input type="file" accept="image/*" data-dashboard-research-image-upload="${key}" />
@@ -1823,7 +1823,7 @@ function initDashboard() {
               <h4>Research images</h4>
               <small>Start with one or two images, then add or remove images as needed.</small>
             </div>
-            <button type="button" data-dashboard-add-research-image>Add research image</button>
+            <button type="button" data-dashboard-add-research-image><i class="ri-add-line"></i> Add research image</button>
           </div>
           <div class="dashboard-detail-editor__grid dashboard-detail-editor__grid--mockups" data-dashboard-research-images>
             ${detail.researchImages.map((image, index) => renderProjectResearchImageField(image, `saved-research-${index}`, index)).join("")}
@@ -1936,7 +1936,7 @@ function initDashboard() {
             <label>Description<textarea name="summary" rows="5" maxlength="180" placeholder="Enter your title here" data-dashboard-summary-input>${escapeHtml(editingItem.summary)}</textarea><small data-dashboard-summary-count>${String(editingItem.summary || "").length}/180</small></label>
             <label>Demo Project<input name="link" value="${escapeHtml(editingItem.link || getDefaultItemLink(activeType))}" placeholder="Enter your title here" /></label>
 
-            <details class="dashboard-project-detail">
+          <details class="dashboard-project-detail" open>
               <summary>Project detail information</summary>
               ${renderProjectDetailFields()}
             </details>
@@ -3143,6 +3143,22 @@ function renderProjectDetailPage() {
   ].filter((image, index, list) => image && list.indexOf(image) === index);
   const snapshotImages = [...legacySnapshotImages, ...(detail.galleryImages || [])]
     .filter((image, index, list) => image && list.indexOf(image) === index);
+  const snapshotSlides = Array.from(
+    { length: Math.ceil(snapshotImages.length / 2) },
+    (_, index) => snapshotImages.slice(index * 2, index * 2 + 2)
+  );
+  const renderSnapshot = (snapshot, index) =>
+    `<figure class="project-case-snapshot-grid__item project-case-snapshot-grid__item--${index + 1}"><img src="${escapeHtml(snapshot)}" alt="${escapeHtml(project.title)} design snapshot ${index + 1}" /></figure>`;
+  const snapshotMedia = snapshotImages.length > 2
+    ? `<div class="project-case-snapshot-carousel" data-project-snapshot-carousel>
+        <div class="project-case-snapshot-carousel__track" data-project-snapshot-track>
+          ${snapshotSlides.map((slide, slideIndex) => `<div class="project-case-snapshot-carousel__slide">${slide.map((snapshot, imageIndex) => renderSnapshot(snapshot, slideIndex * 2 + imageIndex)).join("")}</div>`).join("")}
+        </div>
+        <div class="project-case-snapshot-carousel__dots" aria-label="Project image gallery">
+          ${snapshotSlides.map((_, index) => `<button type="button" data-project-snapshot-dot aria-label="Show image group ${index + 1}"${index === 0 ? ' aria-current="true"' : ""}></button>`).join("")}
+        </div>
+      </div>`
+    : `<div class="project-case-snapshot-grid">${snapshotImages.map(renderSnapshot).join("")}</div>`;
   const designSteps = [
     { title: "Design concept", text: detail.research, icon: "ri-layout-4-line" },
     { title: "Information architecture", text: detail.wireframes, icon: "ri-node-tree" },
@@ -3165,9 +3181,7 @@ function renderProjectDetailPage() {
           <article><span>Role</span><strong>${escapeHtml(detail.role)}</strong></article>
           <article><span>Region</span><strong>${escapeHtml(detail.region)}</strong></article>
         </div>
-        <div class="project-case-snapshot-grid">
-          ${snapshotImages.slice(0, 2).map((snapshot, index) => `<figure class="project-case-snapshot-grid__item project-case-snapshot-grid__item--${index + 1}"><img src="${escapeHtml(snapshot)}" alt="${escapeHtml(project.title)} design snapshot ${index + 1}" /></figure>`).join("")}
-        </div>
+        ${snapshotMedia}
       </div>
     </section>
     <section class="project-case-section project-case-section--overview">
@@ -3219,6 +3233,28 @@ function renderProjectDetailPage() {
       </div>
     </section>
   `;
+
+  const snapshotTrack = page.querySelector("[data-project-snapshot-track]");
+  const snapshotDots = Array.from(page.querySelectorAll("[data-project-snapshot-dot]"));
+
+  if (snapshotTrack && snapshotDots.length) {
+    const updateSnapshotDots = () => {
+      const activeIndex = Math.min(
+        snapshotDots.length - 1,
+        Math.max(0, Math.round(snapshotTrack.scrollLeft / snapshotTrack.clientWidth))
+      );
+      snapshotDots.forEach((dot, index) => {
+        dot.toggleAttribute("aria-current", index === activeIndex);
+      });
+    };
+
+    snapshotTrack.addEventListener("scroll", updateSnapshotDots, { passive: true });
+    snapshotDots.forEach((dot, index) => {
+      dot.addEventListener("click", () => {
+        snapshotTrack.scrollTo({ left: snapshotTrack.clientWidth * index, behavior: "smooth" });
+      });
+    });
+  }
 }
 
 function initProjectCards() {
