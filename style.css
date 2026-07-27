@@ -7728,7 +7728,7 @@ body.loaded {
 
 .project-case-snapshot-carousel__slide {
   display: block;
-  flex: 0 0 calc((100% - 20px) / 2);
+  flex: 0 0 calc((100% - 20px) / 2.05);
   min-width: 0;
   scroll-snap-align: center;
 }
@@ -7985,7 +7985,7 @@ body.loaded {
     gap: 28px;
   }
   .project-case-snapshot-carousel__slide {
-    flex-basis: calc((100% - 12px) / 2);
+    flex-basis: calc((100% - 12px) / 2.05);
     gap: 12px;
   }
   .project-case-deliverables article {

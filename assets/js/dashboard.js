@@ -3240,6 +3240,10 @@ function renderProjectDetailPage() {
       const gap = Number.parseFloat(window.getComputedStyle(snapshotTrack).gap) || 0;
       return firstSlide.getBoundingClientRect().width + gap;
     };
+    const getSlideOffset = (index) => {
+      const peek = Math.min(snapshotTrack.clientWidth * 0.07, 72);
+      return Math.max(0, getSlideStep() * index - peek);
+    };
     const updateSnapshotDots = (index = activeIndex) => {
       activeIndex = Math.min(snapshotDots.length - 1, Math.max(0, index));
       snapshotDots.forEach((dot, index) => {
@@ -3262,7 +3266,7 @@ function renderProjectDetailPage() {
         const maxIndex = Math.max(0, snapshotDots.length - 1);
         const targetIndex = Math.min(index, maxIndex);
         updateSnapshotDots(targetIndex);
-        snapshotTrack.scrollTo({ left: getSlideStep() * targetIndex, behavior: "smooth" });
+        snapshotTrack.scrollTo({ left: getSlideOffset(targetIndex), behavior: "smooth" });
       });
     });
 
@@ -3277,7 +3281,7 @@ function renderProjectDetailPage() {
         }
         const nextIndex = activeIndex + 1;
         updateSnapshotDots(nextIndex);
-        snapshotTrack.scrollTo({ left: getSlideStep() * nextIndex, behavior: "smooth" });
+        snapshotTrack.scrollTo({ left: getSlideOffset(nextIndex), behavior: "smooth" });
       }, 4200);
     };
 
