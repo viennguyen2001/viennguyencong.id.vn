@@ -7019,7 +7019,19 @@ body.loaded {
 .project-case-study {
   background: #f4f1ec;
   color: #151515;
+  font-family: "Roboto", sans-serif;
   overflow: hidden;
+}
+
+.project-case-study h1,
+.project-case-study h2,
+.project-case-study h3,
+.project-case-study p,
+.project-case-study span,
+.project-case-study strong,
+.project-case-study a,
+.project-case-study button {
+  font-family: "Roboto", sans-serif;
 }
 
 .project-case-study .container {
@@ -7595,21 +7607,24 @@ body.loaded {
 .project-case-demo--hero {
   align-items: center;
   background: transparent;
-  border: 1.5px solid #ff4b3f;
+  border: 1.5px solid #9c383c;
   border-radius: 12px;
-  color: #ff4b3f;
+  color: #9c383c;
   display: inline-flex;
-  font-size: 15px;
+  font-family: "Roboto", sans-serif;
+  font-size: 14px;
   font-weight: 500;
   gap: 7px;
   justify-content: center;
-  min-height: 44px;
-  padding: 9px 16px;
+  letter-spacing: 0;
+  line-height: 1.2;
+  min-height: 40px;
+  padding: 8px 14px;
 }
 
 .project-case-demo--hero:hover {
-  background: #ff4b3f;
-  border-color: #ff4b3f;
+  background: #9c383c;
+  border-color: #9c383c;
   color: #ffffff;
 }
 
@@ -7697,9 +7712,9 @@ body.loaded {
 
 .project-case-info-grid span {
   color: #8a8178;
-  font-family: monospace;
   font-size: 14px;
-  letter-spacing: 0.04em;
+  font-weight: 500;
+  letter-spacing: 0.02em;
 }
 
 .project-case-info-grid strong {
