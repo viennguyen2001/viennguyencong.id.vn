@@ -8824,6 +8824,34 @@ body *:not(i):not(.fa):not(.fas):not(.far):not(.fal):not(.fab):not(.fa-brands):n
   background: #f4f1ec;
 }
 
+/* The detail page uses its existing rules as separators instead of changing background per section. */
+.project-case-hero--snapshot,
+.project-case-section--overview,
+.project-case-section--role,
+.project-case-section--showcase,
+.project-case-section--snapshot-gallery,
+.project-case-section--flexible,
+.project-case-section--quote {
+  background: #fbfaf7;
+}
+
+.project-case-section--quote {
+  color: #2a1608;
+}
+
+.project-case-section--quote blockquote {
+  color: #2a1608;
+}
+
+.project-case-quote__footer {
+  border-color: #dfdad2;
+}
+
+.project-case-quote__footer p {
+  color: #574c43;
+  font-family: "Roboto", sans-serif;
+}
+
 .project-case-flexible {
   display: grid;
   grid-gap: 28px;
