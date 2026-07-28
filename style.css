@@ -805,7 +805,7 @@ html{
   margin-right: 5px;
   display: inline-block;
   cursor: pointer;
-  border-radius: 2px;
+  border-radius: 10px;
   border-width: 1px;
   border-color: rgba(119, 119, 125, 0.2);
   --tw-bg-opacity: 1;
@@ -5501,7 +5501,7 @@ a.meanmenu-reveal{
 
 .dashboard-button {
   align-items: center;
-  border-radius: 8px;
+  border-radius: 10px;
   cursor: pointer;
   display: inline-flex;
   font: inherit;
@@ -6055,6 +6055,7 @@ a.meanmenu-reveal{
   color: #fff !important;
   display: inline-flex;
   gap: 10px;
+  border-radius: 10px;
 }
 
 .project-card-view-all:hover,
@@ -7616,10 +7617,10 @@ body.loaded {
 
 .project-case-demo--hero {
   align-items: center;
-  background: transparent;
+  background: #9c383c;
   border: 1.5px solid #9c383c;
-  border-radius: 12px;
-  color: #9c383c;
+  border-radius: 10px;
+  color: #ffffff;
   display: inline-flex;
   font-family: "Roboto", sans-serif;
   font-size: 14px;
@@ -7633,8 +7634,8 @@ body.loaded {
 }
 
 .project-case-demo--hero:hover {
-  background: #9c383c;
-  border-color: #9c383c;
+  background: #782b2e;
+  border-color: #782b2e;
   color: #ffffff;
 }
 

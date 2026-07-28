@@ -271,7 +271,7 @@ Version      : 1.0
 
   /* Theme Button */
   .theme-btn {
-    @apply mb-2.5 mr-[5px] inline-block cursor-pointer rounded-[2px] border border-buttonBorder bg-mainColor px-[34px] py-5 text-center text-sm font-medium leading-[20px] text-white transition duration-300;
+    @apply mb-2.5 mr-[5px] inline-block cursor-pointer rounded-[10px] border border-buttonBorder bg-mainColor px-[34px] py-5 text-center text-sm font-medium leading-[20px] text-white transition duration-300;
   }
 
   .theme-btn-two {
@@ -3194,7 +3194,7 @@ Version      : 1.0
 
 .dashboard-button {
   align-items: center;
-  border-radius: 8px;
+  border-radius: 10px;
   cursor: pointer;
   display: inline-flex;
   font: inherit;
@@ -3747,6 +3747,7 @@ Version      : 1.0
   color: #fff !important;
   display: inline-flex;
   gap: 10px;
+  border-radius: 10px;
 }
 
 .project-card-view-all:hover,
@@ -5957,10 +5958,10 @@ body.loaded {
 
 .project-case-demo--hero {
   align-items: center;
-  background: transparent;
+  background: #9c383c;
   border: 1.5px solid #9c383c;
-  border-radius: 12px;
-  color: #9c383c;
+  border-radius: 10px;
+  color: #ffffff;
   display: inline-flex;
   font-family: "Roboto", sans-serif;
   font-size: 14px;
@@ -5974,8 +5975,8 @@ body.loaded {
 }
 
 .project-case-demo--hero:hover {
-  background: #9c383c;
-  border-color: #9c383c;
+  background: #782b2e;
+  border-color: #782b2e;
   color: #ffffff;
 }
 
