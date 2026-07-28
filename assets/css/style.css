@@ -6011,6 +6011,16 @@ body.loaded {
   padding: 13px 24px;
 }
 
+.project-case-tags .project-case-demo--hero {
+  margin-left: auto;
+}
+
+@media (max-width: 640px) {
+  .project-case-tags .project-case-demo--hero {
+    margin-left: 0;
+  }
+}
+
 .project-case-info-grid {
   border-top: 1px solid #dfdad2;
   display: grid;
