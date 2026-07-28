@@ -10478,6 +10478,20 @@ p.copy-left-text a:hover {
     opacity: 0.92 !important;
   }
 }
+/* Public primary CTAs use the portfolio brand color in both system themes. */
+.theme-btn {
+  background: #9c383c !important;
+  border-color: #9c383c !important;
+  border-radius: 10px !important;
+  color: #ffffff !important;
+}
+
+.theme-btn:hover,
+.theme-btn:focus-visible {
+  background: #782b2e !important;
+  border-color: #782b2e !important;
+  color: #ffffff !important;
+}
 
 .hover\:cursor-pointer:hover{
   cursor: pointer;
