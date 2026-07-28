@@ -483,6 +483,14 @@ Version      : 1.0
     });
   });
 
+  // Do not leave visitors trapped behind the animated loader if a third-party
+  // resource delays the window load event.
+  window.setTimeout(function () {
+    if (document.readyState !== "complete") {
+      $(".preloader").css({ display: "none", zIndex: -1 });
+    }
+  }, 6000);
+
   /*
    * ----------------------------------------------------------------------------------------
    *  CUSTOM CURSOR JS
