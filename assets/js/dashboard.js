@@ -951,12 +951,13 @@ function getProjectDetailDefaults(item = {}) {
     nextSteps:
       item.detail?.nextSteps ||
       "Validate with more users\nExpand edge cases\nRefine analytics and content states",
-    researchImageOne: item.detail?.researchImageOne || item.image || "assets/images/projects/work1.jpg",
+    // Thumbnails belong to listing cards only; detail media must be added separately.
+    researchImageOne: item.detail?.researchImageOne || "assets/images/projects/work1.jpg",
     researchImageTwo: item.detail?.researchImageTwo || "assets/images/projects/work3.jpg",
     researchImages: Array.isArray(item.detail?.researchImages)
       ? item.detail.researchImages.filter(Boolean)
       : [
-          item.detail?.researchImageOne || item.image || "assets/images/projects/work1.jpg",
+          item.detail?.researchImageOne || "assets/images/projects/work1.jpg",
           item.detail?.researchImageTwo || "assets/images/projects/work3.jpg",
         ].filter(Boolean),
     wireframeImage: item.detail?.wireframeImage || "assets/images/projects/work4.jpg",
@@ -967,7 +968,7 @@ function getProjectDetailDefaults(item = {}) {
     galleryImages: Array.isArray(item.detail?.galleryImages)
       ? item.detail.galleryImages.filter(Boolean)
       : [
-          item.detail?.mockupImageOne || item.image || "assets/images/projects/work5.jpg",
+          item.detail?.mockupImageOne || "assets/images/projects/work5.jpg",
           item.detail?.mockupImageTwo || "assets/images/blog/blog1.jpg",
           item.detail?.mockupImageThree || "assets/images/blog/blog2.jpg",
           item.detail?.mockupImageFour || "assets/images/blog/blog3.jpg",
@@ -3109,7 +3110,6 @@ function renderProjectDetailPage() {
     window.history.replaceState(null, "", getProjectDetailLink(project));
   }
   const detail = getProjectDetailDefaults(project);
-  const image = project.image || "assets/images/projects/work2.jpg";
   const projectDetailLink = getProjectDetailLink(project);
   const demoLink = String(project.link || "").trim();
   const hasDemoLink =
@@ -3214,18 +3214,18 @@ function renderProjectDetailPage() {
         </div>
       </div>
     </section>
-    <section class="project-case-section project-case-section--showcase" id="wireframes">
+    ${snapshotImages[2] ? `<section class="project-case-section project-case-section--showcase" id="wireframes">
       <div class="container">
-        <figure class="project-case-showcase-image"><img src="${escapeHtml(snapshotImages[2] || image)}" alt="${escapeHtml(project.title)} product showcase" /></figure>
+        <figure class="project-case-showcase-image"><img src="${escapeHtml(snapshotImages[2])}" alt="${escapeHtml(project.title)} product showcase" /></figure>
       </div>
-    </section>
-    <section class="project-case-section project-case-section--snapshot-gallery" id="design">
+    </section>` : ""}
+    ${snapshotImages.slice(3).length ? `<section class="project-case-section project-case-section--snapshot-gallery" id="design">
       <div class="container">
         <div class="project-case-snapshot-gallery">
           ${snapshotImages.slice(3).map((snapshot, index) => `<figure><img src="${escapeHtml(snapshot)}" alt="${escapeHtml(project.title)} interface ${index + 1}" /></figure>`).join("")}
         </div>
       </div>
-    </section>
+    </section>` : ""}
     ${flexibleBlocks.length ? `
     <section class="project-case-section project-case-section--flexible">
       <div class="container">
