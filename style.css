@@ -805,7 +805,7 @@ html{
   margin-right: 5px;
   display: inline-block;
   cursor: pointer;
-  border-radius: 10px;
+  border-radius: 24px;
   border-width: 1px;
   border-color: rgba(119, 119, 125, 0.2);
   --tw-bg-opacity: 1;
@@ -5501,7 +5501,7 @@ a.meanmenu-reveal{
 
 .dashboard-button {
   align-items: center;
-  border-radius: 10px;
+  border-radius: 24px;
   cursor: pointer;
   display: inline-flex;
   font: inherit;
@@ -6055,7 +6055,7 @@ a.meanmenu-reveal{
   color: #fff !important;
   display: inline-flex;
   gap: 10px;
-  border-radius: 10px;
+  border-radius: 24px;
 }
 
 .project-card-view-all:hover,
@@ -7619,7 +7619,7 @@ body.loaded {
   align-items: center;
   background: #9c383c;
   border: 1.5px solid #9c383c;
-  border-radius: 10px;
+  border-radius: 24px;
   color: #ffffff;
   display: inline-flex;
   font-family: "Roboto", sans-serif;
@@ -10482,7 +10482,7 @@ p.copy-left-text a:hover {
 .theme-btn {
   background: #9c383c !important;
   border-color: #9c383c !important;
-  border-radius: 10px !important;
+  border-radius: 24px !important;
   color: #ffffff !important;
 }
 
