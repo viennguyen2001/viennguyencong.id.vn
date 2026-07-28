@@ -3179,11 +3179,10 @@ function renderProjectDetailPage() {
       <div class="container">
         <div class="project-case-snapshot__top">
           <p>Project case study</p>
-          ${hasDemoLink ? `<a class="project-case-demo project-case-demo--hero" href="${escapeHtml(demoHref)}"${demoLinkAttrs}>Demo Project <i class="ri-arrow-right-up-line"></i></a>` : ""}
         </div>
         <h1>${escapeHtml(project.title)}</h1>
         <p class="project-case-lead">${escapeHtml(project.summary || detail.overview)}</p>
-        <div class="project-case-tags">${tags.map((tag) => `<span>${escapeHtml(tag)}</span>`).join("")}</div>
+        <div class="project-case-tags">${tags.map((tag) => `<span>${escapeHtml(tag)}</span>`).join("")}${hasDemoLink ? `<a class="project-case-demo project-case-demo--hero" href="${escapeHtml(demoHref)}"${demoLinkAttrs}>Demo Project <i class="ri-arrow-right-up-line"></i></a>` : ""}</div>
         <div class="project-case-info-grid" aria-label="Project information">
           <article><span>Project type</span><strong>${escapeHtml(detail.service)}</strong></article>
           <article><span>Timeframe</span><strong>${escapeHtml(detail.year)}</strong></article>
