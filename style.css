@@ -6050,8 +6050,18 @@ a.meanmenu-reveal{
 
 .project-card-view-all {
   align-items: center;
+  background: #9c383c !important;
+  border-color: #9c383c !important;
+  color: #fff !important;
   display: inline-flex;
   gap: 10px;
+}
+
+.project-card-view-all:hover,
+.project-card-view-all:focus-visible {
+  background: #782b2e !important;
+  border-color: #782b2e !important;
+  color: #fff !important;
 }
 
 .project-card-view-all i {
