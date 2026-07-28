@@ -5973,6 +5973,9 @@ a.meanmenu-reveal{
   aspect-ratio: 6/5;
   display: block;
   overflow: hidden;
+  position: relative;
+  box-shadow: 0 15px 24px rgba(28, 21, 16, 0.2);
+  z-index: 2;
 }
 
 .project-card__image img {
@@ -5994,16 +5997,26 @@ a.meanmenu-reveal{
   gap: 18px;
   justify-content: space-between;
   padding: 24px;
+  position: relative;
+  z-index: 1;
 }
 
-.project-card__content span {
+.project-card__tools {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-bottom: 18px;
+}
+
+.project-card__tool {
+  background: #ffc8ca;
+  border-radius: 10px;
   color: #9c383c;
-  display: block;
-  font-size: 12px;
-  font-weight: 900;
-  letter-spacing: 0.08em;
-  margin-bottom: 10px;
-  text-transform: uppercase;
+  display: inline-flex;
+  font-size: 13px;
+  font-weight: 600;
+  line-height: 1;
+  padding: 8px 12px;
 }
 
 .project-card__content h3 {

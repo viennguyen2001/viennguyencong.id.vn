@@ -3335,6 +3335,21 @@ function initProjectCards() {
     return window.matchMedia("(max-width: 1020px) and (min-width: 641px)").matches ? 4 : 3;
   }
 
+  function renderProjectCardTools(tags) {
+    const tools = String(tags || "")
+      .split(",")
+      .map((tool) => tool.trim())
+      .filter(Boolean);
+
+    if (!tools.length) return "";
+
+    return `
+      <div class="project-card__tools" aria-label="Project tools">
+        ${tools.map((tool) => `<span class="project-card__tool">${escapeHtml(tool)}</span>`).join("")}
+      </div>
+    `;
+  }
+
   function renderProjectCards() {
     const data = getDashboardData();
     const projects = (data.projects || []).filter((project) => project.status === "Active" || project.status === "Published");
@@ -3350,7 +3365,7 @@ function initProjectCards() {
             </a>
             <div class="project-card__content">
               <div>
-                <span>${escapeHtml(project.tags || "Project")}</span>
+                ${renderProjectCardTools(project.tags)}
                 <h3>${escapeHtml(project.title)}</h3>
                 <p>${escapeHtml(project.summary)}</p>
               </div>
