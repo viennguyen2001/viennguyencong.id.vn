@@ -37,6 +37,28 @@ const dashboardSeed = {
       },
     },
   ],
+  about: [
+    {
+      id: 601,
+      title: "About Me",
+      owner: "I’m Vien Nguyen, a passionate UI/UX Designer. I specialize in designing intuitive user interfaces and seamless user experiences, focusing on clarity, usability, and conversion. I combine visual design with product thinking to create digital experiences that are both functional and engaging.",
+      status: "Active",
+      date: "2026-07-08",
+      metric: "About",
+      tags: "About",
+      link: "/#about",
+      image: "",
+      summary: "Portfolio introduction",
+      detail: {
+        years: "3+",
+        yearsLabel: "Years Experience",
+        projects: "30+",
+        projectsLabel: "Projects Completed",
+        satisfaction: "96%",
+        satisfactionLabel: "Client Satisfaction",
+      },
+    },
+  ],
   projects: [
     {
       id: 1,
@@ -380,6 +402,12 @@ const dashboardLabels = {
     page: "/#home",
     helper: "Update the home avata image, intro text, review, and review avatars.",
   },
+  about: {
+    label: "About",
+    singular: "About",
+    page: "/#about",
+    helper: "Update your introduction and the portfolio experience, project, and satisfaction counters.",
+  },
   projects: {
     label: "Projects",
     singular: "Project",
@@ -445,6 +473,7 @@ const contactStatuses = [
 ];
 const dashboardIcons = {
   hero: "ri-home-5-line",
+  about: "ri-user-3-line",
   projects: "ri-folder-line",
   testimonials: "ri-chat-quote-line",
   skills: "ri-tools-line",
@@ -754,6 +783,19 @@ function normalizeDashboardData(data) {
         avatarThree: item.detail?.avatarThree || "assets/images/avatar/03.jpg",
       },
     })),
+    about: (data.about || dashboardSeed.about).map((item) => ({
+      ...item,
+      status: item.status || "Active",
+      link: item.link || "/#about",
+      detail: {
+        years: item.detail?.years || "3+",
+        yearsLabel: item.detail?.yearsLabel || "Years Experience",
+        projects: item.detail?.projects || "30+",
+        projectsLabel: item.detail?.projectsLabel || "Projects Completed",
+        satisfaction: item.detail?.satisfaction || "96%",
+        satisfactionLabel: item.detail?.satisfactionLabel || "Client Satisfaction",
+      },
+    })),
     testimonials: (data.testimonials || []).map((item) => ({
       ...item,
       link: item.link === "/about/#testimonials" ? "/#testimonials" : item.link,
@@ -817,6 +859,7 @@ function getDashboardData() {
         : {
             ...dashboardSeed,
             hero: parsedData?.hero || dashboardSeed.hero,
+            about: parsedData?.about || dashboardSeed.about,
             skills: dashboardSeed.skills,
             social: parsedData?.social || dashboardSeed.social,
             companies: parsedData?.companies || dashboardSeed.companies,
@@ -1403,6 +1446,31 @@ function initDashboard() {
       return;
     }
 
+    if (activeType === "about") {
+      const aboutItem = (data.about || dashboardSeed.about)[0] || dashboardSeed.about[0];
+      const detail = aboutItem.detail || {};
+      listNode.className = "dashboard-card-grid dashboard-card-grid--hero";
+      listNode.innerHTML = `
+        <article class="dashboard-content-card dashboard-hero-card">
+          <div class="dashboard-content-card__body">
+            <span class="dashboard-content-card__role">Portfolio introduction</span>
+            <h3>${escapeHtml(aboutItem.title)}</h3>
+            <p>${escapeHtml(aboutItem.owner)}</p>
+            <div class="dashboard-content-card__tags">
+              <span>${escapeHtml(detail.years || "3+")} ${escapeHtml(detail.yearsLabel || "Years Experience")}</span>
+              <span>${escapeHtml(detail.projects || "30+")} ${escapeHtml(detail.projectsLabel || "Projects Completed")}</span>
+              <span>${escapeHtml(detail.satisfaction || "96%")} ${escapeHtml(detail.satisfactionLabel || "Client Satisfaction")}</span>
+            </div>
+          </div>
+          <div class="dashboard-content-card__actions">
+            <a href="/#about">Open <i class="ri-arrow-right-line"></i></a>
+            <button type="button" aria-label="Edit About content" data-dashboard-edit="${aboutItem.id}"><i class="ri-edit-line"></i></button>
+          </div>
+        </article>
+      `;
+      return;
+    }
+
     if (activeType === "projects" && editingItem) {
       renderProjectEditor();
       return;
@@ -1701,7 +1769,7 @@ function initDashboard() {
       ? `${dashboardLabels[activeType].helper} You have ${unreadMessages} unread contact message${unreadMessages > 1 ? "s" : ""}.`
       : dashboardLabels[activeType].helper;
     addButton.querySelector("span").textContent = `Add ${dashboardLabels[activeType].singular}`;
-    addButton.hidden = activeType === "hero" || activeType === "contact" || activeType === "logo";
+    addButton.hidden = activeType === "hero" || activeType === "about" || activeType === "contact" || activeType === "logo";
     searchNode.placeholder =
       activeType === "contact" ? "Search messages" : activeType === "social" ? "Search social links" : "Search";
     searchNode.disabled = activeType === "logo";
@@ -2011,6 +2079,28 @@ function initDashboard() {
         : "";
 
     modalNode.classList.add("is-open");
+
+    if (activeType === "about") {
+      const detail = editingItem.detail || {};
+      modalNode.innerHTML = `
+        <div class="dashboard-modal__panel">
+          <header><div><p>About editor</p><h2>Edit About</h2></div><button type="button" data-dashboard-close aria-label="Close editor"><i class="ri-close-line"></i></button></header>
+          <form data-dashboard-form>
+            <label class="dashboard-form__wide">Section title<input name="title" value="${escapeHtml(editingItem.title || "About Me")}" required /></label>
+            <label class="dashboard-form__wide">Introduction<textarea name="owner" rows="6" required>${escapeHtml(editingItem.owner || "")}</textarea></label>
+            <label>Experience value<input name="aboutYears" value="${escapeHtml(detail.years || "3+")}" /></label>
+            <label>Experience label<input name="aboutYearsLabel" value="${escapeHtml(detail.yearsLabel || "Years Experience")}" /></label>
+            <label>Projects value<input name="aboutProjects" value="${escapeHtml(detail.projects || "30+")}" /></label>
+            <label>Projects label<input name="aboutProjectsLabel" value="${escapeHtml(detail.projectsLabel || "Projects Completed")}" /></label>
+            <label>Satisfaction value<input name="aboutSatisfaction" value="${escapeHtml(detail.satisfaction || "96%")}" /></label>
+            <label>Satisfaction label<input name="aboutSatisfactionLabel" value="${escapeHtml(detail.satisfactionLabel || "Client Satisfaction")}" /></label>
+            <input type="hidden" name="status" value="Active" /><input type="hidden" name="date" value="${escapeHtml(editingItem.date || "2026-07-08")}" />
+            <input type="hidden" name="metric" value="About" /><input type="hidden" name="tags" value="About" /><input type="hidden" name="link" value="/#about" /><input type="hidden" name="summary" value="Portfolio introduction" />
+            <footer><button class="dashboard-button dashboard-button--secondary" type="button" data-dashboard-close>Cancel</button><button class="dashboard-button dashboard-button--primary" type="submit">Save About</button></footer>
+          </form>
+        </div>`;
+      return;
+    }
 
     if (activeType === "hero") {
       modalNode.innerHTML = `
@@ -2712,7 +2802,19 @@ function initDashboard() {
       };
     }
 
-    if (activeType === "hero") {
+    if (activeType === "about") {
+      item.id = 601;
+      item.image = "";
+      item.detail = {
+        years: String(formData.get("aboutYears") || "3+").trim(),
+        yearsLabel: String(formData.get("aboutYearsLabel") || "Years Experience").trim(),
+        projects: String(formData.get("aboutProjects") || "30+").trim(),
+        projectsLabel: String(formData.get("aboutProjectsLabel") || "Projects Completed").trim(),
+        satisfaction: String(formData.get("aboutSatisfaction") || "96%").trim(),
+        satisfactionLabel: String(formData.get("aboutSatisfactionLabel") || "Client Satisfaction").trim(),
+      };
+      data = { ...data, about: [item] };
+    } else if (activeType === "hero") {
       const score = String(formData.get("heroReviewScore") || editingItem.detail?.reviewScore || "").trim();
       item.summary = String(item.summary || "100+ reviews").split(score).join("").replace(/\s+/g, " ").trim();
       item.id = 501;
@@ -2759,7 +2861,7 @@ function initDashboard() {
   });
 
   addButton.addEventListener("click", () => {
-    if (activeType === "hero" || activeType === "contact") {
+    if (activeType === "hero" || activeType === "about" || activeType === "contact") {
       return;
     }
 
@@ -2984,6 +3086,42 @@ function renderSiteHero() {
       `)
       .join("");
   }
+}
+
+
+function renderSiteAbout() {
+  const data = getDashboardData();
+  const about = (data.about || dashboardSeed.about)[0] || dashboardSeed.about[0];
+  const detail = about.detail || {};
+  const title = document.querySelector("[data-site-about-title]");
+  const description = document.querySelector("[data-site-about-description]");
+  const counters = document.querySelectorAll("[data-site-about-counter]");
+
+  if (title) title.textContent = about.title || "About Me";
+  if (description) description.textContent = about.owner || "";
+
+  const values = [
+    [detail.years || "3+", detail.yearsLabel || "Years Experience"],
+    [detail.projects || "30+", detail.projectsLabel || "Projects Completed"],
+    [detail.satisfaction || "96%", detail.satisfactionLabel || "Client Satisfaction"],
+  ];
+  counters.forEach((counter, index) => {
+    const [value, label] = values[index] || [];
+    const number = String(value || "").replace(/[^0-9]/g, "") || "0";
+    counter.querySelector(".count-text")?.setAttribute("data-stop", number);
+    const countText = counter.querySelector(".count-text");
+    if (countText) countText.textContent = value;
+    const titleNode = counter.querySelector(".counter-title");
+    if (titleNode) titleNode.textContent = label;
+  });
+}
+
+function initSiteAbout() {
+  renderSiteAbout();
+  window.addEventListener("nino-dashboard-updated", renderSiteAbout);
+  window.addEventListener("storage", (event) => {
+    if (event.key === dashboardStorageKey) renderSiteAbout();
+  });
 }
 
 function initSiteHero() {
@@ -3516,6 +3654,7 @@ document.addEventListener("DOMContentLoaded", async () => {
   initDashboardAuth();
   initDashboard();
   initSiteHero();
+  initSiteAbout();
   initSiteSocials();
   initSiteCompanies();
   initSiteSkills();
