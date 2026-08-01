@@ -59,6 +59,14 @@ const dashboardSeed = {
       },
     },
   ],
+  resume: [
+    { id: 701, title: "Web Developer & Business Partner (Full-Time)", owner: "Envato Marketplace", status: "Active", date: "2020 - Present", metric: "Experience", tags: "Experience", link: "/about/", image: "", summary: "Consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat." },
+    { id: 702, title: "CEO & Founder", owner: "Thememaster LTD", status: "Active", date: "2018 - 2020", metric: "Experience", tags: "Experience", link: "/about/", image: "", summary: "Consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat." },
+    { id: 703, title: "Senior Designer", owner: "Google", status: "Active", date: "2012 - 2018", metric: "Experience", tags: "Experience", link: "/about/", image: "", summary: "Consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat." },
+    { id: 704, title: "Bachelor Degree of Science", owner: "University of London", status: "Active", date: "2020 - Present", metric: "Education", tags: "Education", link: "/about/", image: "", summary: "Consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat." },
+    { id: 705, title: "Master Degree of Design", owner: "Envato Education", status: "Active", date: "2018 - 2020", metric: "Education", tags: "Education", link: "/about/", image: "", summary: "Consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat." },
+    { id: 706, title: "Degree Of UI & UX", owner: "University of world", status: "Active", date: "2015 - 2018", metric: "Education", tags: "Education", link: "/about/", image: "", summary: "Consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat." },
+  ],
   projects: [
     {
       id: 1,
@@ -408,6 +416,12 @@ const dashboardLabels = {
     page: "/#about",
     helper: "Update your introduction and the portfolio experience, project, and satisfaction counters.",
   },
+  resume: {
+    label: "About Page",
+    singular: "Resume Item",
+    page: "/about/",
+    helper: "Manage experience and education cards shown on the About page.",
+  },
   projects: {
     label: "Projects",
     singular: "Project",
@@ -474,6 +488,7 @@ const contactStatuses = [
 const dashboardIcons = {
   hero: "ri-home-5-line",
   about: "ri-user-3-line",
+  resume: "ri-profile-line",
   projects: "ri-folder-line",
   testimonials: "ri-chat-quote-line",
   skills: "ri-tools-line",
@@ -796,6 +811,12 @@ function normalizeDashboardData(data) {
         satisfactionLabel: item.detail?.satisfactionLabel || "Client Satisfaction",
       },
     })),
+    resume: (data.resume || dashboardSeed.resume).map((item) => ({
+      ...item,
+      status: item.status || "Active",
+      metric: item.metric === "Education" ? "Education" : "Experience",
+      link: item.link || "/about/",
+    })),
     testimonials: (data.testimonials || []).map((item) => ({
       ...item,
       link: item.link === "/about/#testimonials" ? "/#testimonials" : item.link,
@@ -860,6 +881,7 @@ function getDashboardData() {
             ...dashboardSeed,
             hero: parsedData?.hero || dashboardSeed.hero,
             about: parsedData?.about || dashboardSeed.about,
+            resume: parsedData?.resume || dashboardSeed.resume,
             skills: dashboardSeed.skills,
             social: parsedData?.social || dashboardSeed.social,
             companies: parsedData?.companies || dashboardSeed.companies,
@@ -1539,7 +1561,9 @@ function initDashboard() {
         ? "dashboard-card-grid dashboard-card-grid--blog"
         : activeType === "social" || activeType === "skills" || activeType === "companies"
           ? "dashboard-card-grid dashboard-card-grid--compact-list"
-          : "dashboard-card-grid";
+          : activeType === "resume"
+            ? "dashboard-card-grid dashboard-card-grid--compact-list"
+            : "dashboard-card-grid";
 
     listNode.innerHTML = items
       .map((item) => {
@@ -1584,6 +1608,23 @@ function initDashboard() {
           `;
         }
 
+        if (activeType === "resume") {
+          return             `<article class="dashboard-social-card dashboard-resume-card">
+              <div class="dashboard-resume-card__type">${escapeHtml(item.metric === "Education" ? "ED" : "EX")}</div>
+              <div>
+                <span class="dashboard-status dashboard-status--${String(item.status).toLowerCase()}">${escapeHtml(item.status)}</span>
+                <h3>${escapeHtml(item.title)}</h3>
+                <p>${escapeHtml(item.metric || "Experience")} · ${escapeHtml(item.date || "")}</p>
+                <p>${escapeHtml(item.owner || "")}</p>
+              </div>
+              <div class="dashboard-content-card__actions">
+                <a href="/about/">Open <i class="ri-arrow-right-line"></i></a>
+                <button type="button" aria-label="Edit ${escapeHtml(item.title)}" data-dashboard-edit="${item.id}"><i class="ri-edit-line"></i></button>
+                <button type="button" aria-label="Delete ${escapeHtml(item.title)}" data-dashboard-delete="${item.id}"><i class="ri-delete-bin-line"></i></button>
+              </div>
+            </article>`;
+        }
+
         if (activeType === "social") {
           const iconClass = item.owner || "ri-global-line";
 
@@ -1611,7 +1652,7 @@ function initDashboard() {
           `;
         }
 
-        if (activeType === "companies") {
+    if (activeType === "companies") {
           return `
             <article class="dashboard-social-card dashboard-company-card">
               <div class="dashboard-social-card__icon dashboard-company-card__logo">
@@ -2183,6 +2224,23 @@ function initDashboard() {
       return;
     }
 
+    if (activeType === "resume") {
+      modalNode.innerHTML = `
+        <div class="dashboard-modal__panel">
+          <header><div><p>About page editor</p><h2>${editingItem.id ? "Edit" : "Add"} Resume Item</h2></div><button type="button" data-dashboard-close aria-label="Close editor"><i class="ri-close-line"></i></button></header>
+          <form data-dashboard-form>
+            <label>Type<select name="metric"><option ${editingItem.metric !== "Education" ? "selected" : ""}>Experience</option><option ${editingItem.metric === "Education" ? "selected" : ""}>Education</option></select></label>
+            <label>Period<input name="date" value="${escapeHtml(editingItem.date || "")}" placeholder="2024 - Present" required /></label>
+            <label class="dashboard-form__wide">Title<input name="title" value="${escapeHtml(editingItem.title || "")}" required /></label>
+            <label class="dashboard-form__wide">Organization<input name="owner" value="${escapeHtml(editingItem.owner || "")}" required /></label>
+            <label>Status<select name="status"><option ${editingItem.status === "Active" ? "selected" : ""}>Active</option><option ${editingItem.status === "Draft" ? "selected" : ""}>Draft</option><option ${editingItem.status === "Disabled" ? "selected" : ""}>Disabled</option></select></label>
+            <label class="dashboard-form__wide">Description<textarea name="summary" rows="6">${escapeHtml(editingItem.summary || "")}</textarea></label>
+            <input type="hidden" name="tags" value="Resume" /><input type="hidden" name="link" value="/about/" /><input type="hidden" name="image" value="" />
+            <footer><button class="dashboard-button dashboard-button--secondary" type="button" data-dashboard-close>Cancel</button><button class="dashboard-button dashboard-button--primary" type="submit">Save item</button></footer>
+          </form>
+        </div>`;
+      return;
+    }
     if (activeType === "companies") {
       modalNode.innerHTML = `
         <div class="dashboard-modal__panel">
@@ -2802,7 +2860,11 @@ function initDashboard() {
       };
     }
 
-    if (activeType === "about") {
+    if (activeType === "resume") {
+      item.image = "";
+      item.tags = "Resume";
+      item.link = "/about/";
+    } else if (activeType === "about") {
       item.id = 601;
       item.image = "";
       item.detail = {
@@ -3113,6 +3175,29 @@ function renderSiteAbout() {
     if (countText) countText.textContent = value;
     const titleNode = counter.querySelector(".counter-title");
     if (titleNode) titleNode.textContent = label;
+  });
+}
+
+
+function renderSiteResume() {
+  const experienceNode = document.querySelector("[data-site-resume-experience]");
+  const educationNode = document.querySelector("[data-site-resume-education]");
+  if (!experienceNode && !educationNode) return;
+  const data = getDashboardData();
+  const items = (data.resume || dashboardSeed.resume).filter((item) => item.status === "Active");
+  const renderItems = (type) => items
+    .filter((item) => item.metric === type)
+    .map((item) => `<div class="resume-box"><span class="resume-date">${escapeHtml(item.date || "")}</span><h2>${escapeHtml(item.title || "")}</h2><span>@ ${escapeHtml(item.owner || "")}</span><p>${escapeHtml(item.summary || "")}</p></div>`)
+    .join("");
+  if (experienceNode) experienceNode.innerHTML = renderItems("Experience");
+  if (educationNode) educationNode.innerHTML = renderItems("Education");
+}
+
+function initSiteResume() {
+  renderSiteResume();
+  window.addEventListener("nino-dashboard-updated", renderSiteResume);
+  window.addEventListener("storage", (event) => {
+    if (event.key === dashboardStorageKey) renderSiteResume();
   });
 }
 
@@ -3655,6 +3740,7 @@ document.addEventListener("DOMContentLoaded", async () => {
   initDashboard();
   initSiteHero();
   initSiteAbout();
+  initSiteResume();
   initSiteSocials();
   initSiteCompanies();
   initSiteSkills();
