@@ -2,6 +2,19 @@
 <html lang="en">
   <head>
   <base href="/">
+    <script>
+      (function () {
+        try {
+          var loaderKey = "vien-portfolio-initial-loader-seen";
+          if (!sessionStorage.getItem(loaderKey)) {
+            document.documentElement.classList.add("has-initial-loader");
+            sessionStorage.setItem(loaderKey, "1");
+          }
+        } catch (error) {
+          document.documentElement.classList.add("has-initial-loader");
+        }
+      })();
+    </script>
     <meta name="color-scheme" content="light dark">
     <!-- META -->
     <meta charset="utf-8" />

@@ -455,41 +455,21 @@ Version      : 1.0
        ========================================================================== */
 
   $(window).on("load", function () {
-    const svg = document.getElementById("preloaderSvg");
-    const tl = gsap.timeline();
-    const curve = "M0 502S175 272 500 272s500 230 500 230V0H0Z";
-    const flat = "M0 2S175 1 500 1s500 1 500 1V0H0Z";
+    const loader = document.querySelector(".preloader");
+    if (!loader) return;
 
-    tl.to(".preloader-heading .load-text , .preloader-heading .cont", {
-      delay: 1.5,
-      y: -100,
-      opacity: 0,
-    });
-    tl.to(svg, {
-      duration: 0.5,
-      attr: { d: curve },
-      ease: "power2.easeIn",
-    }).to(svg, {
-      duration: 0.5,
-      attr: { d: flat },
-      ease: "power2.easeOut",
-    });
-    tl.to(".preloader", {
-      y: -1500,
-    });
-    tl.to(".preloader", {
-      zIndex: -1,
-      display: "none",
-    });
-  });
+    const dismissLoader = function () {
+      loader.style.display = "none";
+      loader.style.zIndex = "-1";
+      document.documentElement.classList.remove("has-initial-loader");
+    };
 
-  // Do not leave visitors trapped behind the animated loader if a third-party
-  // resource delays the window load event.
-  window.setTimeout(function () {
-    if (document.readyState !== "complete") {
-      $(".preloader").css({ display: "none", zIndex: -1 });
+    if (document.documentElement.classList.contains("has-initial-loader")) {
+      window.setTimeout(dismissLoader, 500);
+    } else {
+      dismissLoader();
     }
-  }, 6000);
+  });
 
   /*
    * ----------------------------------------------------------------------------------------

@@ -10506,6 +10506,46 @@ p.copy-left-text a:hover {
   color: #ffffff !important;
 }
 
+/* Mobile typography and initial loader refinements */
+/* The loader is visible only for the first document load in a browser session. */
+.preloader {
+  display: none !important;
+}
+
+html.has-initial-loader .preloader {
+  display: flex !important;
+}
+
+@media (max-width: 640px) {
+  /* Keep page hierarchy clear without headline-sized text taking over the screen. */
+  body:not(.dashboard-page) main h1,
+  body:not(.dashboard-page) .hero-content h1,
+  body:not(.dashboard-page) .project-case-hero h1 {
+    font-size: 48px !important;
+    line-height: 1.08 !important;
+  }
+  body:not(.dashboard-page) main h2,
+  body:not(.dashboard-page) .section-title h2,
+  body:not(.dashboard-page) .project-case-section h2,
+  body:not(.dashboard-page) .about-content h2 {
+    font-size: 42px !important;
+    line-height: 1.12 !important;
+  }
+  body:not(.dashboard-page) main h3,
+  body:not(.dashboard-page) .project-case-flex-block h3 {
+    font-size: 28px !important;
+    line-height: 1.16 !important;
+  }
+  body:not(.dashboard-page) .project-case-section--quote blockquote {
+    font-size: 34px !important;
+    line-height: 1.16 !important;
+  }
+  .dashboard-header h1 {
+    font-size: 30px !important;
+    line-height: 1.15 !important;
+  }
+}
+
 .hover\:cursor-pointer:hover{
   cursor: pointer;
 }
