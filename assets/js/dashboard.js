@@ -3702,7 +3702,10 @@ function initManagedContentSections() {
     `;
 
     if (testimonials.length > 3) {
-      const marqueeItems = testimonials.concat(testimonials);
+      const isMobileMarquee = window.matchMedia("(max-width: 640px)").matches;
+      const marqueeItems = isMobileMarquee
+        ? testimonials.concat(testimonials, testimonials)
+        : testimonials.concat(testimonials);
       testimonialList.className = "testimonial-marquee";
       testimonialList.innerHTML = `
         <div class="testimonial-marquee__track">

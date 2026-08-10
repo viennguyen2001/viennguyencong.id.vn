@@ -10649,6 +10649,47 @@ html.has-initial-loader .preloader {
     margin-top: 12px !important;
   }
 }
+/* Compact mobile header and seamless testimonial loop */
+@media (max-width: 640px) {
+  .main-header .header-upper,
+  .fixed-header .header-upper {
+    height: 96px !important;
+    padding: 0 !important;
+  }
+  .main-header .header-inner,
+  .fixed-header .header-inner,
+  .main-header .header-inner .grid {
+    align-items: center !important;
+    height: 96px !important;
+    min-height: 0 !important;
+    padding-bottom: 0 !important;
+    padding-top: 0 !important;
+  }
+  .main-header .logo img {
+    width: 104px !important;
+  }
+  .main-header .side-menu-icon {
+    transform: scale(0.78) !important;
+  }
+  .testimonial-marquee__track {
+    animation-name: testimonial-scroll-mobile-seamless !important;
+    animation-duration: 36s !important;
+    gap: 0 !important;
+  }
+  .testimonial-marquee__item {
+    box-sizing: content-box;
+    flex-basis: calc(100vw - 56px) !important;
+    padding-right: 16px;
+  }
+}
+@keyframes testimonial-scroll-mobile-seamless {
+  from {
+    transform: translateX(0);
+  }
+  to {
+    transform: translateX(-33.333333%);
+  }
+}
 .hover\:cursor-pointer:hover{
   cursor: pointer;
 }
