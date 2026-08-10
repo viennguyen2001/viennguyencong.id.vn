@@ -9212,3 +9212,26 @@ html.has-initial-loader .preloader {
   from { transform: translateX(0); }
   to { transform: translateX(-33.333333%); }
 }
+
+
+/* Extra-compact mobile site header */
+@media (max-width: 640px) {
+  .main-header .header-upper,
+  .fixed-header .header-upper {
+    height: 66px !important;
+  }
+
+  .main-header .header-inner,
+  .fixed-header .header-inner,
+  .main-header .header-inner .grid {
+    height: 66px !important;
+  }
+
+  .main-header .logo img {
+    width: 76px !important;
+  }
+
+  .main-header .side-menu-icon {
+    transform: scale(0.64) !important;
+  }
+}
