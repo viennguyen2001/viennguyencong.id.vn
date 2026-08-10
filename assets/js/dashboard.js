@@ -817,7 +817,7 @@ function normalizeDashboardData(data) {
       metric: item.metric === "Education" ? "Education" : "Experience",
       link: item.link || "/about/",
     })),
-    testimonials: (data.testimonials || []).map((item) => ({
+    testimonials: (Array.isArray(data.testimonials) && data.testimonials.length ? data.testimonials : dashboardSeed.testimonials).map((item) => ({
       ...item,
       link: item.link === "/about/#testimonials" ? "/#testimonials" : item.link,
       status:
