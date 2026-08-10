@@ -3709,7 +3709,7 @@ function initManagedContentSections() {
       testimonialList.className = "testimonial-marquee";
       testimonialList.innerHTML = `
         <div class="testimonial-marquee__track">
-          ${marqueeItems.map((testimonial, index) => renderCard(testimonial, index, true)).join("")}
+          ${marqueeItems.map((testimonial, index) => renderCard(testimonial, index % testimonials.length, true)).join("")}
         </div>
       `;
       return;

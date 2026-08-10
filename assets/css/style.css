@@ -9235,3 +9235,16 @@ html.has-initial-loader .preloader {
     transform: scale(0.64) !important;
   }
 }
+
+
+/* Slow, seamless testimonial movement on mobile */
+@media (max-width: 640px) {
+  .testimonial-marquee__track,
+  .testimonial-marquee:hover .testimonial-marquee__track {
+    animation-duration: 58s !important;
+    animation-iteration-count: infinite !important;
+    animation-play-state: running !important;
+    animation-timing-function: linear !important;
+    will-change: transform;
+  }
+}
