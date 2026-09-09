@@ -4176,17 +4176,11 @@ a.meanmenu-reveal{
 .top-\[40\%\]{
   top: 40%;
 }
-.z-20{
-  z-index: 20;
-}
 .z-50{
   z-index: 50;
 }
 .z-\[10000\]{
   z-index: 10000;
-}
-.z-\[99999999999999\]{
-  z-index: 99999999999999;
 }
 .z-\[999\]{
   z-index: 999;
@@ -4277,12 +4271,6 @@ a.meanmenu-reveal{
 .h-10{
   height: 2.5rem;
 }
-.h-\[100vh\]{
-  height: 100vh;
-}
-.h-\[110vh\]{
-  height: 110vh;
-}
 .h-\[30px\]{
   height: 30px;
 }
@@ -4294,9 +4282,6 @@ a.meanmenu-reveal{
 }
 .w-10{
   width: 2.5rem;
-}
-.w-\[100vw\]{
-  width: 100vw;
 }
 .w-\[30px\]{
   width: 30px;
@@ -4361,9 +4346,6 @@ a.meanmenu-reveal{
 .gap-6{
   gap: 1.5rem;
 }
-.overflow-hidden{
-  overflow: hidden;
-}
 .overflow-x-hidden{
   overflow-x: hidden;
 }
@@ -4404,12 +4386,6 @@ a.meanmenu-reveal{
   --tw-bg-opacity: 1;
   background-color: rgba(244, 243, 237, 1);
   background-color: rgba(244, 243, 237, var(--tw-bg-opacity));
-}
-.bg-transparent{
-  background-color: transparent;
-}
-.fill-bodyBackground{
-  fill: #000;
 }
 .fill-none{
   fill: none;
@@ -4485,15 +4461,8 @@ a.meanmenu-reveal{
 .text-\[90px\]{
   font-size: 90px;
 }
-.text-xl{
-  font-size: 1.25rem;
-  line-height: 1.75rem;
-}
 .font-extrabold{
   font-weight: 800;
-}
-.font-extralight{
-  font-weight: 200;
 }
 .font-normal{
   font-weight: 400;
@@ -4506,9 +4475,6 @@ a.meanmenu-reveal{
 }
 .leading-\[80px\]{
   line-height: 80px;
-}
-.tracking-\[15px\]{
-  letter-spacing: 15px;
 }
 .text-blackColor{
   --tw-text-opacity: 1;
@@ -10506,16 +10472,7 @@ p.copy-left-text a:hover {
   color: #ffffff !important;
 }
 
-/* Mobile typography and initial loader refinements */
-/* The loader is visible only for the first document load in a browser session. */
-.preloader {
-  display: none !important;
-}
-
-html.has-initial-loader .preloader {
-  display: flex !important;
-}
-
+/* Mobile typography refinements */
 @media (max-width: 640px) {
   /* Keep page hierarchy clear without headline-sized text taking over the screen. */
   body:not(.dashboard-page) main h1,

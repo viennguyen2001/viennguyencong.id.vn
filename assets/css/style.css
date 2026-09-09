@@ -8995,16 +8995,7 @@ p.copy-left-text a:hover {
 }
 
 
-/* Mobile typography and initial loader refinements */
-/* The loader is visible only for the first document load in a browser session. */
-.preloader {
-  display: none !important;
-}
-
-html.has-initial-loader .preloader {
-  display: flex !important;
-}
-
+/* Mobile typography refinements */
 @media (max-width: 640px) {
   /* Keep page hierarchy clear without headline-sized text taking over the screen. */
   body:not(.dashboard-page) main h1,
