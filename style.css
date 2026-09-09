@@ -10962,6 +10962,368 @@ body:not(.dashboard-page) footer {
     line-height: 1.55 !important;
   }
 }
+/* Full Adora-inspired layout system */
+/* A portfolio interpretation of the Adora visual language: intentional, not a source clone. */
+body:not(.dashboard-page) {
+  background: #fafaf8 !important;
+  color: #353241 !important;
+}
+
+body:not(.dashboard-page) .container {
+  max-width: 1240px !important;
+}
+
+/* Centered product-style navigation */
+@media (min-width: 768px) {
+  body:not(.dashboard-page) .main-header .header-upper,
+  body:not(.dashboard-page) .fixed-header .header-upper {
+    max-width: 620px !important;
+    width: calc(100% - 48px) !important;
+    padding: 0 22px !important;
+  }
+  body:not(.dashboard-page) .main-header .header-inner,
+  body:not(.dashboard-page) .fixed-header .header-inner {
+    min-height: 62px !important;
+  }
+  body:not(.dashboard-page) .main-header .logo img {
+    width: 82px !important;
+  }
+  body:not(.dashboard-page) .main-header .grid {
+    gap: 10px !important;
+  }
+}
+body:not(.dashboard-page) .main-header .nav-menu > ul {
+  align-items: center;
+  display: flex;
+  gap: 22px;
+  justify-content: flex-end;
+}
+
+body:not(.dashboard-page) .main-header .nav-menu > ul > li > a {
+  font-size: 14px !important;
+  font-weight: 600 !important;
+}
+
+/* Home hero becomes a calm centered product showcase. */
+body:not(.dashboard-page) #home {
+  background: #fafaf8 !important;
+  overflow: hidden;
+  padding: 164px 0 88px !important;
+  position: relative;
+}
+
+body:not(.dashboard-page) #home .container > .grid:first-child {
+  display: block !important;
+}
+
+body:not(.dashboard-page) #home h2[data-site-hero-title] {
+  color: #21164c !important;
+  color: var(--adora-plum) !important;
+  font-size: max(66px, min(9vw, 128px)) !important;
+  font-weight: 800 !important;
+  line-height: 0.94 !important;
+  margin: 0 auto !important;
+  max-width: 900px;
+  text-align: center !important;
+  text-transform: none !important;
+  white-space: normal !important;
+}
+
+body:not(.dashboard-page) #home .container > .grid:nth-child(2) {
+  align-items: center;
+  display: grid !important;
+  grid-gap: 36px !important;
+  gap: 36px !important;
+  grid-template-columns: minmax(180px, 0.75fr) minmax(360px, 1.32fr) minmax(220px, 0.85fr);
+  margin: 58px auto 0 !important;
+  max-width: 1120px;
+}
+
+body:not(.dashboard-page) #home .container > .grid:nth-child(2) > div {
+  grid-column: auto !important;
+  padding: 0 !important;
+}
+
+body:not(.dashboard-page) #home .hero-image {
+  background: #dff5ff;
+  background: var(--adora-sky);
+  border: 1px solid rgba(89, 46, 255, 0.12);
+  border-radius: 48px !important;
+  box-shadow: 0 20px 50px rgba(33, 22, 76, 0.1);
+  margin: 0 !important;
+  overflow: hidden;
+  transform: rotate(-2deg);
+}
+
+body:not(.dashboard-page) #home .hero-image img {
+  aspect-ratio: 1/1;
+  display: block;
+  height: auto !important;
+  -o-object-fit: cover;
+     object-fit: cover;
+  transform: rotate(2deg) scale(1.05);
+  width: 100% !important;
+}
+
+body:not(.dashboard-page) #home .hero-content {
+  padding: 0 !important;
+}
+
+body:not(.dashboard-page) #home .clienti-reviews {
+  background: #fff;
+  border: 1px solid #e0e0db;
+  border: 1px solid var(--adora-line);
+  border-radius: 24px;
+  box-shadow: 0 10px 30px rgba(33, 22, 76, 0.06);
+  padding: 24px !important;
+}
+
+body:not(.dashboard-page) #home .reviews {
+  color: #21164c !important;
+  color: var(--adora-plum) !important;
+  font-size: 17px !important;
+  font-weight: 700;
+}
+
+body:not(.dashboard-page) #home .reviews p,
+body:not(.dashboard-page) #home .hero-content > p {
+  color: #5f5f69 !important;
+  color: var(--adora-muted) !important;
+  font-size: 16px !important;
+  line-height: 1.6 !important;
+  margin: 16px 0 0 !important;
+}
+
+body:not(.dashboard-page) #home .hero-content > p {
+  color: #353241 !important;
+  color: var(--adora-text) !important;
+  font-size: 18px !important;
+  margin: 0 0 22px !important;
+}
+
+/* Trust strip */
+body:not(.dashboard-page) .company-design-area {
+  background: #fff !important;
+  border-bottom: 1px solid #e0e0db;
+  border-bottom: 1px solid var(--adora-line);
+  border-top: 1px solid #e0e0db;
+  border-top: 1px solid var(--adora-line);
+  padding: 42px 0 !important;
+}
+
+body:not(.dashboard-page) .company-design-area h2 {
+  color: #5f5f69 !important;
+  color: var(--adora-muted) !important;
+  font-size: 14px !important;
+  font-weight: 700 !important;
+  margin: 0 0 24px !important;
+  text-align: center;
+}
+
+body:not(.dashboard-page) .company-list img {
+  border: 1px solid #e0e0db;
+  border: 1px solid var(--adora-line);
+  border-radius: 16px;
+  padding: 13px 22px !important;
+}
+
+/* Section rhythm and product cards */
+body:not(.dashboard-page) .about-area,
+body:not(.dashboard-page) .services-area,
+body:not(.dashboard-page) .projects-area,
+body:not(.dashboard-page) .testimonials-area,
+body:not(.dashboard-page) .contact-area {
+  padding: 120px 0 !important;
+}
+
+body:not(.dashboard-page) .about-area {
+  background: #f4f0ff !important;
+}
+
+body:not(.dashboard-page) .about-pre-title,
+body:not(.dashboard-page) .section-title h2 {
+  color: #21164c !important;
+  color: var(--adora-plum) !important;
+  font-size: max(42px, min(5vw, 66px)) !important;
+  font-weight: 800 !important;
+  line-height: 1.02 !important;
+}
+
+body:not(.dashboard-page) .about-content-part p {
+  color: #21164c !important;
+  color: var(--adora-plum) !important;
+  font-size: max(24px, min(2.7vw, 42px)) !important;
+  line-height: 1.22 !important;
+  max-width: 920px;
+}
+
+body:not(.dashboard-page) .hero-counter-area {
+  border-top: 1px solid rgba(33, 22, 76, 0.18);
+  margin-top: 52px !important;
+  padding-top: 30px;
+}
+
+body:not(.dashboard-page) .counter-item .count-text {
+  color: #592eff !important;
+  color: var(--adora-violet) !important;
+  font-size: 45px !important;
+}
+
+body:not(.dashboard-page) .service-item {
+  background: #fff !important;
+  border: 1px solid #e0e0db !important;
+  border: 1px solid var(--adora-line) !important;
+  border-radius: 32px !important;
+  box-shadow: none !important;
+  min-height: 300px !important;
+  padding: 36px !important;
+  transition: border-color 0.2s ease, transform 0.2s ease;
+}
+
+body:not(.dashboard-page) .service-item:hover {
+  border-color: #592eff !important;
+  border-color: var(--adora-violet) !important;
+  transform: translateY(-5px);
+}
+
+body:not(.dashboard-page) .service-item h5,
+body:not(.dashboard-page) .service-item i {
+  color: #592eff !important;
+  color: var(--adora-violet) !important;
+}
+
+body:not(.dashboard-page) .service-item h4 {
+  color: #21164c !important;
+  color: var(--adora-plum) !important;
+  font-size: 30px !important;
+}
+
+body:not(.dashboard-page) .service-item p {
+  color: #5f5f69 !important;
+  color: var(--adora-muted) !important;
+  font-size: 17px !important;
+  line-height: 1.6 !important;
+}
+
+body:not(.dashboard-page) .project-card-grid {
+  gap: 28px !important;
+}
+
+body:not(.dashboard-page) .project-card {
+  border-radius: 32px !important;
+}
+
+body:not(.dashboard-page) .project-card .project-card-image,
+body:not(.dashboard-page) .project-card .project-image {
+  background: #dff5ff;
+  background: var(--adora-sky);
+}
+
+body:not(.dashboard-page) .project-card h3,
+body:not(.dashboard-page) .project-card .project-card-title {
+  color: #21164c !important;
+  color: var(--adora-plum) !important;
+  font-size: 27px !important;
+  font-weight: 800 !important;
+}
+
+body:not(.dashboard-page) .testimonials-area {
+  background: #f0ffdf !important;
+}
+
+body:not(.dashboard-page) .testimonial-card {
+  border-radius: 28px !important;
+}
+
+body:not(.dashboard-page) .contact-area {
+  background: #fff3f8 !important;
+}
+
+body:not(.dashboard-page) .contact-info-wrap,
+body:not(.dashboard-page) .contact-form-wrap {
+  border-radius: 32px !important;
+}
+
+body:not(.dashboard-page) .footer-area {
+  background: #21164c !important;
+  background: var(--adora-plum) !important;
+  border: 0 !important;
+  color: #fff !important;
+}
+
+body:not(.dashboard-page) .footer-area a,
+body:not(.dashboard-page) .footer-area p,
+body:not(.dashboard-page) .footer-area h2 {
+  color: #fff !important;
+}
+
+@media (max-width: 767px) {
+  body:not(.dashboard-page) #home {
+    padding: 112px 0 56px !important;
+  }
+  body:not(.dashboard-page) #home h2[data-site-hero-title] {
+    font-size: 54px !important;
+    max-width: 340px;
+  }
+  body:not(.dashboard-page) #home .container > .grid:nth-child(2) {
+    display: flex !important;
+    flex-direction: column;
+    gap: 24px !important;
+    margin-top: 32px !important;
+  }
+  body:not(.dashboard-page) #home .container > .grid:nth-child(2) > div:nth-child(1) {
+    order: 2;
+  }
+  body:not(.dashboard-page) #home .container > .grid:nth-child(2) > div:nth-child(2) {
+    order: 1;
+    width: min(88vw, 400px);
+  }
+  body:not(.dashboard-page) #home .container > .grid:nth-child(2) > div:nth-child(3) {
+    order: 3;
+    text-align: center;
+  }
+  body:not(.dashboard-page) #home .hero-image {
+    border-radius: 32px !important;
+  }
+  body:not(.dashboard-page) #home .clienti-reviews {
+    border-radius: 20px;
+    text-align: left;
+  }
+  body:not(.dashboard-page) #home .hero-content > p {
+    font-size: 16px !important;
+  }
+  body:not(.dashboard-page) .about-area,
+  body:not(.dashboard-page) .services-area,
+  body:not(.dashboard-page) .projects-area,
+  body:not(.dashboard-page) .testimonials-area,
+  body:not(.dashboard-page) .contact-area {
+    padding: 72px 0 !important;
+  }
+  body:not(.dashboard-page) .about-pre-title,
+  body:not(.dashboard-page) .section-title h2 {
+    font-size: 38px !important;
+  }
+  body:not(.dashboard-page) .about-content-part p {
+    font-size: 25px !important;
+  }
+  body:not(.dashboard-page) .hero-counter-area {
+    gap: 18px !important;
+  }
+  body:not(.dashboard-page) .counter-item .count-text {
+    font-size: 31px !important;
+  }
+  body:not(.dashboard-page) .counter-item .counter-title {
+    font-size: 12px !important;
+  }
+  body:not(.dashboard-page) .service-item {
+    border-radius: 26px !important;
+    min-height: 0 !important;
+    padding: 26px !important;
+  }
+  body:not(.dashboard-page) .project-card {
+    border-radius: 26px !important;
+  }
+}
 
 .hover\:cursor-pointer:hover{
   cursor: pointer;
