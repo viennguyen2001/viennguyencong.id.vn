@@ -9248,3 +9248,241 @@ html.has-initial-loader .preloader {
     will-change: transform;
   }
 }
+
+
+/* Adora-inspired public portfolio theme */
+/* Public portfolio only: the admin dashboard keeps its focused working UI. */
+:root {
+  --adora-violet: #592eff;
+  --adora-plum: #21164c;
+  --adora-text: #353241;
+  --adora-muted: #5f5f69;
+  --adora-line: #e0e0db;
+  --adora-sky: #dff5ff;
+  --adora-lime: #ecffd3;
+  --adora-pink: #ffe2ee;
+}
+
+body:not(.dashboard-page) {
+  background: #ffffff !important;
+  color: var(--adora-text) !important;
+  font-family: "Plus Jakarta Sans", Inter, Arial, sans-serif !important;
+}
+
+body:not(.dashboard-page) h1,
+body:not(.dashboard-page) h2,
+body:not(.dashboard-page) h3,
+body:not(.dashboard-page) h4,
+body:not(.dashboard-page) .main-title,
+body:not(.dashboard-page) .section-title {
+  color: var(--adora-plum) !important;
+  font-family: "Plus Jakarta Sans", Inter, Arial, sans-serif !important;
+  letter-spacing: 0 !important;
+}
+
+body:not(.dashboard-page) p,
+body:not(.dashboard-page) li,
+body:not(.dashboard-page) input,
+body:not(.dashboard-page) textarea {
+  font-family: "Plus Jakarta Sans", Inter, Arial, sans-serif !important;
+  letter-spacing: 0 !important;
+}
+
+/* Floating pill navigation */
+@media (min-width: 641px) {
+  body:not(.dashboard-page) .main-header .header-upper,
+  body:not(.dashboard-page) .fixed-header .header-upper {
+    background: rgba(255, 255, 255, .94) !important;
+    border: 1px solid var(--adora-line) !important;
+    border-radius: 40px !important;
+    box-shadow: 0 8px 30px rgba(33, 22, 76, .08) !important;
+    left: 50% !important;
+    margin: 0 !important;
+    max-width: 1180px !important;
+    padding: 0 20px !important;
+    right: auto !important;
+    top: 16px !important;
+    transform: translateX(-50%) !important;
+    width: calc(100% - 48px) !important;
+  }
+
+  body:not(.dashboard-page) .main-header .header-inner,
+  body:not(.dashboard-page) .fixed-header .header-inner {
+    min-height: 64px !important;
+  }
+}
+
+body:not(.dashboard-page) .main-header .nav-menu > ul > li > a,
+body:not(.dashboard-page) .main-header .nav-menu > ul > li > button {
+  color: var(--adora-text) !important;
+  font-size: 13px !important;
+  font-weight: 700 !important;
+  letter-spacing: 0 !important;
+}
+
+body:not(.dashboard-page) .main-header .nav-menu > ul > li > a:hover,
+body:not(.dashboard-page) .main-header .nav-menu > ul > li.current > a {
+  color: var(--adora-violet) !important;
+}
+
+body:not(.dashboard-page) .theme-btn,
+body:not(.dashboard-page) .project-card-view-all,
+body:not(.dashboard-page) .project-demo-btn,
+body:not(.dashboard-page) .contact-form button[type="submit"] {
+  background: var(--adora-violet) !important;
+  border: 1px solid var(--adora-violet) !important;
+  border-radius: 12px !important;
+  box-shadow: none !important;
+  color: #fff !important;
+  font-family: "Plus Jakarta Sans", Inter, Arial, sans-serif !important;
+  font-weight: 700 !important;
+  letter-spacing: 0 !important;
+  transition: background-color .2s ease, border-color .2s ease, transform .2s ease !important;
+}
+
+body:not(.dashboard-page) .theme-btn:hover,
+body:not(.dashboard-page) .project-card-view-all:hover,
+body:not(.dashboard-page) .project-demo-btn:hover,
+body:not(.dashboard-page) .contact-form button[type="submit"]:hover {
+  background: #4722d4 !important;
+  border-color: #4722d4 !important;
+  transform: translateY(-2px);
+}
+
+body:not(.dashboard-page) .projects-area,
+body:not(.dashboard-page) .testimonials-area,
+body:not(.dashboard-page) .about-area,
+body:not(.dashboard-page) .services-area,
+body:not(.dashboard-page) .contact-area,
+body:not(.dashboard-page) .blog-area {
+  background: #fff !important;
+}
+
+body:not(.dashboard-page) .project-card,
+body:not(.dashboard-page) .testimonial-card,
+body:not(.dashboard-page) .service-card,
+body:not(.dashboard-page) .contact-form-wrap,
+body:not(.dashboard-page) .contact-info-wrap,
+body:not(.dashboard-page) .about-card {
+  background: #fff !important;
+  border: 1px solid var(--adora-line) !important;
+  border-radius: 40px !important;
+  box-shadow: 0 10px 26px rgba(33, 22, 76, .06) !important;
+  overflow: hidden;
+}
+
+body:not(.dashboard-page) .project-card img,
+body:not(.dashboard-page) .project-card__image img {
+  background: var(--adora-sky);
+}
+
+body:not(.dashboard-page) .project-card .project-tools span,
+body:not(.dashboard-page) .project-card .tool-tag,
+body:not(.dashboard-page) .project-card__tools span {
+  background: var(--adora-pink) !important;
+  border: 0 !important;
+  border-radius: 12px !important;
+  color: var(--adora-plum) !important;
+  font-weight: 700 !important;
+}
+
+body:not(.dashboard-page) .project-card a,
+body:not(.dashboard-page) .project-card .project-card-link {
+  color: var(--adora-violet) !important;
+  font-weight: 700 !important;
+}
+
+body:not(.dashboard-page) .section-title h2,
+body:not(.dashboard-page) .section-heading,
+body:not(.dashboard-page) .page-title {
+  font-weight: 700 !important;
+  line-height: 1.08 !important;
+}
+
+body:not(.dashboard-page) .contact-form input,
+body:not(.dashboard-page) .contact-form textarea {
+  background: #fff !important;
+  border: 1px solid var(--adora-line) !important;
+  border-radius: 12px !important;
+  color: var(--adora-text) !important;
+}
+
+body:not(.dashboard-page) .contact-form input:focus,
+body:not(.dashboard-page) .contact-form textarea:focus {
+  border-color: var(--adora-violet) !important;
+  box-shadow: 0 0 0 3px rgba(89, 46, 255, .12) !important;
+}
+
+body:not(.dashboard-page) .footer-area,
+body:not(.dashboard-page) footer {
+  background: #fff !important;
+  color: var(--adora-text) !important;
+  border-top: 1px solid var(--adora-line) !important;
+}
+
+@media (max-width: 640px) {
+  body:not(.dashboard-page) .main-header .header-upper,
+  body:not(.dashboard-page) .fixed-header .header-upper {
+    background: rgba(255, 255, 255, .96) !important;
+    border: 1px solid var(--adora-line) !important;
+    border-radius: 32px !important;
+    box-shadow: 0 7px 24px rgba(33, 22, 76, .07) !important;
+    height: 60px !important;
+    left: 12px !important;
+    padding: 0 12px !important;
+    right: 12px !important;
+    top: 10px !important;
+    width: auto !important;
+  }
+
+  body:not(.dashboard-page) .main-header .header-inner,
+  body:not(.dashboard-page) .fixed-header .header-inner,
+  body:not(.dashboard-page) .main-header .header-inner .grid {
+    height: 60px !important;
+  }
+
+  body:not(.dashboard-page) .main-header .logo img {
+    width: 70px !important;
+  }
+
+  body:not(.dashboard-page) .main-header .side-menu-icon {
+    transform: scale(.56) !important;
+  }
+
+  body:not(.dashboard-page) h1,
+  body:not(.dashboard-page) .main-title {
+    font-size: clamp(42px, 12vw, 58px) !important;
+    line-height: 1.02 !important;
+  }
+
+  body:not(.dashboard-page) h2,
+  body:not(.dashboard-page) .section-title h2,
+  body:not(.dashboard-page) .section-heading {
+    font-size: clamp(30px, 9vw, 40px) !important;
+    line-height: 1.08 !important;
+  }
+
+  body:not(.dashboard-page) .project-card,
+  body:not(.dashboard-page) .testimonial-card,
+  body:not(.dashboard-page) .service-card,
+  body:not(.dashboard-page) .contact-form-wrap,
+  body:not(.dashboard-page) .contact-info-wrap,
+  body:not(.dashboard-page) .about-card {
+    border-radius: 28px !important;
+  }
+
+  body:not(.dashboard-page) .project-card .project-card-content,
+  body:not(.dashboard-page) .project-card .project-card-info {
+    padding: 26px 24px !important;
+  }
+
+  body:not(.dashboard-page) .project-card h3 {
+    font-size: 28px !important;
+    line-height: 1.15 !important;
+  }
+
+  body:not(.dashboard-page) .project-card p {
+    font-size: 18px !important;
+    line-height: 1.55 !important;
+  }
+}
