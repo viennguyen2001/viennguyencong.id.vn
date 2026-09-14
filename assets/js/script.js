@@ -454,22 +454,6 @@ Version      : 1.0
        When document is loaded, do
        ========================================================================== */
 
-  $(window).on("load", function () {
-    const loader = document.querySelector(".preloader");
-    if (!loader) return;
-
-    const dismissLoader = function () {
-      loader.style.display = "none";
-      loader.style.zIndex = "-1";
-      document.documentElement.classList.remove("has-initial-loader");
-    };
-
-    if (document.documentElement.classList.contains("has-initial-loader")) {
-      window.setTimeout(dismissLoader, 500);
-    } else {
-      dismissLoader();
-    }
-  });
 
   /*
    * ----------------------------------------------------------------------------------------
