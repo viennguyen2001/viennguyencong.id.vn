@@ -450,52 +450,5 @@ Version      : 1.0
     headerStyle();
   });
 
-  /* ==========================================================================
-       When document is loaded, do
-       ========================================================================== */
-
-
-  /*
-   * ----------------------------------------------------------------------------------------
-   *  CUSTOM CURSOR JS
-   * ----------------------------------------------------------------------------------------
-   */
-  const cursorBall = document.getElementById("ball");
-
-  document.addEventListener("mousemove", function (e) {
-    // Update cursor position and opacity on mousemove
-    gsap.to(cursorBall, {
-      duration: 0.3,
-      x: e.clientX,
-      y: e.clientY,
-      opacity: 1, // Ensure cursor is visible
-      ease: "power2.out",
-    });
-  });
-
-  // Hover effect on elements
-  const hoverElements = document.querySelectorAll("a");
-  hoverElements.forEach(function (element) {
-    element.addEventListener("mouseenter", function () {
-      // Animate cursorBall on mouseenter
-      cursorBall.classList.add("hovered");
-      gsap.to(cursorBall, {
-        duration: 0.3,
-        scale: 2, // Increase scale
-        opacity: 0, // Set opacity to 0
-        ease: 0.1,
-      });
-    });
-
-    element.addEventListener("mouseleave", function () {
-      // Restore cursorBall on mouseleave
-      cursorBall.classList.remove("hovered");
-      gsap.to(cursorBall, {
-        duration: 0.3,
-        scale: 1, // Restore scale to normal
-        opacity: 1, // Restore opacity
-        ease: "power2.out",
-      });
-    });
-  });
 })(jQuery); // End jQuery
+

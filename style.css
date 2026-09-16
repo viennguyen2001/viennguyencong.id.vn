@@ -6894,6 +6894,7 @@ body.loaded {
 }
 
 #ball {
+  display: none !important;
   position: fixed;
   width: 40px;
   height: 40px;
