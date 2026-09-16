@@ -3672,6 +3672,8 @@ Version      : 1.0
 }
 
 .project-card__image img {
+  object-position: center top;
+  transform-origin: center top;
   height: 100%;
   object-fit: cover;
   transition: transform 0.7s ease;
@@ -3723,6 +3725,10 @@ Version      : 1.0
 }
 
 .project-card__content p {
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+  overflow: hidden;
   color: #625c55;
   line-height: 1.65;
   margin: 12px 0 0;
