@@ -5666,7 +5666,7 @@ a.meanmenu-reveal{
 }
 
 .dashboard-row__title img {
-  aspect-ratio: 6/5;
+  aspect-ratio: 1 / 1;
   border-radius: 8px;
   height: 74px;
   -o-object-fit: cover;
@@ -10624,7 +10624,7 @@ p.copy-left-text a:hover {
     box-shadow: 0 10px 26px rgba(25, 24, 22, 0.1) !important;
   }
   .project-card__image {
-    aspect-ratio: 16/10 !important;
+    aspect-ratio: 1 / 1 !important;
   }
   .project-card__content {
     gap: 14px !important;
