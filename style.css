@@ -5988,6 +5988,34 @@ a.meanmenu-reveal{
   .single-page-hero-area h2 { font-size: 42px; }
 }
 
+/* Keep the closed mobile drawer invisible, including on horizontally scrolled pages. */
+body:not(.dashboard-page) .sidebar__area {
+  right: 0 !important;
+  width: min(360px, 100vw);
+  transform: translateX(100%);
+  visibility: hidden;
+  pointer-events: none;
+  background: #fff !important;
+}
+body:not(.dashboard-page) .sidebar__area.sidebar-opened {
+  transform: translateX(0);
+  visibility: visible;
+  pointer-events: auto;
+}
+body:not(.dashboard-page) .sidebar__area .sidebar__wrapper,
+body:not(.dashboard-page) .sidebar__area .mean-nav,
+body:not(.dashboard-page) .sidebar__area .mean-bar {
+  background: #fff !important;
+}
+body:not(.dashboard-page) .sidebar__area .mean-nav ul li a {
+  color: #191816 !important;
+  border-color: #e5e5e5 !important;
+}
+body:not(.dashboard-page) .sidebar__area .sidebar__close-btn {
+  background: #f1f1f1 !important;
+  color: #191816 !important;
+}
+
 .project-card__image img {
   object-position: center top;
   transform-origin: center top;
