@@ -3355,7 +3355,7 @@ Version      : 1.0
 }
 
 .dashboard-row__title img {
-  aspect-ratio: 1 / 1;
+  aspect-ratio: 6 / 5;
   border-radius: 8px;
   height: 74px;
   object-fit: cover;
@@ -3663,7 +3663,7 @@ Version      : 1.0
 }
 
 .project-card__image {
-  aspect-ratio: 6 / 5;
+  aspect-ratio: 1 / 1;
   display: block;
   overflow: hidden;
   position: relative;
