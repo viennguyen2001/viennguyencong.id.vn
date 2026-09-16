@@ -3671,6 +3671,16 @@ Version      : 1.0
   z-index: 2;
 }
 
+@media (max-width: 991px) {
+  .single-page-hero-area { padding-top: 120px; padding-bottom: 40px; }
+  .single-page-hero-area .col-span-12 { min-width: 0; }
+  .single-page-hero-area h2 { font-size: 64px; line-height: 1.1; overflow-wrap: anywhere; }
+  .single-page-hero-area p { padding: 24px 0 0; max-width: 560px; margin-inline: auto; }
+}
+@media (max-width: 640px) {
+  .single-page-hero-area h2 { font-size: 42px; }
+}
+
 .project-card__image img {
   object-position: center top;
   transform-origin: center top;
