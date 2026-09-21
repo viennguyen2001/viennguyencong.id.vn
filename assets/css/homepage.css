@@ -154,8 +154,9 @@ body.home-redesign .home-project-intro h2 { font-size: 48px !important; font-wei
 .home-project-intro h2 span { display: block; }
 body.home-redesign .home-project-intro h2 span:last-child { color: var(--home-muted) !important; }
 body.home-redesign .home-project-intro p { font-size: 14px; line-height: 1.6; color: var(--home-muted) !important; margin: 22px 0 28px; }
-.home-redesign #portfolio .project-card { transition: opacity .85s ease, translate .85s cubic-bezier(.22,1,.36,1) !important; }
-.home-redesign #portfolio .project-enter { opacity: 0; translate: 0 70px; }
+.home-redesign #portfolio .project-card { transition: opacity .85s ease, translate .85s cubic-bezier(.22,1,.36,1) !important; will-change: opacity, translate; }
+.home-redesign #portfolio .project-enter { opacity: 0; translate: -84px 0; }
+.home-redesign #portfolio .project-card:nth-child(even).project-enter { translate: 84px 0; }
 .home-project-intro__inner[data-home-reveal] { transition: opacity .8s ease, translate .8s cubic-bezier(.22,1,.36,1); }
 .home-project-intro__inner.home-pending { translate: -36px 0; }
 @media (max-width: 991px) {

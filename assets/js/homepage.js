@@ -7,7 +7,7 @@
       entry.target.classList.remove('home-pending');
       observer.unobserve(entry.target);
     });
-  }, { threshold: 0.08 });
+  }, { threshold: 0.12, rootMargin: '0px 0px -8% 0px' });
   document.querySelectorAll('.section-title, .service-item, .home-process__steps > div, .home-project-intro__inner').forEach(element => {
     element.setAttribute('data-home-reveal', '');
     if (element.getBoundingClientRect().top > window.innerHeight) element.classList.add('home-pending');
