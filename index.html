@@ -40,9 +40,9 @@
       <script src="https://oss.maxcdn.com/html5shiv/3.7.2/html5shiv.min.js"></script>
       <script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
     <![endif]-->
-  <link href="style.css?v=20260916-no-cursor" rel="stylesheet"></head>
+  <link href="style.css?v=20260916-no-cursor" rel="stylesheet"><link rel="stylesheet" href="/assets/css/homepage.css?v=20260921-1" /></head>
 
-  <body class="overflow-x-hidden bg-bodyBackground font-normal text-greyBg">
+  <body class="home-redesign overflow-x-hidden bg-bodyBackground font-normal text-greyBg">
     <!-- START SCROOL UP DESIGN AREA -->
     <div
       class="progress-wrap fixed bottom-[30px] right-[30px] z-50 block size-11 cursor-pointer rounded-[50px]"
@@ -124,76 +124,16 @@
     <div class="body-overlay"></div>
     <!-- // END MOBILE MENU DESIGN AREA-->
     <!-- START HEADER DESIGN AREA -->
-    <section id="home" class="bg-primaryColor pt-[115px]">
-      <div class="container">
-        <div class="grid grid-cols-12">
-          <div class="col-span-12">
-            <!-- START HERO DESIGN AREA -->
-            <div class="wow fadeInUp delay-0-2s p-0 text-center">
-              <h2
-                class="whitespace-nowrap text-center text-[58px] font-extrabold uppercase text-mainColor md:text-[105px] lg:text-[150px] xl:text-[200px]"
-                data-site-hero-title
-              >
-                Vien Nguyen
-              </h2>
-            </div>
-            <!-- / END HERO DESIGN AREA -->
-          </div>
+    <section id="home" class="home-hero" aria-labelledby="home-heading">
+      <img class="home-hero__portrait" src="https://res.cloudinary.com/tpwni7f3/image/upload/v1783747679/vien-portfolio/site-content-hero-0-image.jpg" alt="Vien Nguyen" data-site-hero-image fetchpriority="high" />
+      <div class="container home-hero__layout">
+        <div class="home-hero__identity"><span data-site-hero-title>Vien Nguyen</span><span>Independent UI/UX Designer</span></div>
+        <h1 id="home-heading">Product<br /><span>Designer.</span></h1>
+        <div class="home-hero__intro">
+          <p data-site-hero-description>I design clear, considered digital experiences that connect people and brands.</p>
+          <a class="theme-btn" href="/contact/" data-site-hero-button>Get in touch</a>
         </div>
-        <div class="grid grid-cols-12 max-lg:overflow-hidden lg:gap-6">
-          <div class="col-span-12 pt-8 lg:col-span-3">
-            <!-- START HERO DESIGN AREA -->
-            <div
-              class="hero-content wow fadeInUp delay-0-2s max-xl:p-0 max-md:p-0"
-            >
-              <div class="clienti-reviews">
-                <ul class="clienti-profile" data-site-hero-review-avatars>
-                  <li>
-                    <img
-                      class="img-fluid"
-                      src="./assets/images/avatar/01.jpg"
-                      alt="client"
-                    />
-                  </li>
-                  <li>
-                    <img
-                      class="img-fluid"
-                      src="./assets/images/avatar/02.jpg"
-                      alt="client"
-                    />
-                  </li>
-                  <li>
-                    <img
-                      class="img-fluid"
-                      src="./assets/images/avatar/03.jpg"
-                      alt="client"
-                    />
-                  </li>
-                </ul>
-                <div class="reviews" data-site-hero-review>
-                  100+ reviews <span>(4.96 of 5)</span>
-                  <p>Five-star reviews from my esteemed clients.</p>
-                </div>
-              </div>
-            </div>
-            <!-- / END HERO DESIGN AREA -->
-          </div>
-          <div class="col-span-12 lg:col-span-6">
-            <div class="hero-image lg:-mt-[100px]">
-              <img src="./assets/images/about/me.jpg" alt="" data-site-hero-image />
-            </div>
-            <!-- / END HERO DESIGN AREA -->
-          </div>
-          <div class="col-span-12 pt-8 lg:col-span-3">
-            <div class="hero-content wow fadeInUp delay-0-4s">
-              <p class="pb-4" data-site-hero-description>
-                I’m Vien Nguyen, a passionate UI/UX Designer focused on clarity, usability, and conversion-driven digital experiences.
-              </p>
-              <a class="theme-btn" href="/contact/" data-site-hero-button>Get In touch</a>
-            </div>
-            <!-- / END HERO DESIGN AREA -->
-          </div>
-        </div>
+        <a class="home-hero__scroll" href="#portfolio">Explore my work <i class="ri-arrow-down-line" aria-hidden="true"></i></a>
       </div>
     </section>
     <!-- / END HEADER DESIGN AREA -->
@@ -292,6 +232,20 @@
       </div>
     </section>
     <!-- / END ABOUT DESIGN AREA -->
+    <!-- START PORTFOLIO DESIGN AREA -->
+    <section class="projects-area project-card-area" id="portfolio">
+      <div class="container">
+        <div class="grid grid-cols-12 gap-6">
+          <div class="col-span-12">
+            <div class="section-title section-black-title wow fadeInUp delay-0-2s">
+              <p class="home-eyebrow">Selected projects</p><h2>Thoughtful design.<br />Real-world work.</h2>
+            </div>
+          </div>
+        </div>
+        <div class="project-card-grid" data-project-card-grid></div>
+      </div>
+    </section>
+    <!-- // END PORTFOLIO DESIGN AREA -->
     <!-- START SERVICE DESIGN AREA -->
     <section id="services" class="services-area">
       <div class="container">
@@ -300,7 +254,7 @@
             <div
               class="section-title section-black-title wow fadeInUp delay-0-2s"
             >
-              <h2>Services</h2>
+              <p class="home-eyebrow">What I do</p><h2>From first idea<br />to final detail.</h2>
             </div>
           </div>
         </div>
@@ -358,21 +312,20 @@
     </section>
     <!-- / END SERVICE DESIGN AREA -->
 
-    <!-- START PORTFOLIO DESIGN AREA -->
-    <section class="projects-area project-card-area" id="portfolio">
+
+
+    <section class="home-process" aria-labelledby="process-heading">
       <div class="container">
-        <div class="grid grid-cols-12 gap-6">
-          <div class="col-span-12">
-            <div class="section-title section-black-title wow fadeInUp delay-0-2s">
-              <h2>Projects</h2>
-            </div>
-          </div>
+        <p class="home-eyebrow">The approach</p>
+        <h2 id="process-heading">A clear process.<br />A considered outcome.</h2>
+        <div class="home-process__steps">
+          <div><span>01 / Discover</span><h3>Understand the context.</h3><p>Start with the people, the product, and the problem worth solving.</p></div>
+          <div><span>02 / Define</span><h3>Find the right direction.</h3><p>Turn priorities into a clear structure and a focused user journey.</p></div>
+          <div><span>03 / Design</span><h3>Make it feel intuitive.</h3><p>Shape the interface, explore interactions, and refine the details.</p></div>
+          <div><span>04 / Deliver</span><h3>Bring it all together.</h3><p>Prepare consistent screens and practical guidance for implementation.</p></div>
         </div>
-        <div class="project-card-grid" data-project-card-grid></div>
       </div>
     </section>
-    <!-- // END PORTFOLIO DESIGN AREA -->
-
     <!-- START TESTIMONIALS DESIGN AREA -->
     <section class="testimonials-area" id="testimonials">
       <div class="container">
@@ -381,7 +334,7 @@
             <div
               class="section-title section-black-title wow fadeInUp delay-0-2s"
             >
-              <h2>Testimonials</h2>
+              <p class="home-eyebrow">Client perspectives</p><h2>Good work starts<br />with good people.</h2>
             </div>
           </div>
         </div>
@@ -540,7 +493,7 @@
                     <div class="form-group mb-0">
                       <button type="submit" class="theme-btn">
                         Send Me Message <i class="ri-mail-line"></i>
-                      </button>
+                      </button>
                     </div>
                   </div>
                   <div class="col-span-12 text-center md:col-span-12">
@@ -612,5 +565,5 @@
     <script src="./assets/js/wow.min.js?v=20260914-b66ade6-no-loader"></script>
     <!-- SCRIPT JS-->
     <script src="./assets/js/script.js?v=20260916-no-cursor"></script>
-  <script defer src="index.contact-dedupe.js?v=20260914-b66ade6-no-loader"></script></body>
+  <script defer src="index.contact-dedupe.js?v=20260914-b66ade6-no-loader"></script><script defer src="/assets/js/homepage.js?v=20260920-1"></script></body>
 </html>
