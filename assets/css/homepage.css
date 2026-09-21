@@ -149,7 +149,7 @@ body.home-redesign { background: var(--home-bg) !important; color: var(--home-te
 .home-redesign #portfolio .project-card__link { font-size: 0 !important; flex-shrink: 0; }
 .home-redesign #portfolio .project-card__link i { font-size: 20px; }
 .home-project-intro { position: absolute; inset: 0 34%; pointer-events: none; }
-.home-project-intro__inner { position: sticky; top: 180px; padding: 96px 12px 24px; text-align: center; pointer-events: auto; }
+.home-project-intro__inner { position: absolute; top: 88px; left: 0; right: 0; padding: 0 12px 24px; text-align: center; pointer-events: auto; }
 body.home-redesign .home-project-intro h2 { font-size: 48px !important; font-weight: 500; line-height: 1.08; color: var(--home-text) !important; text-transform: none; }
 .home-project-intro h2 span { display: block; }
 body.home-redesign .home-project-intro h2 span:last-child { color: var(--home-muted) !important; }
