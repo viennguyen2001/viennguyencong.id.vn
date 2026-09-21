@@ -155,10 +155,12 @@ body.home-redesign .home-project-intro h2 { font-size: 48px !important; font-wei
 body.home-redesign .home-project-intro h2 span:last-child { color: var(--home-muted) !important; }
 body.home-redesign .home-project-intro p { font-size: 14px; line-height: 1.6; color: var(--home-muted) !important; margin: 22px 0 28px; }
 .home-redesign #portfolio .project-card { transition: opacity .85s ease, translate .85s cubic-bezier(.22,1,.36,1) !important; will-change: opacity, translate; }
-.home-redesign #portfolio .project-enter { opacity: 0; translate: -84px 0; }
-.home-redesign #portfolio .project-card:nth-child(even).project-enter { translate: 84px 0; }
-.home-project-intro__inner[data-home-reveal] { transition: opacity .8s ease, translate .8s cubic-bezier(.22,1,.36,1); }
-.home-project-intro__inner.home-pending { translate: -36px 0; }
+.home-redesign #portfolio .project-enter { opacity: 0; translate: 0 64px; scale: .94; }
+.home-redesign #portfolio .project-card:nth-child(2) { transition-delay: .08s; }
+.home-redesign #portfolio .project-card:nth-child(3) { transition-delay: .16s; }
+.home-redesign #portfolio .project-card:nth-child(4) { transition-delay: .24s; }
+.home-project-intro__inner[data-home-reveal] { transition: opacity .8s .14s ease, translate .8s .14s cubic-bezier(.22,1,.36,1); }
+.home-project-intro__inner.home-pending { translate: 0 34px; }
 @media (max-width: 991px) {
   .home-project-intro { position: static; }
   .home-project-intro__inner { position: static; padding: 0 0 36px; max-width: 420px; margin: auto; }
@@ -172,7 +174,7 @@ body.home-redesign .home-project-intro p { font-size: 14px; line-height: 1.6; co
   .home-redesign #portfolio .project-card:nth-child(even) { grid-column: 1; margin: 0; }
 }
 @media (prefers-reduced-motion: reduce) {
-  .home-redesign #portfolio .project-card { transition: none !important; opacity: 1; translate: none; }
+  .home-redesign #portfolio .project-card { transition: none !important; opacity: 1; translate: none; scale: 1; }
 }
 body.home-redesign {
   --home-bg: #ffffff;
