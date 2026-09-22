@@ -35,7 +35,6 @@ body.home-redesign { background: var(--home-bg) !important; color: var(--home-te
 .home-redesign .company-list { background: transparent !important; padding: 0; }
 .home-redesign .company-list img { height: 36px !important; max-width: 130px; object-fit: contain; filter: grayscale(1) !important; }
 .home-redesign .about-area { padding: 96px 0 !important; background: var(--home-bg) !important; }
-.home-redesign .about-pre-title { color: var(--home-muted) !important; font-size: 14px !important; font-weight: 400; }
 .home-redesign .about-content-part { padding: 0 !important; }
 .home-redesign .about-content-part p { font-size: 24px !important; line-height: 1.55 !important; color: var(--home-text) !important; font-weight: 400 !important; }
 .home-redesign .hero-counter-area { border-top: 1px solid #e6e6e8; margin-top: 40px; padding-top: 28px; gap: 24px; }
