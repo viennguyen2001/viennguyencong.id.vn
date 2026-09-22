@@ -30,6 +30,8 @@ body.home-redesign { background: var(--home-bg) !important; color: var(--home-te
 .home-hero__scroll { position: absolute; bottom: 38px; left: 24px; display: inline-flex; gap: 32px; align-items: center; color: #fff; font-size: 13px; }
 .home-redesign .company-design-area { padding: 40px 0 !important; background: var(--home-bg) !important; border-bottom: 1px solid #e6e6e8; }
 .home-redesign .company-design-area h2 { font-size: 12px; font-weight: 500; text-transform: none; color: var(--home-muted) !important; margin-bottom: 24px; letter-spacing: 0; }
+.home-redesign .company-design-area h2,
+.home-redesign .about-pre-title { font-size: 46px !important; line-height: 1.12 !important; font-weight: 500 !important; color: var(--home-text) !important; margin-bottom: 32px !important; }
 .home-redesign .company-list { background: transparent !important; padding: 0; }
 .home-redesign .company-list img { height: 36px !important; max-width: 130px; object-fit: contain; filter: grayscale(1) !important; }
 .home-redesign .about-area { padding: 96px 0 !important; background: var(--home-bg) !important; }
@@ -112,6 +114,8 @@ body.home-redesign { background: var(--home-bg) !important; color: var(--home-te
   .home-redesign .company-design-area { padding: 30px 0 !important; }
   .home-redesign .about-area { padding: 48px 0 !important; }
   .home-redesign .about-content-part p { font-size: 20px !important; }
+  .home-redesign .company-design-area h2,
+  .home-redesign .about-pre-title { font-size: 34px !important; line-height: 1.2 !important; margin-bottom: 24px !important; }
   .home-redesign .hero-counter-area { flex-wrap: wrap; gap: 20px; }
   .home-redesign .hero-counter-area .count-text { font-size: 28px !important; }
   .home-redesign .section-title h2,
