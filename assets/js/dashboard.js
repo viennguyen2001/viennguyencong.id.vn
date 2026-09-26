@@ -67,6 +67,11 @@ const dashboardSeed = {
     { id: 705, title: "Master Degree of Design", owner: "Envato Education", status: "Active", date: "2018 - 2020", metric: "Education", tags: "Education", link: "/about/", image: "", summary: "Consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat." },
     { id: 706, title: "Degree Of UI & UX", owner: "University of world", status: "Active", date: "2015 - 2018", metric: "Education", tags: "Education", link: "/about/", image: "", summary: "Consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat." },
   ],
+  education: [
+    { id: 801, title: "Bachelor Degree of Science", owner: "University of London", status: "Active", date: "2020 - Present", metric: "Education", tags: "Education", link: "/education/", image: "", summary: "Consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua." },
+    { id: 802, title: "Master Degree of Design", owner: "Envato Education", status: "Active", date: "2018 - 2020", metric: "Education", tags: "Education", link: "/education/", image: "", summary: "Focused on visual systems, digital products, and thoughtful user experiences." },
+    { id: 803, title: "Degree Of UI & UX", owner: "University of world", status: "Active", date: "2015 - 2018", metric: "Education", tags: "Education", link: "/education/", image: "", summary: "Built a foundation in interface design, interaction patterns, and visual communication." },
+  ],
   projects: [
     {
       id: 1,
@@ -422,6 +427,12 @@ const dashboardLabels = {
     page: "/about/",
     helper: "Manage experience and education cards shown on the About page.",
   },
+  education: {
+    label: "Education",
+    singular: "Education Item",
+    page: "/education/",
+    helper: "Manage education history and qualifications shown on the Education page.",
+  },
   projects: {
     label: "Projects",
     singular: "Project",
@@ -489,6 +500,7 @@ const dashboardIcons = {
   hero: "ri-home-5-line",
   about: "ri-user-3-line",
   resume: "ri-profile-line",
+  education: "ri-graduation-cap-line",
   projects: "ri-folder-line",
   testimonials: "ri-chat-quote-line",
   skills: "ri-tools-line",
@@ -817,6 +829,13 @@ function normalizeDashboardData(data) {
       metric: item.metric === "Education" ? "Education" : "Experience",
       link: item.link || "/about/",
     })),
+    education: (data.education || dashboardSeed.education).map((item) => ({
+      ...item,
+      status: item.status || "Active",
+      metric: "Education",
+      tags: item.tags || "Education",
+      link: item.link || "/education/",
+    })),
     testimonials: (Array.isArray(data.testimonials) && data.testimonials.length ? data.testimonials : dashboardSeed.testimonials).map((item) => ({
       ...item,
       link: item.link === "/about/#testimonials" ? "/#testimonials" : item.link,
@@ -882,6 +901,7 @@ function getDashboardData() {
             hero: parsedData?.hero || dashboardSeed.hero,
             about: parsedData?.about || dashboardSeed.about,
             resume: parsedData?.resume || dashboardSeed.resume,
+            education: parsedData?.education || dashboardSeed.education,
             skills: dashboardSeed.skills,
             social: parsedData?.social || dashboardSeed.social,
             companies: parsedData?.companies || dashboardSeed.companies,
@@ -3201,6 +3221,29 @@ function initSiteResume() {
   });
 }
 
+function renderSiteEducation() {
+  const educationNode = document.querySelector("[data-site-education]");
+  if (!educationNode) return;
+  const data = getDashboardData();
+  const items = (data.education || dashboardSeed.education).filter((item) => item.status === "Active");
+  educationNode.innerHTML = items.map((item) => `
+    <div class="resume-box">
+      <span class="resume-date">${escapeHtml(item.date || "")}</span>
+      <h2>${escapeHtml(item.title || "")}</h2>
+      <span>@ ${escapeHtml(item.owner || "")}</span>
+      <p>${escapeHtml(item.summary || "")}</p>
+    </div>
+  `).join("");
+}
+
+function initSiteEducation() {
+  renderSiteEducation();
+  window.addEventListener("nino-dashboard-updated", renderSiteEducation);
+  window.addEventListener("storage", (event) => {
+    if (event.key === dashboardStorageKey) renderSiteEducation();
+  });
+}
+
 function initSiteAbout() {
   renderSiteAbout();
   window.addEventListener("nino-dashboard-updated", renderSiteAbout);
@@ -3744,6 +3787,7 @@ document.addEventListener("DOMContentLoaded", async () => {
   initSiteHero();
   initSiteAbout();
   initSiteResume();
+  initSiteEducation();
   initSiteSocials();
   initSiteCompanies();
   initSiteSkills();
