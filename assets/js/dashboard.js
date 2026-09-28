@@ -733,16 +733,17 @@ function stripInlineImagesForFirebase(value) {
 
 function getFirebaseSaveErrorMessage(error) {
   const text = String(error?.message || error || "").toLowerCase();
+  const detail = String(error?.message || error || "").trim();
   if (text.includes("cloudinary") || text.includes("upload preset") || text.includes("upload failed")) {
-    return "Cloudinary chưa upload được ảnh. Kiểm tra Cloud name, unsigned upload preset và preset phải ở chế độ Unsigned.";
+    return `Cloudinary chưa upload được ảnh. Kiểm tra Cloud name, unsigned upload preset và preset phải ở chế độ Unsigned. Chi tiết: ${detail}`;
   }
   if (text.includes("permission") || text.includes("permission-denied")) {
-    return "Firebase chưa cho phép ghi dữ liệu. Kiểm tra Firestore/Storage Rules và đăng nhập dashboard bằng email Firebase.";
+    return `Firebase chưa cho phép ghi dữ liệu. Kiểm tra Firestore/Storage Rules và đăng nhập dashboard bằng email Firebase. Chi tiết: ${detail}`;
   }
   if (text.includes("size") || text.includes("maximum") || text.includes("too large")) {
     return "Dữ liệu có ảnh quá nặng nên Firestore không nhận. Mình đã bỏ ảnh base64 khi sync, hãy lưu lại lần nữa.";
   }
-  return "Dữ liệu đã lưu trên trình duyệt, nhưng chưa đồng bộ lên Firebase. Kiểm tra Auth/Firestore rules rồi thử lại.";
+  return `Dữ liệu đã lưu trên trình duyệt, nhưng chưa đồng bộ lên Firebase. Chi tiết: ${detail}`;
 }
 
 async function persistDashboardDataToFirebase(data) {
