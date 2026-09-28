@@ -747,7 +747,10 @@ function getFirebaseSaveErrorMessage(error) {
 
 async function persistDashboardDataToFirebase(data) {
   try {
-    const { firestore } = await initFirebaseServices();
+    const { auth, firestore } = await initFirebaseServices();
+    if (!auth.currentUser) {
+      throw new Error("permission-denied: Firebase admin session expired");
+    }
     const content = await uploadInlineImagesForCloud(normalizeDashboardData(data), "site-content");
     await getFirebaseContentRef(firestore).set(
       {
@@ -1256,6 +1259,13 @@ function initDashboardAuth() {
   }
 
   setAuthenticated(window.sessionStorage.getItem(dashboardAuthKey) === "true");
+  initFirebaseServices()
+    .then(({ auth }) => auth.onAuthStateChanged((user) => {
+      if (!user) {
+        setAuthenticated(false);
+      }
+    }))
+    .catch(() => setAuthenticated(false));
   if (window.localStorage.getItem(sidebarCollapsedStorageKey) === "true") {
     app.classList.add("is-sidebar-collapsed");
   }
