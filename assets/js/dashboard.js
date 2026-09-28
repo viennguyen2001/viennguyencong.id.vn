@@ -14,6 +14,7 @@ const cloudinaryCloudName = "tpwni7f3";
 const cloudinaryUploadPreset = "vien_portfolio_unsigned";
 let firebaseReadyPromise = null;
 let firebaseServices = null;
+let dashboardSavePromise = Promise.resolve(true);
 
 const dashboardSeed = {
   hero: [
@@ -940,7 +941,7 @@ function setDashboardData(data) {
   try {
     window.localStorage.setItem(dashboardStorageKey, JSON.stringify(data));
     window.dispatchEvent(new CustomEvent("nino-dashboard-updated", { detail: data }));
-    persistDashboardDataToFirebase(data);
+    dashboardSavePromise = persistDashboardDataToFirebase(data);
     return true;
   } catch (error) {
     const isQuotaError =
@@ -949,7 +950,7 @@ function setDashboardData(data) {
       String(error?.message || "").toLowerCase().includes("quota");
     if (isQuotaError) {
       // Large draft images go straight to Cloudinary, then the returned URL is cached.
-      persistDashboardDataToFirebase(data).then((saved) => {
+      dashboardSavePromise = persistDashboardDataToFirebase(data).then((saved) => {
         if (saved) {
           window.dispatchEvent(new CustomEvent("nino-dashboard-updated", { detail: getDashboardData() }));
         } else {
@@ -2808,7 +2809,7 @@ function initDashboard() {
     }
   });
 
-  app.addEventListener("submit", (event) => {
+  app.addEventListener("submit", async (event) => {
     const logoForm = event.target.closest("[data-dashboard-logo-form]");
 
     if (logoForm) {
@@ -2965,6 +2966,9 @@ function initDashboard() {
       if (messageNode) {
         messageNode.textContent = errorMessage;
       }
+      return;
+    }
+    if (activeType === "projects" && !(await dashboardSavePromise)) {
       return;
     }
     editingItem = null;
