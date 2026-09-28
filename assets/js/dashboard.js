@@ -672,7 +672,8 @@ async function uploadInlineImageToCloudinary(dataUrl, pathHint = "image") {
   formData.append("file", dataUrl);
   formData.append("upload_preset", cloudinaryUploadPreset);
   formData.append("folder", "vien-portfolio");
-  formData.append("public_id", String(pathHint || "image").replace(/[^a-z0-9-]/gi, "-").toLowerCase());
+  const publicId = `${String(pathHint || "image").replace(/[^a-z0-9-]/gi, "-").toLowerCase()}-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`;
+  formData.append("public_id", publicId);
 
   const response = await fetch(endpoint, {
     method: "POST",
