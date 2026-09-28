@@ -932,16 +932,22 @@ function setDashboardData(data) {
       error?.name === "QuotaExceededError" ||
       error?.name === "NS_ERROR_DOM_QUOTA_REACHED" ||
       String(error?.message || "").toLowerCase().includes("quota");
-    window.dispatchEvent(
-      new CustomEvent("nino-dashboard-save-error", {
-        detail: {
-          error,
-          message: isQuotaError
-            ? "Ảnh vẫn quá nặng nên trình duyệt không lưu được. Hãy dùng ảnh nhỏ hơn hoặc dán URL ảnh."
-            : "Không lưu được dữ liệu dashboard. Vui lòng thử lại.",
-        },
-      })
-    );
+    if (isQuotaError) {
+      // Large draft images go straight to Cloudinary, then the returned URL is cached.
+      persistDashboardDataToFirebase(data).then((saved) => {
+        if (saved) {
+          window.dispatchEvent(new CustomEvent("nino-dashboard-updated", { detail: getDashboardData() }));
+        } else {
+          window.dispatchEvent(new CustomEvent("nino-dashboard-save-error", {
+            detail: { error, message: "Không upload được ảnh draft. Hãy thử ảnh nhẹ hơn hoặc dán URL ảnh." },
+          }));
+        }
+      });
+      return true;
+    }
+    window.dispatchEvent(new CustomEvent("nino-dashboard-save-error", {
+      detail: { error, message: "Không lưu được dữ liệu dashboard. Vui lòng thử lại." },
+    }));
     return false;
   }
 }
