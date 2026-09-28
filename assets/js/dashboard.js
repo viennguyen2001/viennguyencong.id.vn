@@ -783,7 +783,17 @@ async function hydrateDashboardDataFromFirebase() {
     return getDashboardData();
   }
 
-  const data = normalizeDashboardData({ ...dashboardSeed, ...remoteData });
+  const shouldRestoreSapp = !((remoteData.projects || []).some((item) => item.title === "SAPP Academy"));
+  const data = normalizeDashboardData({
+    ...dashboardSeed,
+    ...remoteData,
+    projects: shouldRestoreSapp
+      ? [...(remoteData.projects || []), dashboardSeed.projects.find((item) => item.title === "SAPP Academy")]
+      : remoteData.projects,
+  });
+  if (shouldRestoreSapp) {
+    await persistDashboardDataToFirebase(data);
+  }
   try {
     window.localStorage.setItem(dashboardVersionStorageKey, dashboardContentVersion);
     window.localStorage.setItem(dashboardStorageKey, JSON.stringify(data));
@@ -846,8 +856,7 @@ function normalizeDashboardData(data) {
       ...item,
       link: item.link && !/^\/?single-project(?:\.html)?\/?(?:\?id=\d+)?$/i.test(item.link) ? item.link : getProjectDetailLink(item),
       detail: getProjectDetailDefaults(item),
-      status:
-        item.status === "Published" ? "Active" : item.status === "Review" ? "Disabled" : item.status,
+      status: item.status === "Published" ? "Active" : item.status === "Review" ? "Disabled" : item.status,
     })),
     skills: (data.skills || []).map((item) => ({
       ...item,
