@@ -1059,26 +1059,26 @@ function getProjectDetailDefaults(item = {}) {
       item.detail?.nextSteps ||
       "Validate with more users\nExpand edge cases\nRefine analytics and content states",
     // Thumbnails belong to listing cards only; detail media must be added separately.
-    researchImageOne: item.detail?.researchImageOne || "assets/images/projects/work1.jpg",
-    researchImageTwo: item.detail?.researchImageTwo || "assets/images/projects/work3.jpg",
+    researchImageOne: item.detail?.researchImageOne || "",
+    researchImageTwo: item.detail?.researchImageTwo || "",
     researchImages: Array.isArray(item.detail?.researchImages)
       ? item.detail.researchImages.filter(Boolean)
       : [
-          item.detail?.researchImageOne || "assets/images/projects/work1.jpg",
-          item.detail?.researchImageTwo || "assets/images/projects/work3.jpg",
+          item.detail?.researchImageOne,
+          item.detail?.researchImageTwo,
         ].filter(Boolean),
-    wireframeImage: item.detail?.wireframeImage || "assets/images/projects/work4.jpg",
-    mockupImageOne: item.detail?.mockupImageOne || item.image || "assets/images/projects/work5.jpg",
-    mockupImageTwo: item.detail?.mockupImageTwo || "assets/images/blog/blog1.jpg",
-    mockupImageThree: item.detail?.mockupImageThree || "assets/images/blog/blog2.jpg",
-    mockupImageFour: item.detail?.mockupImageFour || "assets/images/blog/blog3.jpg",
+    wireframeImage: item.detail?.wireframeImage || "",
+    mockupImageOne: item.detail?.mockupImageOne || "",
+    mockupImageTwo: item.detail?.mockupImageTwo || "",
+    mockupImageThree: item.detail?.mockupImageThree || "",
+    mockupImageFour: item.detail?.mockupImageFour || "",
     galleryImages: Array.isArray(item.detail?.galleryImages)
       ? item.detail.galleryImages.filter(Boolean)
       : [
-          item.detail?.mockupImageOne || "assets/images/projects/work5.jpg",
-          item.detail?.mockupImageTwo || "assets/images/blog/blog1.jpg",
-          item.detail?.mockupImageThree || "assets/images/blog/blog2.jpg",
-          item.detail?.mockupImageFour || "assets/images/blog/blog3.jpg",
+          item.detail?.mockupImageOne,
+          item.detail?.mockupImageTwo,
+          item.detail?.mockupImageThree,
+          item.detail?.mockupImageFour,
         ].filter(Boolean),
     blocks: Array.isArray(item.detail?.blocks) ? item.detail.blocks : [],
   };
