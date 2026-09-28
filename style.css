@@ -5970,7 +5970,7 @@ a.meanmenu-reveal{
 }
 
 .project-card__image {
-  aspect-ratio: auto;
+  aspect-ratio: 6 / 5;
   display: block;
   overflow: hidden;
   position: relative;
@@ -6019,10 +6019,9 @@ body:not(.dashboard-page) .sidebar__area .sidebar__close-btn {
 .project-card__image img {
   object-position: center top;
   transform-origin: center top;
-  height: auto;
+  height: 100%;
   -o-object-fit: cover;
-     object-fit: contain;
-  display: block;
+     object-fit: cover;
   transition: transform 0.7s ease;
   width: 100%;
 }
@@ -10626,7 +10625,7 @@ p.copy-left-text a:hover {
     box-shadow: 0 10px 26px rgba(25, 24, 22, 0.1) !important;
   }
   .project-card__image {
-    aspect-ratio: auto !important;
+    aspect-ratio: 6 / 5 !important;
   }
   .project-card__content {
     gap: 14px !important;
