@@ -751,6 +751,7 @@ async function persistDashboardDataToFirebase(data) {
     if (!auth.currentUser) {
       throw new Error("permission-denied: Firebase admin session expired");
     }
+    await auth.currentUser.getIdToken(true);
     const content = await uploadInlineImagesForCloud(normalizeDashboardData(data), "site-content");
     await getFirebaseContentRef(firestore).set(
       {
