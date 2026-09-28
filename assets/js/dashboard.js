@@ -2893,6 +2893,13 @@ function initDashboard() {
         galleryImages,
         blocks: detailBlocks,
       };
+      const exists = data.projects.some((contentItem) => contentItem.id === item.id);
+      data = {
+        ...data,
+        projects: exists
+          ? data.projects.map((contentItem) => (contentItem.id === item.id ? item : contentItem))
+          : [item, ...data.projects],
+      };
     }
 
     if (activeType === "resume") {
