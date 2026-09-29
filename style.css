@@ -1104,7 +1104,11 @@ html{
 }
 /* Logo */
 .logo img{
-  width: 70px;
+  width: 100px;
+  height: 48px;
+  max-width: 100%;
+  object-fit: contain;
+  object-position: left center;
 }
 /* Main Menu */
 .main-menu{
