@@ -3268,7 +3268,11 @@ function renderSiteAbout() {
     const number = String(value || "").replace(/[^0-9]/g, "") || "0";
     counter.querySelector(".count-text")?.setAttribute("data-stop", number);
     const countText = counter.querySelector(".count-text");
-    if (countText) countText.textContent = value;
+    if (countText) {
+      countText.textContent = countText.classList.contains("plus") && !String(value).includes("+")
+        ? `${number}+`
+        : value;
+    }
     const titleNode = counter.querySelector(".counter-title");
     if (titleNode) titleNode.textContent = label;
   });
