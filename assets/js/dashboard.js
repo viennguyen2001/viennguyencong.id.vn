@@ -3299,14 +3299,22 @@ function renderSiteEducation() {
   if (!educationNode) return;
   const data = getDashboardData();
   const items = (data.education || dashboardSeed.education).filter((item) => item.status === "Active");
-  educationNode.innerHTML = items.map((item) => `
+  educationNode.innerHTML = items.map((item) => {
+    const certificateLink = item.link && item.link !== "/education/" && item.link !== "/about/" ? item.link : "";
+    const certificateActions = [
+      certificateLink ? `<a class="education-box__action" href="${escapeHtml(certificateLink)}" target="_blank" rel="noopener noreferrer">View certificate <i class="ri-arrow-up-right-line"></i></a>` : "",
+      item.image ? `<a class="education-box__action" href="${escapeHtml(item.image)}" target="_blank" rel="noopener noreferrer">View image <i class="ri-image-line"></i></a>` : "",
+    ].filter(Boolean).join("");
+    return `
     <div class="resume-box">
       <span class="resume-date">${escapeHtml(item.date || "")}</span>
       <h2>${escapeHtml(item.title || "")}</h2>
       <span>@ ${escapeHtml(item.owner || "")}</span>
       <p>${escapeHtml(item.summary || "")}</p>
+      ${certificateActions ? `<div class="education-box__actions">${certificateActions}</div>` : ""}
     </div>
-  `).join("");
+  `;
+  }).join("");
 }
 
 function initSiteEducation() {
