@@ -7908,8 +7908,11 @@ body.loaded {
 }
 
 .project-case-snapshot-grid__item {
+  align-items: flex-start;
   background: #edeae5;
   border-radius: 22px;
+  display: flex;
+  justify-content: center;
   margin: 0;
   overflow: hidden;
 }
@@ -7921,7 +7924,9 @@ body.loaded {
 .project-case-snapshot-grid img {
   display: block;
   height: auto;
-  width: 100%;
+  margin: 0 auto;
+  max-width: 100%;
+  width: auto;
 }
 
 .project-case-section--overview,
