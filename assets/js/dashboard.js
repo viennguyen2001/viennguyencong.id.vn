@@ -2318,6 +2318,7 @@ function initDashboard() {
             <label class="dashboard-form__wide">Organization<input name="owner" value="${escapeHtml(editingItem.owner || "")}" required /></label>
             <label>Status<select name="status"><option ${editingItem.status === "Active" ? "selected" : ""}>Active</option><option ${editingItem.status === "Draft" ? "selected" : ""}>Draft</option><option ${editingItem.status === "Disabled" ? "selected" : ""}>Disabled</option></select></label>
             <label class="dashboard-form__wide">Description<textarea name="summary" rows="6">${escapeHtml(editingItem.summary || "")}</textarea></label>
+            ${editingItem.metric === "Education" ? `<label class="dashboard-form__wide">Certificate link<input name="certificateLink" value="${escapeHtml(editingItem.certificateLink || "")}" placeholder="https://..." /></label><label class="dashboard-form__wide">Certificate image<input name="certificateImage" value="${escapeHtml(editingItem.certificateImage || "")}" placeholder="Paste image URL" /></label>` : ""}
             <input type="hidden" name="tags" value="Resume" /><input type="hidden" name="link" value="/about/" /><input type="hidden" name="image" value="" />
             <footer><button class="dashboard-button dashboard-button--secondary" type="button" data-dashboard-close>Cancel</button><button class="dashboard-button dashboard-button--primary" type="submit">Save item</button></footer>
           </form>
@@ -2954,6 +2955,8 @@ function initDashboard() {
       item.image = "";
       item.tags = "Resume";
       item.link = "/about/";
+      item.certificateLink = String(formData.get("certificateLink") || "").trim();
+      item.certificateImage = String(formData.get("certificateImage") || "").trim();
     } else if (activeType === "about") {
       item.id = 601;
       item.image = "";
@@ -3271,6 +3274,14 @@ function renderSiteAbout() {
   });
 }
 
+function renderEducationActions(item) {
+  const certificateLink = item.certificateLink || (item.link && item.link !== "/education/" && item.link !== "/about/" ? item.link : "");
+  const actions = [
+    certificateLink ? `<a class="education-box__action" href="${escapeHtml(certificateLink)}" target="_blank" rel="noopener noreferrer">View certificate <i class="ri-arrow-up-right-line"></i></a>` : "",
+    (item.certificateImage || item.image) ? `<a class="education-box__action" href="${escapeHtml(item.certificateImage || item.image)}" target="_blank" rel="noopener noreferrer">View image <i class="ri-image-line"></i></a>` : "",
+  ].filter(Boolean).join("");
+  return actions ? `<div class="education-box__actions">${actions}</div>` : "";
+}
 
 function renderSiteResume() {
   const experienceNode = document.querySelector("[data-site-resume-experience]");
@@ -3280,7 +3291,7 @@ function renderSiteResume() {
   const items = (data.resume || dashboardSeed.resume).filter((item) => item.status === "Active");
   const renderItems = (type) => items
     .filter((item) => item.metric === type)
-    .map((item) => `<div class="resume-box"><span class="resume-date">${escapeHtml(item.date || "")}</span><h2>${escapeHtml(item.title || "")}</h2><span>@ ${escapeHtml(item.owner || "")}</span><p>${escapeHtml(item.summary || "")}</p></div>`)
+    .map((item) => `<div class="resume-box"><span class="resume-date">${escapeHtml(item.date || "")}</span><h2>${escapeHtml(item.title || "")}</h2><span>@ ${escapeHtml(item.owner || "")}</span><p>${escapeHtml(item.summary || "")}</p>${type === "Education" ? renderEducationActions(item) : ""}</div>`)
     .join("");
   if (experienceNode) experienceNode.innerHTML = renderItems("Experience");
   if (educationNode) educationNode.innerHTML = renderItems("Education");
@@ -3300,18 +3311,13 @@ function renderSiteEducation() {
   const data = getDashboardData();
   const items = (data.education || dashboardSeed.education).filter((item) => item.status === "Active");
   educationNode.innerHTML = items.map((item) => {
-    const certificateLink = item.link && item.link !== "/education/" && item.link !== "/about/" ? item.link : "";
-    const certificateActions = [
-      certificateLink ? `<a class="education-box__action" href="${escapeHtml(certificateLink)}" target="_blank" rel="noopener noreferrer">View certificate <i class="ri-arrow-up-right-line"></i></a>` : "",
-      item.image ? `<a class="education-box__action" href="${escapeHtml(item.image)}" target="_blank" rel="noopener noreferrer">View image <i class="ri-image-line"></i></a>` : "",
-    ].filter(Boolean).join("");
     return `
     <div class="resume-box">
       <span class="resume-date">${escapeHtml(item.date || "")}</span>
       <h2>${escapeHtml(item.title || "")}</h2>
       <span>@ ${escapeHtml(item.owner || "")}</span>
       <p>${escapeHtml(item.summary || "")}</p>
-      ${certificateActions ? `<div class="education-box__actions">${certificateActions}</div>` : ""}
+      ${renderEducationActions(item)}
     </div>
   `;
   }).join("");
