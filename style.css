@@ -7777,6 +7777,34 @@ body.loaded {
   padding-top: 32px;
 }
 
+.project-case-hero-grid {
+  align-items: end;
+  display: grid;
+  gap: max(28px, min(5vw, 72px));
+  grid-template-columns: minmax(220px, 0.72fr) minmax(0, 1.28fr);
+  margin-top: max(42px, min(6vw, 78px));
+}
+
+.project-case-hero-grid .project-case-info-grid {
+  margin-top: 0;
+}
+
+.project-case-hero-visual {
+  background: #ede9e3;
+  border-radius: 24px;
+  margin: 0;
+  overflow: hidden;
+}
+
+.project-case-hero-visual img {
+  aspect-ratio: 1200 / 1000;
+  display: block;
+  height: auto;
+  object-fit: cover;
+  object-position: top center;
+  width: 100%;
+}
+
 .project-case-info-grid article {
   display: grid;
   grid-gap: 8px;
@@ -8101,6 +8129,7 @@ body.loaded {
     width: 50px;
   }
   .project-case-info-grid,
+  .project-case-hero-grid,
   .project-case-snapshot-grid,
   .project-case-snapshot-gallery,
   .project-case-story {

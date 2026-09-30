@@ -3492,6 +3492,7 @@ function renderProjectDetailPage() {
     : [project.detail?.researchImageOne, project.detail?.researchImageTwo];
   const snapshotImages = configuredResearchImages
     .filter((image, index, list) => image && list.indexOf(image) === index);
+  const heroVisual = detail.galleryImages[0] || snapshotImages[0] || "";
   // Duplicate the slides so the carousel can continue into the first image without an empty tile.
   const carouselImages = snapshotImages.length > 1 ? [...snapshotImages, ...snapshotImages] : snapshotImages;
   const renderSnapshot = (snapshot, index) =>
@@ -3522,11 +3523,14 @@ function renderProjectDetailPage() {
         <h1>${escapeHtml(project.title)}</h1>
         <p class="project-case-lead">${escapeHtml(project.summary || detail.overview)}</p>
         <div class="project-case-tags">${tags.map((tag) => `<span>${escapeHtml(tag)}</span>`).join("")}${hasDemoLink ? `<a class="project-case-demo project-case-demo--hero" href="${escapeHtml(demoHref)}"${demoLinkAttrs}>Demo Project <i class="ri-arrow-right-up-line"></i></a>` : ""}</div>
-        <div class="project-case-info-grid" aria-label="Project information">
-          <article><span>Project type</span><strong>${escapeHtml(detail.service)}</strong></article>
-          <article><span>Timeframe</span><strong>${escapeHtml(detail.year)}</strong></article>
-          <article><span>Role</span><strong>${escapeHtml(detail.role)}</strong></article>
-          <article><span>Region</span><strong>${escapeHtml(detail.region)}</strong></article>
+        <div class="project-case-hero-grid">
+          <div class="project-case-info-grid" aria-label="Project information">
+            <article><span>Project type</span><strong>${escapeHtml(detail.service)}</strong></article>
+            <article><span>Timeframe</span><strong>${escapeHtml(detail.year)}</strong></article>
+            <article><span>Role</span><strong>${escapeHtml(detail.role)}</strong></article>
+            <article><span>Region</span><strong>${escapeHtml(detail.region)}</strong></article>
+          </div>
+          ${heroVisual ? `<figure class="project-case-hero-visual"><img src="${escapeHtml(heroVisual)}" alt="${escapeHtml(project.title)} featured screen" /></figure>` : ""}
         </div>
       </div>
     </section>
