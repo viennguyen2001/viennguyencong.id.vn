@@ -8023,6 +8023,34 @@ body.loaded {
   padding: max(64px, min(9vw, 132px)) 0;
 }
 
+.project-case-section--media {
+  background: #f5f2ed;
+}
+
+.project-case-media-heading {
+  border-top: 1px solid #dfdad2;
+  margin-bottom: max(34px, min(5vw, 64px));
+  padding-top: 24px;
+}
+
+.project-case-media-heading span {
+  color: #8a8178;
+  display: block;
+  font-size: 13px;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.project-case-media-heading h2 {
+  color: #2a1608;
+  font-size: max(30px, min(3.2vw, 52px));
+  font-weight: 500;
+  line-height: 1.08;
+  margin: 18px 0 0;
+  max-width: 760px;
+}
+
 .project-case-section--quote blockquote {
   color: #ffffff;
   font-size: max(32px, min(4.1vw, 64px));

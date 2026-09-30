@@ -3528,7 +3528,6 @@ function renderProjectDetailPage() {
           <article><span>Role</span><strong>${escapeHtml(detail.role)}</strong></article>
           <article><span>Region</span><strong>${escapeHtml(detail.region)}</strong></article>
         </div>
-        ${snapshotMedia}
       </div>
     </section>
     <section class="project-case-section project-case-section--overview">
@@ -3553,15 +3552,23 @@ function renderProjectDetailPage() {
         </div>
       </div>
     </section>
-    ${snapshotImages[2] ? `<section class="project-case-section project-case-section--showcase" id="wireframes">
+    ${snapshotImages.length ? `<section class="project-case-section project-case-section--media" id="research-images">
       <div class="container">
-        <figure class="project-case-showcase-image"><img src="${escapeHtml(snapshotImages[2])}" alt="${escapeHtml(project.title)} product showcase" /></figure>
+        <div class="project-case-media-heading">
+          <span>01 / Research</span>
+          <h2>Understanding the experience before shaping the interface.</h2>
+        </div>
+        ${snapshotMedia}
       </div>
     </section>` : ""}
-    ${snapshotImages.slice(3).length ? `<section class="project-case-section project-case-section--snapshot-gallery" id="design">
+    ${detail.galleryImages.length ? `<section class="project-case-section project-case-section--media project-case-section--gallery" id="design">
       <div class="container">
+        <div class="project-case-media-heading">
+          <span>02 / Selected work</span>
+          <h2>The final interface, shown in context.</h2>
+        </div>
         <div class="project-case-snapshot-gallery">
-          ${snapshotImages.slice(3).map((snapshot, index) => `<figure><img src="${escapeHtml(snapshot)}" alt="${escapeHtml(project.title)} interface ${index + 1}" /></figure>`).join("")}
+          ${detail.galleryImages.map((snapshot, index) => `<figure><img src="${escapeHtml(snapshot)}" alt="${escapeHtml(project.title)} interface ${index + 1}" /></figure>`).join("")}
         </div>
       </div>
     </section>` : ""}
