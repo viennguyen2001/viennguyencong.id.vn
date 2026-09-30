@@ -138,6 +138,37 @@ const dashboardSeed = {
         service: "Landing Page, Marketing Assets",
       },
     },
+    {
+      id: 9,
+      title: "Hello Vietnam",
+      owner: "Vien Nguyen",
+      status: "Active",
+      date: "2026-09-30",
+      metric: "1200x1000",
+      tags: "UI/UX Design, Web Design, Figma",
+      link: "https://hellovietnam.in/",
+      image: "",
+      summary: "A clear, welcoming digital experience designed to introduce Vietnam through a focused visual system and intuitive navigation.",
+      detail: {
+        region: "Vietnam",
+        year: "2026",
+        role: "UI/UX Designer",
+        service: "UX Strategy, UI Design, Web Design",
+        overview: "Hello Vietnam is a digital experience built to make discovering Vietnam feel clear, warm, and easy to navigate.",
+        problem: "The experience needed a stronger visual hierarchy so visitors could understand the content and move through the site with confidence.",
+        goal: "Create a polished, accessible interface that balances Vietnamese character with a modern web experience.",
+        responsibilities: "UX direction\nInformation architecture\nUI design\nResponsive design\nPrototype and iteration",
+        research: "Content structure and visitor intent shaped the navigation, page rhythm, and hierarchy of the experience.",
+        wireframes: "Wireframes established a simple route from introduction to exploration before the visual system was applied.",
+        design: "The interface uses clear sections, considered spacing, and a flexible visual language that supports exploration.",
+        prototype: "The prototype connected the main discovery flow across desktop and mobile layouts.",
+        impact: "A more focused structure gives Hello Vietnam a stronger first impression and makes the content easier to explore.",
+        learned: "Good visual design can make a place feel more approachable before a visitor reads a single paragraph.",
+        researchImages: [],
+        galleryImages: [],
+        blocks: [],
+      },
+    },
   ],
   blog: [
     {
@@ -790,15 +821,18 @@ async function hydrateDashboardDataFromFirebase() {
     return getDashboardData();
   }
 
-  const shouldRestoreSapp = !((remoteData.projects || []).some((item) => item.title === "SAPP Academy"));
+  const sappSeed = dashboardSeed.projects.find((item) => item.title === "SAPP Academy");
+  const helloVietnamSeed = dashboardSeed.projects.find((item) => item.title === "Hello Vietnam");
+  const projectsToRestore = [
+    sappSeed && !(remoteData.projects || []).some((item) => item.title === sappSeed.title) ? sappSeed : null,
+    helloVietnamSeed && !(remoteData.projects || []).some((item) => item.title === helloVietnamSeed.title) ? helloVietnamSeed : null,
+  ].filter(Boolean);
   const data = normalizeDashboardData({
     ...dashboardSeed,
     ...remoteData,
-    projects: shouldRestoreSapp
-      ? [...(remoteData.projects || []), dashboardSeed.projects.find((item) => item.title === "SAPP Academy")]
-      : remoteData.projects,
+    projects: [...(remoteData.projects || []), ...projectsToRestore],
   });
-  if (shouldRestoreSapp) {
+  if (projectsToRestore.length) {
     await persistDashboardDataToFirebase(data);
   }
   try {
