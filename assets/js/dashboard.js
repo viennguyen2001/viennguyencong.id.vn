@@ -3492,7 +3492,6 @@ function renderProjectDetailPage() {
     : [project.detail?.researchImageOne, project.detail?.researchImageTwo];
   const snapshotImages = configuredResearchImages
     .filter((image, index, list) => image && list.indexOf(image) === index);
-  const heroVisual = detail.galleryImages[0] || snapshotImages[0] || "";
   // Duplicate the slides so the carousel can continue into the first image without an empty tile.
   const carouselImages = snapshotImages.length > 1 ? [...snapshotImages, ...snapshotImages] : snapshotImages;
   const renderSnapshot = (snapshot, index) =>
@@ -3530,7 +3529,6 @@ function renderProjectDetailPage() {
             <article><span>Role</span><strong>${escapeHtml(detail.role)}</strong></article>
             <article><span>Region</span><strong>${escapeHtml(detail.region)}</strong></article>
           </div>
-          ${heroVisual ? `<figure class="project-case-hero-visual"><img src="${escapeHtml(heroVisual)}" alt="${escapeHtml(project.title)} featured screen" /></figure>` : ""}
         </div>
       </div>
     </section>

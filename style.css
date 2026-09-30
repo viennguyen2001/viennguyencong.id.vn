@@ -7781,7 +7781,8 @@ body.loaded {
   align-items: end;
   display: grid;
   gap: max(28px, min(5vw, 72px));
-  grid-template-columns: minmax(220px, 0.72fr) minmax(0, 1.28fr);
+  grid-template-columns: minmax(0, 1fr);
+  max-width: 760px;
   margin-top: max(42px, min(6vw, 78px));
 }
 
