@@ -1058,9 +1058,15 @@ html{
   --tw-bg-opacity: 1;
   background-color: rgba(244, 243, 237, 1);
   background-color: rgba(244, 243, 237, var(--tw-bg-opacity));
+  box-shadow: 0 8px 24px rgba(38, 27, 18, 0.08);
+  backdrop-filter: blur(12px);
   transition-property: all;
   transition-duration: 500ms;
   transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.fixed-header .header-inner {
+  background: #f4f3ed;
 }
 .fixed-header .header-inner{
   padding-top: 1rem;
