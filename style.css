@@ -1101,6 +1101,8 @@ html{
   }
 }
 .main-header .header-upper{
+  background: #f4f3ed;
+  box-shadow: 0 8px 24px rgba(38, 27, 18, 0.06);
   position: fixed;
   z-index: 5;
   width: 100%;
