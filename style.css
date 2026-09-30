@@ -7797,10 +7797,8 @@ body.loaded {
 }
 
 .project-case-hero-visual img {
-  aspect-ratio: 1200 / 1000;
   display: block;
   height: auto;
-  object-fit: cover;
   object-position: top center;
   width: 100%;
 }
@@ -7907,7 +7905,6 @@ body.loaded {
 }
 
 .project-case-snapshot-grid__item {
-  aspect-ratio: 1/1;
   background: #edeae5;
   border-radius: 22px;
   margin: 0;
@@ -7919,11 +7916,8 @@ body.loaded {
 }
 
 .project-case-snapshot-grid img {
-  aspect-ratio: 1/1;
   display: block;
-  height: 100%;
-  -o-object-fit: cover;
-     object-fit: cover;
+  height: auto;
   width: 100%;
 }
 
@@ -7974,21 +7968,17 @@ body.loaded {
 .project-case-deliverables article {
   align-items: flex-start;
   display: grid;
-  grid-gap: 30px;
-  gap: 30px;
-  grid-template-columns: 108px minmax(0, 1fr);
+  grid-gap: 24px;
+  gap: 24px;
+  grid-template-columns: 48px minmax(0, 1fr);
 }
 
-.project-case-deliverables i {
-  align-items: center;
-  background: #f3e1ce;
-  border-radius: 16px;
+.project-case-deliverable-number {
   color: #9c5a2f;
-  display: inline-flex;
-  font-size: 42px;
-  height: 88px;
-  justify-content: center;
-  width: 88px;
+  font-family: monospace;
+  font-size: 18px;
+  letter-spacing: .04em;
+  padding-top: 4px;
 }
 
 .project-case-deliverables h3 {
@@ -8015,10 +8005,8 @@ body.loaded {
 }
 
 .project-case-showcase-image img {
-  aspect-ratio: 16/9;
   display: block;
-  -o-object-fit: cover;
-     object-fit: cover;
+  height: auto;
   width: 100%;
 }
 
@@ -8034,15 +8022,13 @@ body.loaded {
 }
 
 .project-case-snapshot-gallery img {
-  aspect-ratio: 1/1;
   display: block;
-  -o-object-fit: cover;
-     object-fit: cover;
+  height: auto;
   width: 100%;
 }
 
 .project-case-snapshot-gallery figure:first-child img {
-  aspect-ratio: 1/1;
+  height: auto;
 }
 
 .project-case-section--quote {
@@ -8144,13 +8130,10 @@ body.loaded {
   }
   .project-case-deliverables article {
     gap: 20px;
-    grid-template-columns: 68px minmax(0, 1fr);
+    grid-template-columns: 36px minmax(0, 1fr);
   }
-  .project-case-deliverables i {
-    border-radius: 12px;
-    font-size: 30px;
-    height: 58px;
-    width: 58px;
+  .project-case-deliverable-number {
+    font-size: 15px;
   }
   .project-case-snapshot-grid__item:only-child,
   .project-case-snapshot-gallery figure:first-child {

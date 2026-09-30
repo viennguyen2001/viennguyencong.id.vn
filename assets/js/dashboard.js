@@ -3508,10 +3508,10 @@ function renderProjectDetailPage() {
       </div>`
     : `<div class="project-case-snapshot-grid">${snapshotImages.map(renderSnapshot).join("") || '<p class="project-case-snapshot-empty">No research images added yet.</p>'}</div>`;
   const designSteps = [
-    { title: "Design concept", text: detail.research, icon: "ri-layout-4-line" },
-    { title: "Information architecture", text: detail.wireframes, icon: "ri-node-tree" },
-    { title: "Prototyping", text: detail.prototype, icon: "ri-cursor-line" },
-    { title: "Design proposal", text: detail.design, icon: "ri-presentation-line" },
+    { title: "Design concept", text: detail.research },
+    { title: "Information architecture", text: detail.wireframes },
+    { title: "Prototyping", text: detail.prototype },
+    { title: "Design proposal", text: detail.design },
   ];
 
   page.innerHTML = `
@@ -3552,7 +3552,7 @@ function renderProjectDetailPage() {
           <div><p>${escapeHtml(detail.goal)}</p></div>
         </div>
         <div class="project-case-deliverables">
-          ${designSteps.map((step) => `<article><i class="${step.icon}"></i><div><h3>${escapeHtml(step.title)}</h3><p>${escapeHtml(step.text)}</p></div></article>`).join("")}
+          ${designSteps.map((step, index) => `<article><span class="project-case-deliverable-number">0${index + 1}</span><div><h3>${escapeHtml(step.title)}</h3><p>${escapeHtml(step.text)}</p></div></article>`).join("")}
         </div>
       </div>
     </section>
