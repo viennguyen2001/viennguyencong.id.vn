@@ -3879,6 +3879,12 @@ function initManagedContentSections() {
   });
 }
 
+// Read-only access for pages that render their own layout (the Canvas homepage).
+window.vienSite = {
+  getData: () => getDashboardData(),
+  getProjectLink: (project) => getProjectDetailLink(project),
+};
+
 document.addEventListener("DOMContentLoaded", async () => {
   window.__ninoFirestoreContactForm = true;
   initContactCapture();
