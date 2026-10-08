@@ -55,10 +55,6 @@
     color-scheme: dark;
   }
 }
-@media (prefers-color-scheme: dark) {
-  /* The maroon logo disappears on the dark toolbar, so it is shown in light ink. */
-  .toolbar__brand img { filter: brightness(0) invert(0.93); }
-}
 
 *, *::before, *::after { box-sizing: border-box; }
 html { -webkit-text-size-adjust: 100%; scroll-padding-top: 96px; }
@@ -113,27 +109,7 @@ a { color: inherit; }
 .section__title { font-size: clamp(36px, 4.2vw, 52px); font-weight: 800; line-height: 1.08; letter-spacing: -0.03em; }
 .section__lead { max-width: 560px; margin-top: 12px; color: var(--muted); font-size: 18px; line-height: 1.6; }
 
-/* Toolbar */
-.topbar { position: sticky; top: 0; z-index: 40; padding-top: 16px; }
-.toolbar {
-  position: relative;
-  display: flex;
-  align-items: center;
-  gap: 16px;
-  min-height: 60px;
-  padding: 0 10px 0 16px;
-  border: 1px solid var(--line);
-  border-radius: 14px;
-  background: var(--frame);
-  box-shadow: var(--shadow);
-}
-.toolbar__brand { display: flex; align-items: center; margin-right: auto; }
-.toolbar__brand img { width: auto; height: 32px; }
-.toolbar__nav { display: flex; gap: 4px; margin-right: auto; }
-.toolbar__nav a { display: block; padding: 7px 12px; border-radius: 8px; color: var(--ink); font-size: 15px; line-height: 1.4; text-decoration: none; }
-.toolbar__nav a:hover { background: var(--hover); }
-.toolbar__nav a[aria-current] { background: var(--hover); font-weight: 500; }
-.toolbar__menu { display: none; align-items: center; justify-content: center; width: 40px; height: 40px; padding: 0; border: 1px solid var(--line); border-radius: 9px; background: var(--frame); color: var(--ink); cursor: pointer; }
+/* Toolbar: see site-toolbar.css, shared with the other pages. */
 
 /* Hero */
 .hero { display: flex; align-items: flex-start; justify-content: space-between; gap: 64px; padding-top: clamp(80px, 9vw, 128px); }
@@ -260,24 +236,6 @@ a { color: inherit; }
   .contact { grid-template-columns: minmax(0, 1fr); gap: 48px; padding: 48px; }
 }
 @media (max-width: 900px) {
-  .toolbar__nav {
-    position: absolute;
-    top: calc(100% + 8px);
-    left: 0;
-    right: 0;
-    display: none;
-    flex-direction: column;
-    gap: 2px;
-    margin: 0;
-    padding: 8px;
-    border: 1px solid var(--line);
-    border-radius: 14px;
-    background: var(--frame);
-    box-shadow: var(--shadow);
-  }
-  .toolbar__nav.is-open { display: flex; }
-  .toolbar__nav a { padding: 12px; font-size: 16px; }
-  .toolbar__menu { display: inline-flex; }
   .hero { flex-direction: column; gap: 72px; }
   .hero__portrait { width: min(340px, 100%); }
   .work-card--large .frame { flex-direction: column; }
@@ -289,8 +247,6 @@ a { color: inherit; }
 }
 @media (max-width: 640px) {
   body { font-size: 17px; }
-  .toolbar { gap: 8px; padding: 0 8px 0 12px; }
-  .toolbar__cta { padding: 0 12px; }
   .hero { padding-top: 64px; }
   .hero__intro { margin-top: 28px; font-size: 17px; }
   .clients { gap: 12px 28px; padding-top: 88px; }

@@ -42,7 +42,10 @@
       <script src="https://oss.maxcdn.com/html5shiv/3.7.2/html5shiv.min.js"></script>
       <script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
     <![endif]-->
-  <link href="style.css?v=20260916-no-cursor" rel="stylesheet"></head>
+  <link href="style.css?v=20260916-no-cursor" rel="stylesheet">
+    <link rel="stylesheet" href="/assets/css/site-toolbar.css?v=20261009-1" />
+    <script defer src="/assets/js/site-toolbar.js?v=20261009-1"></script>
+  </head>
 
   <body class="overflow-x-hidden bg-bodyBackground font-normal text-greyBg">
     <!-- START SCROOL UP DESIGN AREA -->
@@ -66,65 +69,27 @@
     </div>
     <!-- / END SCROOL UP DESIGN AREA -->
     <!-- START MENU DESIGN AREA-->
-    <header class="main-header">
-      <div class="header-upper">
-        <div class="container">
-          <div class="header-inner">
-            <div class="grid grid-cols-12 items-center gap-6">
-              <div class="col-span-6 sm:col-span-3 xl:col-span-2">
-                <div class="logo-area">
-                  <div class="logo">
-                    <a href="/"
-                      ><img src="./assets/images/logo.png?v=20260929-vien-brand-assets-v2" alt=""
-                    /></a>
-                  </div>
-                </div>
-              </div>
-              <div class="col-span-6 sm:col-span-9 xl:col-span-10">
-                <div class="main-menu">
-                  <nav id="mobile-menu">
-                    <ul>
-                      <li><a href="/" class="linkstyle">Home</a></li>
-                      <li><a href="/about/" class="linkstyle">about</a></li>
-                      <li><a href="/education/" class="linkstyle">education</a></li>
-                      <li>
-                        <a href="/service/" class="linkstyle">services</a>
-                      </li>
-                      <li><a href="/projects/" class="linkstyle">projects</a></li>
-                      <li>
-                        <a href="/contact/" class="linkstyle">Contact</a>
-                      </li>
-                    </ul>
-                  </nav>
-                </div>
-                <div class="side-menu-icon text-end lg:hidden">
-                  <a
-                    href="javascript:void(0)"
-                    class="info-toggle-btn sidebar-toggle-btn"
-                    ><i class="fal fa-bars"></i
-                  ></a>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
+    <header class="site-topbar site-topbar--fixed" id="site-topbar" data-site-toolbar>
+      <nav class="site-toolbar" aria-label="Main">
+        <a class="site-toolbar__brand" href="/">
+          <img data-site-logo src="/assets/images/logo.png?v=20260929-vien-brand-assets-v2" alt="Vien Nguyen" width="80" height="32" />
+        </a>
+        <ul class="site-toolbar__nav" id="site-menu" data-menu>
+          <li><a href="/projects/" data-match="/projects/ /projectdetail/ /single-project/">Work</a></li>
+          <li><a href="/about/" data-match="/about/">About</a></li>
+          <li><a href="/#services">Services</a></li>
+          <li><a href="/education/" data-match="/education/">Education</a></li>
+          <li><a href="/#contact">Contact</a></li>
+        </ul>
+        <a class="site-toolbar__cta" href="/#contact">Get in touch</a>
+        <button class="site-toolbar__menu" type="button" aria-expanded="false" aria-controls="site-menu" data-menu-toggle>
+          <span class="site-toolbar__sr">Menu</span>
+          <svg width="20" height="20" viewBox="0 0 20 20" aria-hidden="true"><path d="M3 6h14M3 10h14M3 14h14" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" /></svg>
+        </button>
+      </nav>
     </header>
     <!-- // END MENU DESIGN AREA-->
     <!-- START MOBILE MENU DESIGN AREA-->
-    <div class="sidebar__area">
-      <div class="sidebar__wrapper">
-        <div class="sidebar__close">
-          <button class="sidebar__close-btn" id="sidebar__close-btn">
-            <i class="fal fa-times"></i>
-          </button>
-        </div>
-        <div class="sidebar__content mb-[20px] mt-[50px]">
-          <div class="mobile-menu fix"></div>
-        </div>
-      </div>
-    </div>
-    <div class="body-overlay"></div>
     <!-- // END MOBILE MENU DESIGN AREA-->
     <!-- START SINGLE PROJECT CASE STUDY AREA -->
     <main class="project-case-study">
