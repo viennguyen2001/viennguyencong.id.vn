@@ -32,16 +32,6 @@
     }
   });
 
-  /* ---------- The size tag shows the headline's real rendered size ---------- */
-  const selection = $("[data-selection]");
-  const sizeTag = $("[data-selection-size]");
-  if (selection && sizeTag && "ResizeObserver" in window) {
-    new ResizeObserver(() => {
-      const box = selection.getBoundingClientRect();
-      sizeTag.textContent = `${Math.round(box.width)} × ${Math.round(box.height)}`;
-    }).observe(selection);
-  }
-
   /* ---------- Highlight the section in view ---------- */
   const spyLinks = $$("[data-spy]");
   if (spyLinks.length && "IntersectionObserver" in window) {
@@ -170,7 +160,6 @@
     const image = isPlaceholderImage(project.image) ? "" : text(project.image);
     return `
       <article class="work-card${large ? " work-card--large" : ""}">
-        <p class="frame-name" aria-hidden="true">${esc(project.title)}</p>
         <a class="frame" href="${esc(projectLink(project))}">
           ${image ? `<img class="frame__image" src="${esc(image)}" alt="" width="1200" height="1000" loading="lazy" decoding="async" />` : `<span class="frame__image" aria-hidden="true"></span>`}
           <div class="frame__caption">
