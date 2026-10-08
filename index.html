@@ -18,26 +18,27 @@
     <link rel="icon" type="image/png" href="./assets/images/favicon.png?v=20260929-vien-brand-assets-v2" />
     <link rel="preload" href="/assets/fonts/be-vietnam-pro/be-vietnam-pro-latin-800-normal.woff2" as="font" type="font/woff2" crossorigin />
     <link rel="preload" href="/assets/fonts/be-vietnam-pro/be-vietnam-pro-latin-400-normal.woff2" as="font" type="font/woff2" crossorigin />
-    <link rel="stylesheet" href="/assets/css/canvas-home.css?v=20261008-3" />
+    <link rel="stylesheet" href="/assets/css/site-toolbar.css?v=20261009-1" />
+    <link rel="stylesheet" href="/assets/css/canvas-home.css?v=20261009-1" />
   </head>
   <body class="canvas-home">
     <a class="skip-link" href="#main">Skip to content</a>
 
-    <header class="topbar">
-      <nav class="toolbar wrap" aria-label="Main">
-        <a class="toolbar__brand" href="/">
-          <img data-site-logo src="./assets/images/logo.png?v=20260929-vien-brand-assets-v2" alt="Vien Nguyen" width="80" height="32" />
+    <header class="site-topbar" id="site-topbar" data-site-toolbar>
+      <nav class="site-toolbar" aria-label="Main">
+        <a class="site-toolbar__brand" href="/">
+          <img data-site-logo src="/assets/images/logo.png?v=20260929-vien-brand-assets-v2" alt="Vien Nguyen" width="80" height="32" />
         </a>
-        <ul class="toolbar__nav" id="site-menu" data-menu>
+        <ul class="site-toolbar__nav" id="site-menu" data-menu>
           <li><a href="#work" data-spy="work">Work</a></li>
-          <li><a href="/about/">About</a></li>
+          <li><a href="/about/" data-match="/about/">About</a></li>
           <li><a href="#services" data-spy="services">Services</a></li>
-          <li><a href="/education/">Education</a></li>
+          <li><a href="/education/" data-match="/education/">Education</a></li>
           <li><a href="#contact" data-spy="contact">Contact</a></li>
         </ul>
-        <a class="btn btn--primary btn--small toolbar__cta" href="#contact">Get in touch</a>
-        <button class="toolbar__menu" type="button" aria-expanded="false" aria-controls="site-menu" data-menu-toggle>
-          <span class="sr-only">Menu</span>
+        <a class="site-toolbar__cta" href="#contact">Get in touch</a>
+        <button class="site-toolbar__menu" type="button" aria-expanded="false" aria-controls="site-menu" data-menu-toggle>
+          <span class="site-toolbar__sr">Menu</span>
           <svg width="20" height="20" viewBox="0 0 20 20" aria-hidden="true"><path d="M3 6h14M3 10h14M3 14h14" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" /></svg>
         </button>
       </nav>
@@ -283,6 +284,7 @@
     </footer>
 
     <script defer src="/index.contact-dedupe.js?v=20261008-canvas"></script>
-    <script defer src="/assets/js/canvas-home.js?v=20261008-2"></script>
+    <script defer src="/assets/js/site-toolbar.js?v=20261009-1"></script>
+    <script defer src="/assets/js/canvas-home.js?v=20261009-1"></script>
   </body>
 </html>

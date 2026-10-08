@@ -11,27 +11,6 @@
     String(value ?? "").replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" })[c]);
   const isPublished = (item) => Boolean(item) && (item.status === "Active" || item.status === "Published");
 
-  /* ---------- Toolbar menu (small screens) ---------- */
-  const menu = $("[data-menu]");
-  const toggle = $("[data-menu-toggle]");
-  const setMenu = (open) => {
-    toggle.setAttribute("aria-expanded", String(open));
-    menu.classList.toggle("is-open", open);
-  };
-  toggle?.addEventListener("click", () => setMenu(toggle.getAttribute("aria-expanded") !== "true"));
-  menu?.addEventListener("click", (event) => {
-    if (event.target.closest("a")) setMenu(false);
-  });
-  document.addEventListener("click", (event) => {
-    if (!event.target.closest(".toolbar")) setMenu(false);
-  });
-  document.addEventListener("keydown", (event) => {
-    if (event.key === "Escape" && toggle?.getAttribute("aria-expanded") === "true") {
-      setMenu(false);
-      toggle.focus();
-    }
-  });
-
   /* ---------- Highlight the section in view ---------- */
   const spyLinks = $$("[data-spy]");
   if (spyLinks.length && "IntersectionObserver" in window) {
