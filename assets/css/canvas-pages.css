@@ -3,7 +3,7 @@
 .canvas-page { --section-gap: clamp(96px, 10vw, 152px); }
 
 .page-hero { padding-top: clamp(56px, 7vw, 96px); }
-.page-hero__title { font-size: clamp(48px, 8vw, 104px); font-weight: 800; line-height: 1; letter-spacing: -0.04em; }
+.page-hero__title { font-size: clamp(48px, 8vw, 104px); font-weight: 800; line-height: 1; letter-spacing: -0.035em; }
 .page-hero__lead { max-width: 640px; margin-top: 24px; color: var(--muted); font-size: clamp(18px, 1.8vw, 21px); line-height: 1.6; }
 .page-hero__meta { margin-top: 20px; color: var(--faint); font-size: 15px; font-variant-numeric: tabular-nums; }
 .page-hero__meta:empty { display: none; }

@@ -45,9 +45,14 @@ html:has(.viewer[open]) { overflow: hidden; }
 .case-overview__grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 32px 40px; }
 .case-overview h3 { font-size: 16px; font-weight: 700; line-height: 1.4; }
 .case-overview__grid p { margin-top: 8px; color: var(--muted); font-size: 16px; line-height: 1.65; }
-.case-points { margin-top: 16px; font-size: 15px; line-height: 1.5; }
-.case-points li { position: relative; padding: 10px 0 10px 20px; border-top: 1px solid var(--line); }
-.case-points li::before { content: ""; position: absolute; left: 1px; top: 17px; width: 7px; height: 7px; border: 1.5px solid var(--selection); border-radius: 1.5px; }
+/* Pain points: each with a small warning badge (a tinted circle with "!") */
+.case-points { margin-top: 20px; font-size: 16px; line-height: 1.5; }
+.case-points li { position: relative; padding: 12px 0 12px 36px; border-top: 1px solid var(--line); }
+.case-points li:last-child { border-bottom: 1px solid var(--line); }
+.case-points li::before,
+.case-points li::after { content: ""; position: absolute; left: 0; top: 13px; width: 22px; height: 22px; border-radius: 50%; }
+.case-points li::before { background: color-mix(in srgb, var(--link) 12%, transparent); }
+.case-points li::after { background: var(--link); -webkit-mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 12 12'%3E%3Cpath d='M6 2.5v4.2' stroke='%23000' stroke-width='1.8' stroke-linecap='round'/%3E%3Ccircle cx='6' cy='9.3' r='1.05'/%3E%3C/svg%3E") center / 12px 12px no-repeat; mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 12 12'%3E%3Cpath d='M6 2.5v4.2' stroke='%23000' stroke-width='1.8' stroke-linecap='round'/%3E%3Ccircle cx='6' cy='9.3' r='1.05'/%3E%3C/svg%3E") center / 12px 12px no-repeat; }
 .case-overview__did { margin-top: 36px; }
 .chips { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 12px; }
 .chips li { padding: 6px 14px; border-radius: 999px; background: var(--hover); font-size: 14px; font-weight: 500; line-height: 1.4; }
