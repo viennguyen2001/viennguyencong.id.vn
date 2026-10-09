@@ -137,8 +137,11 @@
     if (ratio < TALL) item.style.setProperty("--pan", `${Math.min(8, Math.max(2.5, 0.9 / ratio)).toFixed(1)}s`);
   };
   // Where each row ends, chosen for the whole grid at once so every row lands close to the target height
-  // (a greedy fill can leave one row much taller than the rest). A short last row keeps the target height
-  // instead of stretching. Without this, CSS alone still gives justified rows.
+  // (a greedy fill can leave one row much taller than the rest). Without this, CSS alone still gives justified rows.
+  // - A very wide image (a banner, a panorama) always has a row of its own, full width.
+  // - No row grows past --row-max: images that cannot fill a row below it (one tall poster) sit centred instead.
+  // - A short last row keeps the height of the row above it instead of stretching.
+  const BREAKOUT = 2.6;
   const layoutGrid = (grid) => {
     const items = [...grid.children];
     const width = grid.clientWidth;
@@ -146,38 +149,68 @@
     const style = getComputedStyle(grid);
     const gap = parseFloat(style.columnGap) || 0;
     const target = parseFloat(style.getPropertyValue("--row")) || 300;
+    const max = parseFloat(style.getPropertyValue("--row-max")) || target * 2;
     const shapes = items.map((item) => parseFloat(item.style.getPropertyValue("--r")) || 1);
+    const count = items.length;
     const heightOf = (from, to) => {
       let sum = 0;
       for (let index = from; index < to; index += 1) sum += shapes[index];
       return (width - gap * (to - from - 1)) / sum;
     };
-    const isLooseLastRow = (height) => height > target * 1.15;
-    const best = [0];
-    const start = [0];
-    for (let end = 1; end <= items.length; end += 1) {
-      best[end] = Infinity;
-      for (let from = end - 1; from >= 0; from -= 1) {
-        const height = heightOf(from, end);
-        if (height < target * 0.4 && end - from > 1) break; // more images would only make the row shorter
-        const cost = end === items.length && isLooseLastRow(height) ? 0 : Math.log(height / target) ** 2;
-        if (best[from] + cost < best[end]) {
-          best[end] = best[from] + cost;
-          start[end] = from;
+    const isLooseLastRow = (to, height) => to === count && height > target * 1.15;
+    const costOf = (from, to) => {
+      const height = heightOf(from, to);
+      if (isLooseLastRow(to, height)) return 0;
+      if (height > max) return Math.log(max / target) ** 2 + 1 + Math.log(height / max) ** 2;
+      return Math.log(height / target) ** 2 * (height < target ? 1.5 : 1);
+    };
+    const rows = [];
+    const plan = (first, last) => {
+      const best = { [first]: 0 };
+      const start = {};
+      for (let end = first + 1; end <= last; end += 1) {
+        best[end] = Infinity;
+        for (let from = end - 1; from >= first; from -= 1) {
+          if (end - from > 1 && heightOf(from, end) < target * 0.4) break; // more images would only make the row shorter
+          const cost = best[from] + costOf(from, end);
+          if (cost < best[end]) {
+            best[end] = cost;
+            start[end] = from;
+          }
         }
       }
-    }
-    const rows = [];
-    for (let end = items.length; end > 0; end = start[end]) rows.unshift([start[end], end]);
+      const found = [];
+      for (let end = last; end > first; end = start[end]) found.unshift([start[end], end]);
+      rows.push(...found);
+    };
+    let first = 0;
+    shapes.forEach((shape, index) => {
+      if (shape < BREAKOUT) return;
+      if (first < index) plan(first, index);
+      rows.push([index, index + 1]);
+      first = index + 1;
+    });
+    if (first < count) plan(first, count);
+
     rows.forEach(([from, end], row) => {
-      const loose = row === rows.length - 1 && isLooseLastRow(heightOf(from, end));
-      // A short last row matches the row above it (never shorter than the target), so the grid reads as one block.
-      const above = row ? heightOf(...rows[row - 1]) : target;
-      const height = loose ? Math.min(heightOf(from, end), Math.max(target, above)) : heightOf(from, end);
+      const full = heightOf(from, end);
+      const breakout = end - from === 1 && shapes[from] >= BREAKOUT;
+      const loose = !breakout && isLooseLastRow(end, full);
+      const capped = !breakout && !loose && full > max;
+      const above = row ? Math.min(heightOf(...rows[row - 1]), max) : target;
+      const height = loose ? Math.min(full, Math.max(target, above)) : capped ? max : full;
+      const fills = !loose && !capped;
+      let used = gap * (end - from - 1);
+      for (let index = from; index < end; index += 1) used += shapes[index] * height;
+      const side = capped ? Math.max(0, (width - used) / 2 - 1) : 0;
       for (let index = from; index < end; index += 1) {
-        // 1px under the exact width so the row always fits; growing in proportion fills it again exactly.
-        items[index].style.setProperty("--basis", `${Math.max(0, shapes[index] * height - (loose ? 0 : 1)).toFixed(2)}px`);
-        items[index].style.setProperty("--grow", loose ? "0" : String(shapes[index]));
+        const item = items[index];
+        // 1px under the exact width so a full row always fits; growing in proportion fills it again exactly.
+        item.style.setProperty("--basis", `${Math.max(0, shapes[index] * height - (fills ? 1 : 0)).toFixed(2)}px`);
+        item.style.setProperty("--grow", fills ? String(shapes[index]) : "0");
+        // A capped row sits in the middle; its margins also fill the row, so the next image starts a new one.
+        item.style.setProperty("--ml", index === from && capped ? `${side.toFixed(2)}px` : "0px");
+        item.style.setProperty("--mr", index === end - 1 && capped ? `${side.toFixed(2)}px` : "0px");
       }
     });
     grid.classList.add("is-laid-out");
@@ -209,10 +242,116 @@
     layoutGrids();
   };
 
+  /* ---------- Kinds of project ---------- */
+  // Each kind has its own layout: which sections show, in what order, and what they are called.
+  // Keep the step and section names in step with PROJECT_TYPES in assets/js/dashboard.js.
+  const TYPES = {
+    uiux: {
+      steps: ["Research", "Structure and wireframes", "Visual design", "Prototype"],
+      processLead: "How the project moved from research to the final interface.",
+      cta: "Visit the live site",
+      linkLabel: "Live site",
+      challenge: "The challenge",
+      research: ["Snapshots", "Screens from the project. Select one to see it whole."],
+      gallery: ["Final design", "The finished screens. Select one to see it whole."],
+      order: ["overview", "research", "process", "gallery", "blocks", "outcome"],
+    },
+    packaging: {
+      steps: ["Research and moodboard", "Concepts and sketches", "Dieline and structure", "Artwork and print"],
+      processLead: "How the pack went from the brief to the shelf.",
+      cta: "View the product",
+      linkLabel: "Shop",
+      challenge: "The brief",
+      research: ["Explorations", "Moodboards, early concepts and sketches. Select one to see it whole."],
+      gallery: ["The packaging", "Mockups and product photos. Select one to see it whole."],
+      order: ["overview", "process", "research", "dieline", "brand", "gallery", "blocks", "outcome"],
+    },
+    logo: {
+      steps: ["Research", "Sketches", "Refinement", "Brand guidelines"],
+      processLead: "How the mark took shape, from the first sketch to the guidelines.",
+      cta: "Visit the brand",
+      linkLabel: "Website",
+      challenge: "The brief",
+      research: ["Sketches", "Where the idea started. Select one to see it whole."],
+      gallery: ["In use", "The identity on real things. Select one to see it whole."],
+      order: ["overview", "process", "research", "logo", "variations", "brand", "gallery", "blocks", "outcome"],
+    },
+    print: {
+      steps: ["Brief and research", "Concepts", "Layout and type", "Production"],
+      processLead: "From the brief to final files, ready for print and screen.",
+      cta: "See it live",
+      linkLabel: "Link",
+      challenge: "The brief",
+      research: ["In context", "The work where people see it. Select one to see it whole."],
+      gallery: ["Artworks", "The final pieces. Select one to see it whole."],
+      order: ["overview", "gallery", "process", "research", "brand", "blocks", "outcome"],
+    },
+  };
+  const typeOf = (project) => (TYPES[project?.projectType] ? project.projectType : "uiux");
+
+  // "Forest green #2E7D4F" → a swatch. Lines without a HEX code are skipped.
+  const parseColors = (value) =>
+    lines(value)
+      .map((line) => {
+        const match = line.match(/#([0-9a-f]{6}|[0-9a-f]{3})\b/i);
+        if (!match) return null;
+        const short = match[1].length === 3;
+        const hex = `#${(short ? [...match[1]].map((c) => c + c).join("") : match[1]).toUpperCase()}`;
+        const [r, g, b] = [1, 3, 5].map((index) => parseInt(hex.slice(index, index + 2), 16));
+        const channel = (value) => {
+          const c = value / 255;
+          return c <= 0.03928 ? c / 12.92 : ((c + 0.055) / 1.055) ** 2.4;
+        };
+        const luminance = 0.2126 * channel(r) + 0.7152 * channel(g) + 0.0722 * channel(b);
+        const name = line.replace(match[0], "").replace(/^[\s:·|–—-]+|[\s:·|–—-]+$/g, "").trim();
+        return { hex, name, rgb: `${r}, ${g}, ${b}`, light: luminance > 0.179 };
+      })
+      .filter(Boolean);
+
+  // "Headings: Playfair Display" → { role: "Headings", name: "Playfair Display" }.
+  const parseTypefaces = (value) =>
+    lines(value).map((line) => {
+      const at = line.indexOf(":");
+      return at > 0 ? { role: line.slice(0, at).trim(), name: line.slice(at + 1).trim() } : { role: "", name: line };
+    }).filter((item) => item.name);
+
+  // A typeface sample shows only once the real font has loaded (from Google Fonts), so a sample is never drawn
+  // in the wrong font. Without it, the card shows the name alone.
+  const loadedFonts = new Set();
+  const showTypefaces = () => {
+    main.querySelectorAll("[data-typeface]").forEach((card) => {
+      const name = card.dataset.typeface;
+      const reveal = () => card.classList.add("is-loaded");
+      if (loadedFonts.has(name) || /^be vietnam pro$/i.test(name)) return reveal();
+      if (!/^[a-z0-9 -]{2,60}$/i.test(name) || !document.fonts) return;
+      const id = `font-${name.toLowerCase().replace(/[^a-z0-9]+/g, "-")}`;
+      const check = () =>
+        document.fonts.load(`48px "${name}"`).then((faces) => {
+          if (faces.length) {
+            loadedFonts.add(name);
+            main.querySelectorAll(`[data-typeface="${CSS.escape(name)}"]`).forEach((node) => node.classList.add("is-loaded"));
+          }
+        }).catch(() => {});
+      let link = document.getElementById(id);
+      if (!link) {
+        link = document.createElement("link");
+        link.id = id;
+        link.rel = "stylesheet";
+        link.href = `https://fonts.googleapis.com/css2?family=${encodeURIComponent(name).replace(/%20/g, "+")}&display=swap`;
+        link.addEventListener("load", check, { once: true });
+        document.head.appendChild(link);
+      } else {
+        check();
+      }
+    });
+  };
+
   /* ---------- The case study ---------- */
   let viewerImages = [];
 
   const renderProject = (project, data) => {
+    const type = typeOf(project);
+    const kind = TYPES[type];
     const detail = detailOf(project);
     const title = text(project.title) || "Project";
     const summary = text(project.summary) || text(detail.overview);
@@ -232,22 +371,51 @@
     const nextSteps = lines(detail.nextSteps);
     const blocks = (Array.isArray(detail.blocks) ? detail.blocks : []).filter((block) => block && (text(block.title) || text(block.text) || text(block.image)));
     const next = nextProjectAfter(project, data);
+    const stepTitles = Array.isArray(detail.stepTitles) ? detail.stepTitles : [];
+    const steps = [detail.research, detail.wireframes, detail.design, detail.prototype]
+      .map((body, index) => [text(stepTitles[index]) || kind.steps[index], body])
+      .filter(([, body]) => text(body));
+    const isVisual = type !== "uiux";
+    const concept = isVisual ? text(detail.concept) : "";
+    const specs = [
+      ["Format", detail.format],
+      ["Size", detail.size],
+      ["Material", detail.material],
+      ["Finish", detail.finish],
+    ].filter(([, value]) => text(value));
+    const dieline = text(detail.dielineImage);
+    const logoImage = text(detail.logoImage);
+    const construction = text(detail.constructionImage);
+    const variations = unique((Array.isArray(detail.variationImages) ? detail.variationImages : []).map(text));
+    const colors = parseColors(detail.colors);
+    const typefaces = parseTypefaces(detail.typefaces);
+    const formats = type === "print" ? lines(detail.formats) : [];
 
-    viewerImages = [...snapshots, ...finals].map((src, index) => ({ src, alt: `${title}, image ${index + 1}` }));
-
-    const steps = [
-      ["Research", detail.research],
-      ["Structure and wireframes", detail.wireframes],
-      ["Visual design", detail.design],
-      ["Prototype", detail.prototype],
-    ].filter(([, body]) => text(body));
-
-    const thumb = (src, index, label) => `
+    // Every image that opens in the viewer, numbered in page order as the sections are drawn.
+    viewerImages = [];
+    const view = (src, alt) => {
+      viewerImages.push({ src, alt: alt || `${title}, image ${viewerImages.length + 1}` });
+      return viewerImages.length - 1;
+    };
+    const thumb = (src) => `
       <li>
-        <button class="case-grid__item" type="button" data-view="${index}" aria-label="${esc(label)}">
+        <button class="case-grid__item" type="button" data-view="${view(src)}">
           <img src="${esc(cld(src, "f_auto,q_auto,c_limit,w_1200,h_2400"))}" alt="" loading="lazy" decoding="async" data-src="${esc(src)}" />
         </button>
       </li>`;
+    const grid = (images, large) =>
+      `<ul class="case-grid${large ? " case-grid--large" : ""}${images.length === 1 ? " case-grid--single" : ""}">${images.map(thumb).join("")}</ul>`;
+    const head = (id, name, lead, extra = "") => `
+          <div class="section__head">
+            <h2 class="section__title" id="${id}-title">${esc(name)}</h2>
+            ${lead ? `<p class="section__lead">${esc(lead)}</p>` : ""}
+            ${extra}
+          </div>`;
+    // A single image that opens in the viewer, on a plain card.
+    const plate = (src, alt, className = "case-plate") => `
+      <button class="${className}" type="button" data-view="${view(src, alt)}">
+        <img src="${esc(cld(src, "f_auto,q_auto,c_limit,w_2000"))}" alt="${esc(alt)}" loading="lazy" decoding="async" />
+      </button>`;
 
     const nextCard = next
       ? (() => {
@@ -256,7 +424,7 @@
           const props = propsList([
             ["Year", text(nextDetail.year) || text(next.date).slice(0, 4)],
             ["Tools", text(next.tags)],
-            ["Live site", hostOf(next.link)],
+            [TYPES[typeOf(next)].linkLabel, hostOf(next.link)],
           ]);
           return `
       <section class="section wrap" aria-labelledby="next-title">
@@ -281,33 +449,8 @@
         })()
       : "";
 
-    main.innerHTML = `
-      <article class="case-study">
-        <header class="case-hero wrap">
-          <div class="case-hero__text">
-            <nav class="crumbs" aria-label="Breadcrumb">
-              <ol>
-                <li><a href="/projects/">Work</a></li>
-                <li><span aria-current="page">${esc(title)}</span></li>
-              </ol>
-            </nav>
-            <h1 class="case-hero__title">${esc(title)}</h1>
-            ${summary ? `<p class="case-hero__lead">${esc(summary)}</p>` : ""}
-          </div>
-          <aside class="case-hero__panel" aria-label="Project details">
-            <dl class="inspector__panel">${propsList([
-              ["Role", detail.role],
-              ["Services", detail.service],
-              ["Tools", tools],
-              ["Year", text(detail.year) || text(project.date).slice(0, 4)],
-              ["Region", detail.region],
-            ])}</dl>
-            ${live ? `<a class="btn btn--primary case-hero__live" href="${esc(live)}" target="_blank" rel="noopener noreferrer">Visit the live site ${arrowIcon}<span class="sr-only"> (opens in a new tab)</span></a>` : ""}
-          </aside>
-        </header>
-
-        ${cover ? `<figure class="case-cover wrap"><img src="${esc(cld(cover, "f_auto,q_auto,w_2000"))}" alt="${esc(title)}" width="1200" height="1000" fetchpriority="high" decoding="async" /></figure>` : ""}
-
+    const sections = {
+      overview: () => `
         <section class="section wrap" aria-labelledby="overview-title">
           <div class="case-overview">
             <h2 class="case-overview__title" id="overview-title">Overview</h2>
@@ -316,34 +459,32 @@
               <div class="case-overview__grid">
                 ${text(detail.problem) || painPoints.length ? `
                 <div>
-                  <h3>The challenge</h3>
+                  <h3>${esc(kind.challenge)}</h3>
                   ${text(detail.problem) ? `<p>${esc(detail.problem)}</p>` : ""}
-                  ${painPoints.length ? `<ul class="case-points" aria-label="Key pain points">${painPoints.map((item) => `<li>${esc(item)}</li>`).join("")}</ul>` : ""}
+                  ${painPoints.length ? `<ul class="case-points" aria-label="${isVisual ? "Problems to solve" : "Key pain points"}">${painPoints.map((item) => `<li>${esc(item)}</li>`).join("")}</ul>` : ""}
                 </div>` : ""}
+                ${concept ? `<div><h3>The idea</h3><p>${esc(concept)}</p></div>` : ""}
                 ${text(detail.goal) ? `<div><h3>The goal</h3><p>${esc(detail.goal)}</p></div>` : ""}
               </div>
               ${did.length ? `<div class="case-overview__did"><h3>What I did</h3><ul class="chips">${did.map((item) => `<li>${esc(item)}</li>`).join("")}</ul></div>` : ""}
             </div>
           </div>
-        </section>
+        </section>`,
 
-        ${snapshots.length ? `
+      research: () =>
+        snapshots.length
+          ? `
         <section class="section wrap" aria-labelledby="snapshots-title">
-          <div class="section__head">
-            <h2 class="section__title" id="snapshots-title">Snapshots</h2>
-            <p class="section__lead">Screens from the project. Select one to see it whole.</p>
-          </div>
-          <ul class="case-grid${snapshots.length === 1 ? " case-grid--single" : ""}">
-            ${snapshots.map((src, index) => thumb(src, index, `Open image ${index + 1} of ${viewerImages.length}`)).join("")}
-          </ul>
-        </section>` : ""}
+          ${head("snapshots", kind.research[0], kind.research[1])}
+          ${grid(snapshots, false)}
+        </section>`
+          : "",
 
-        ${steps.length ? `
+      process: () =>
+        steps.length
+          ? `
         <section class="section wrap" aria-labelledby="process-title">
-          <div class="section__head">
-            <h2 class="section__title" id="process-title">Process</h2>
-            <p class="section__lead">How the project moved from research to the final interface.</p>
-          </div>
+          ${head("process", "Process", kind.processLead)}
           <ol class="steps case-steps" style="--steps: ${steps.length}">
             ${steps
               .map(
@@ -357,21 +498,100 @@
               )
               .join("")}
           </ol>
-          ${wireframe ? `<figure class="case-wide"><img src="${esc(cld(wireframe, "f_auto,q_auto,w_2000"))}" alt="${esc(title)} wireframes" loading="lazy" decoding="async" /><figcaption>Wireframes</figcaption></figure>` : ""}
-        </section>` : ""}
+          ${type === "uiux" && wireframe ? `<figure class="case-wide"><img src="${esc(cld(wireframe, "f_auto,q_auto,w_2000"))}" alt="${esc(title)} wireframes" loading="lazy" decoding="async" /><figcaption>Wireframes</figcaption></figure>` : ""}
+        </section>`
+          : "",
 
-        ${finals.length ? `
+      gallery: () =>
+        finals.length
+          ? `
         <section class="section wrap" aria-labelledby="final-title">
-          <div class="section__head">
-            <h2 class="section__title" id="final-title">Final design</h2>
-            <p class="section__lead">The finished screens. Select one to see it whole.</p>
-          </div>
-          <ul class="case-grid case-grid--large${finals.length === 1 ? " case-grid--single" : ""}">
-            ${finals.map((src, index) => thumb(src, snapshots.length + index, `Open image ${snapshots.length + index + 1} of ${viewerImages.length}`)).join("")}
-          </ul>
-        </section>` : ""}
+          ${head("final", kind.gallery[0], kind.gallery[1], formats.length ? `<ul class="chips case-formats" aria-label="Formats and sizes">${formats.map((item) => `<li>${esc(item)}</li>`).join("")}</ul>` : "")}
+          ${grid(finals, true)}
+        </section>`
+          : "",
 
-        ${blocks.length ? `
+      // Packaging: the pack laid flat beside what it is made of.
+      dieline: () =>
+        dieline || specs.length
+          ? `
+        <section class="section wrap" aria-labelledby="dieline-title">
+          ${head("dieline", "Dieline and specs", "The pack laid flat, and what it is made of.")}
+          <div class="case-spec${dieline ? "" : " case-spec--specs-only"}">
+            ${dieline ? `<figure class="case-spec__dieline">${plate(dieline, `${title} dieline`)}</figure>` : ""}
+            ${specs.length ? `<dl class="inspector__panel case-spec__list" aria-label="Packaging specs">${propsList(specs)}</dl>` : ""}
+          </div>
+        </section>`
+          : "",
+
+      // Logo: the mark on its own, large, then how it is built.
+      logo: () =>
+        logoImage || construction
+          ? `
+        <section class="section wrap" aria-labelledby="logo-title">
+          ${head("logo", "The logo", "")}
+          ${logoImage ? plate(logoImage, `${title} logo`, "case-stage") : ""}
+          ${construction ? `<figure class="case-wide">${plate(construction, `${title} logo construction`)}<figcaption>Construction</figcaption></figure>` : ""}
+        </section>`
+          : "",
+
+      variations: () =>
+        variations.length
+          ? `
+        <section class="section wrap" aria-labelledby="variations-title">
+          ${head("variations", "Variations", "Versions of the logo for different places and backgrounds.")}
+          <ul class="case-tiles">
+            ${variations
+              .map(
+                (src) => `
+            <li>
+              <button class="case-tile" type="button" data-view="${view(src)}">
+                <img src="${esc(cld(src, "f_auto,q_auto,c_limit,w_900"))}" alt="" loading="lazy" decoding="async" />
+              </button>
+            </li>`
+              )
+              .join("")}
+          </ul>
+        </section>`
+          : "",
+
+      brand: () =>
+        colors.length || typefaces.length
+          ? `
+        <section class="section wrap" aria-labelledby="brand-title">
+          ${head("brand", colors.length && typefaces.length ? "Color and type" : colors.length ? "Color" : "Type", "")}
+          ${colors.length ? `
+          <ul class="case-swatches" aria-label="Colors">
+            ${colors
+              .map(
+                (color) => `
+            <li class="case-swatch${color.light ? " case-swatch--light" : ""}" style="--swatch: ${color.hex}">
+              ${color.name ? `<strong>${esc(color.name)}</strong>` : ""}
+              <span>${color.hex}</span>
+              <span>RGB ${color.rgb}</span>
+            </li>`
+              )
+              .join("")}
+          </ul>` : ""}
+          ${typefaces.length ? `
+          <ul class="case-typefaces" aria-label="Typefaces">
+            ${typefaces
+              .map(
+                (face) => `
+            <li class="case-typeface" data-typeface="${esc(face.name)}">
+              ${face.role ? `<p class="case-typeface__role">${esc(face.role)}</p>` : ""}
+              <p class="case-typeface__sample" style="font-family: '${esc(face.name.replace(/'/g, ""))}', var(--font)" aria-hidden="true">Aa</p>
+              <p class="case-typeface__name">${esc(face.name)}</p>
+            </li>`
+              )
+              .join("")}
+          </ul>` : ""}
+        </section>`
+          : "",
+
+      blocks: () =>
+        blocks.length
+          ? `
         <section class="section wrap" aria-label="More about the project">
           <div class="case-blocks">
             ${blocks
@@ -382,9 +602,12 @@
               )
               .join("")}
           </div>
-        </section>` : ""}
+        </section>`
+          : "",
 
-        ${text(detail.impact) || text(detail.learned) || nextSteps.length ? `
+      outcome: () =>
+        text(detail.impact) || text(detail.learned) || nextSteps.length
+          ? `
         <section class="section wrap" aria-labelledby="outcome-title">
           <div class="case-outcome">
             <h2 class="case-outcome__label" id="outcome-title">Outcome</h2>
@@ -394,12 +617,51 @@
               ${nextSteps.length ? `<div><h3>Next steps</h3><ul>${nextSteps.map((item) => `<li>${esc(item)}</li>`).join("")}</ul></div>` : ""}
             </div>
           </div>
-        </section>` : ""}
+        </section>`
+          : "",
+    };
+
+    // Sections are drawn in this kind's order, so the viewer numbers images in the order they appear.
+    const body = kind.order.map((id) => sections[id]()).join("");
+
+    main.innerHTML = `
+      <article class="case-study case-study--${type}">
+        <header class="case-hero wrap">
+          <div class="case-hero__text">
+            <nav class="crumbs" aria-label="Breadcrumb">
+              <ol>
+                <li><a href="/projects/">Work</a></li>
+                <li><span aria-current="page">${esc(title)}</span></li>
+              </ol>
+            </nav>
+            <h1 class="case-hero__title">${esc(title)}</h1>
+            ${summary ? `<p class="case-hero__lead">${esc(summary)}</p>` : ""}
+          </div>
+          <aside class="case-hero__panel" aria-label="Project details">
+            <dl class="inspector__panel">${propsList([
+              ["Client", detail.client],
+              ["Role", detail.role],
+              ["Services", detail.service],
+              ["Tools", tools],
+              ["Year", text(detail.year) || text(project.date).slice(0, 4)],
+              ["Region", detail.region],
+            ])}</dl>
+            ${live ? `<a class="btn btn--primary case-hero__live" href="${esc(live)}" target="_blank" rel="noopener noreferrer">${esc(kind.cta)} ${arrowIcon}<span class="sr-only"> (opens in a new tab)</span></a>` : ""}
+          </aside>
+        </header>
+
+        ${cover ? `<figure class="case-cover wrap"><img src="${esc(cld(cover, "f_auto,q_auto,w_2000"))}" alt="${esc(title)}" width="1200" height="1000" fetchpriority="high" decoding="async" /></figure>` : ""}
+
+        ${body}
 
         ${nextCard}
       </article>`;
 
+    main.querySelectorAll("[data-view]").forEach((button) => {
+      button.setAttribute("aria-label", `Open image ${Number(button.dataset.view) + 1} of ${viewerImages.length}`);
+    });
     shapeGrids();
+    showTypefaces();
     main.removeAttribute("aria-busy");
     setMeta(`${title} – ${SITE}`, summary);
     // Old /single-project/?id=N links move to the project's own address.

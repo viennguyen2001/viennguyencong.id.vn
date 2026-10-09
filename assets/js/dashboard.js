@@ -1050,72 +1050,189 @@ function getProjectDetailLink(project) {
   return `/projectdetail/${getProjectSlug(project)}/`;
 }
 
-function getProjectDetailDefaults(item = {}) {
+// Kinds of project. Each kind has its own case study layout; this sets the form's sections, labels and defaults.
+// Keep the step and section names in step with TYPES in assets/js/case-study.js.
+const PROJECT_TYPES = {
+  uiux: {
+    label: "UI/UX (website or app)",
+    role: "UI/UX Designer",
+    service: "UI/UX Design",
+    steps: ["Research", "Structure and wireframes", "Visual design", "Prototype"],
+    research: ["Snapshots", "Screens from the project."],
+    gallery: ["Final design", "The finished screens, shown larger than snapshots."],
+    link: ["Live site", "Visit the live site"],
+    challenge: "The challenge",
+    sections: ["basics", "overview", "research", "process", "gallery", "blocks", "outcome"],
+  },
+  packaging: {
+    label: "Packaging",
+    role: "Packaging Designer",
+    service: "Packaging design",
+    steps: ["Research and moodboard", "Concepts and sketches", "Dieline and structure", "Artwork and print"],
+    research: ["Explorations", "Moodboards, early concepts and sketches."],
+    gallery: ["The packaging", "Mockups and product photos. The main showcase, shown large."],
+    link: ["Product or shop link", "View the product"],
+    challenge: "The brief",
+    sections: ["basics", "overview", "process", "research", "dieline", "brand", "gallery", "blocks", "outcome"],
+  },
+  logo: {
+    label: "Logo and brand identity",
+    role: "Brand Designer",
+    service: "Logo design",
+    steps: ["Research", "Sketches", "Refinement", "Brand guidelines"],
+    research: ["Sketches", "Where the idea started: sketches and early directions."],
+    gallery: ["In use", "The logo on real things: cards, signs, packaging, social posts."],
+    link: ["Brand website", "Visit the brand"],
+    challenge: "The brief",
+    sections: ["basics", "overview", "process", "research", "logo", "variations", "brand", "gallery", "blocks", "outcome"],
+  },
+  print: {
+    label: "Posters, banners and print",
+    role: "Graphic Designer",
+    service: "Graphic design",
+    steps: ["Brief and research", "Concepts", "Layout and type", "Production"],
+    research: ["In context", "The work where people see it: on the wall, in the feed, in hand."],
+    gallery: ["Artworks", "The final pieces, shown large. Tall posters and wide banners both fit."],
+    link: ["Link", "See it live"],
+    challenge: "The brief",
+    sections: ["basics", "overview", "gallery", "process", "research", "brand", "blocks", "outcome"],
+  },
+};
+
+const getProjectType = (item = {}) => (PROJECT_TYPES[item.projectType] ? item.projectType : "uiux");
+
+// Sample text that fills an empty UI/UX case study. Other kinds of project start empty instead,
+// so text about screens and users never shows on a packaging, logo or poster project.
+const UIUX_SAMPLE_TEXT = {
+  overview: "A focused case study covering the design context, research, solution direction, and final outcome.",
+  problem: "Users need a clearer way to complete important tasks without confusion, delay, or scattered information.",
+  goal: "Create a clearer, more useful experience with strong visual hierarchy and a practical user flow.",
+  responsibilities: "Research and interviews\nInformation architecture\nWireframing\nUI design\nPrototype and iteration",
+  research: "Research helped identify the most important user needs, blockers, and decisions that shaped the product direction.",
+  painPoints: "Unclear priority\nSlow decision making\nLimited visibility",
+  wireframes: "Early maps and wireframes explored the core structure before moving into high-fidelity design.",
+  design: "The final design system focused on clarity, rhythm, useful states, and a visual language that supports repeated use.",
+  prototype: "The prototype connected the primary flow, key screens, and feedback states so the experience could be tested end to end.",
+  impact: "The final concept makes the experience easier to understand, faster to navigate, and more confidence-building for users.",
+  learned: "Small interface decisions can change how confident users feel when they move through a complex workflow.",
+  nextSteps: "Validate with more users\nExpand edge cases\nRefine analytics and content states",
+};
+
+// Reads the project form into the detail object that is saved (also used when the project type changes).
+function readProjectDetail(formData) {
+  const value = (name) => String(formData.get(name) || "").trim();
+  const list = (name) => formData.getAll(name).map((item) => String(item || "").trim()).filter(Boolean);
+  const blockTypes = formData.getAll("detailBlockType");
+  const blockTitles = formData.getAll("detailBlockTitle");
+  const blockTexts = formData.getAll("detailBlockText");
+  const blockImages = formData.getAll("detailBlockImage");
+  const blocks = blockTypes
+    .map((type, index) => ({
+      type: String(type || "text") === "image" ? "image" : "text",
+      title: String(blockTitles[index] || "").trim(),
+      text: String(blockTexts[index] || "").trim(),
+      image: String(blockImages[index] || "").trim(),
+    }))
+    .filter((block) => block.title || block.text || block.image);
+
   return {
-    region: item.detail?.region || "Vietnam",
-    year: item.detail?.year || item.date?.slice(0, 4) || "2024",
-    role: item.detail?.role || item.owner || "UI/UX Designer",
-    service: item.detail?.service || item.tags || "Product Design",
-    overview:
-      item.detail?.overview ||
-      item.summary ||
-      "A focused case study covering the design context, research, solution direction, and final outcome.",
-    problem:
-      item.detail?.problem ||
-      "Users need a clearer way to complete important tasks without confusion, delay, or scattered information.",
-    goal:
-      item.detail?.goal ||
-      "Create a clearer, more useful experience with strong visual hierarchy and a practical user flow.",
-    responsibilities:
-      item.detail?.responsibilities ||
-      "Research and interviews\nInformation architecture\nWireframing\nUI design\nPrototype and iteration",
-    research:
-      item.detail?.research ||
-      "Research helped identify the most important user needs, blockers, and decisions that shaped the product direction.",
-    painPoints:
-      item.detail?.painPoints ||
-      "Unclear priority\nSlow decision making\nLimited visibility",
-    wireframes:
-      item.detail?.wireframes ||
-      "Early maps and wireframes explored the core structure before moving into high-fidelity design.",
-    design:
-      item.detail?.design ||
-      "The final design system focused on clarity, rhythm, useful states, and a visual language that supports repeated use.",
-    prototype:
-      item.detail?.prototype ||
-      "The prototype connected the primary flow, key screens, and feedback states so the experience could be tested end to end.",
-    impact:
-      item.detail?.impact ||
-      "The final concept makes the experience easier to understand, faster to navigate, and more confidence-building for users.",
-    learned:
-      item.detail?.learned ||
-      "Small interface decisions can change how confident users feel when they move through a complex workflow.",
-    nextSteps:
-      item.detail?.nextSteps ||
-      "Validate with more users\nExpand edge cases\nRefine analytics and content states",
+    region: value("detailRegion"),
+    year: value("detailYear"),
+    role: value("detailRole"),
+    service: value("detailService"),
+    client: value("detailClient"),
+    overview: value("detailOverview"),
+    problem: value("detailProblem"),
+    goal: value("detailGoal"),
+    concept: value("detailConcept"),
+    responsibilities: value("detailResponsibilities"),
+    research: value("detailResearch"),
+    painPoints: value("detailPainPoints"),
+    wireframes: value("detailWireframes"),
+    design: value("detailDesign"),
+    prototype: value("detailPrototype"),
+    stepTitles: formData.getAll("detailStepTitle").map((item) => String(item || "").trim()),
+    impact: value("detailImpact"),
+    learned: value("detailLearned"),
+    nextSteps: value("detailNextSteps"),
+    researchImageOne: value("detailResearchImageOne"),
+    researchImageTwo: value("detailResearchImageTwo"),
+    researchImages: list("detailResearchImage"),
+    wireframeImage: value("detailWireframeImage"),
+    mockupImageOne: value("detailMockupImageOne"),
+    mockupImageTwo: value("detailMockupImageTwo"),
+    mockupImageThree: value("detailMockupImageThree"),
+    mockupImageFour: value("detailMockupImageFour"),
+    galleryImages: list("detailGalleryImage"),
+    // Packaging
+    format: value("detailFormat"),
+    size: value("detailSize"),
+    material: value("detailMaterial"),
+    finish: value("detailFinish"),
+    dielineImage: value("detailDielineImage"),
+    // Logo
+    logoImage: value("detailLogoImage"),
+    constructionImage: value("detailConstructionImage"),
+    variationImages: list("detailVariationImage"),
+    // Packaging, logo, print
+    colors: value("detailColors"),
+    typefaces: value("detailTypefaces"),
+    formats: value("detailFormats"),
+    blocks,
+  };
+}
+
+function getProjectDetailDefaults(item = {}) {
+  const type = getProjectType(item);
+  const saved = item.detail || {};
+  const sample = (field) => saved[field] || (type === "uiux" ? UIUX_SAMPLE_TEXT[field] : "");
+  const images = (field) => (Array.isArray(saved[field]) ? saved[field].filter(Boolean) : []);
+  return {
+    region: saved.region || "Vietnam",
+    year: saved.year || item.date?.slice(0, 4) || "2024",
+    role: saved.role || (type === "uiux" ? item.owner || "UI/UX Designer" : PROJECT_TYPES[type].role),
+    service: saved.service || (type === "uiux" ? item.tags || "Product Design" : PROJECT_TYPES[type].service),
+    client: saved.client || "",
+    overview: saved.overview || item.summary || (type === "uiux" ? UIUX_SAMPLE_TEXT.overview : ""),
+    problem: sample("problem"),
+    goal: sample("goal"),
+    concept: saved.concept || "",
+    responsibilities: sample("responsibilities"),
+    research: sample("research"),
+    painPoints: sample("painPoints"),
+    wireframes: sample("wireframes"),
+    design: sample("design"),
+    prototype: sample("prototype"),
+    stepTitles: Array.isArray(saved.stepTitles) ? saved.stepTitles : [],
+    impact: sample("impact"),
+    learned: sample("learned"),
+    nextSteps: sample("nextSteps"),
     // Thumbnails belong to listing cards only; detail media must be added separately.
-    researchImageOne: item.detail?.researchImageOne || "",
-    researchImageTwo: item.detail?.researchImageTwo || "",
-    researchImages: Array.isArray(item.detail?.researchImages)
-      ? item.detail.researchImages.filter(Boolean)
-      : [
-          item.detail?.researchImageOne,
-          item.detail?.researchImageTwo,
-        ].filter(Boolean),
-    wireframeImage: item.detail?.wireframeImage || "",
-    mockupImageOne: item.detail?.mockupImageOne || "",
-    mockupImageTwo: item.detail?.mockupImageTwo || "",
-    mockupImageThree: item.detail?.mockupImageThree || "",
-    mockupImageFour: item.detail?.mockupImageFour || "",
-    galleryImages: Array.isArray(item.detail?.galleryImages)
-      ? item.detail.galleryImages.filter(Boolean)
-      : [
-          item.detail?.mockupImageOne,
-          item.detail?.mockupImageTwo,
-          item.detail?.mockupImageThree,
-          item.detail?.mockupImageFour,
-        ].filter(Boolean),
-    blocks: Array.isArray(item.detail?.blocks) ? item.detail.blocks : [],
+    researchImageOne: saved.researchImageOne || "",
+    researchImageTwo: saved.researchImageTwo || "",
+    researchImages: Array.isArray(saved.researchImages)
+      ? saved.researchImages.filter(Boolean)
+      : [saved.researchImageOne, saved.researchImageTwo].filter(Boolean),
+    wireframeImage: saved.wireframeImage || "",
+    mockupImageOne: saved.mockupImageOne || "",
+    mockupImageTwo: saved.mockupImageTwo || "",
+    mockupImageThree: saved.mockupImageThree || "",
+    mockupImageFour: saved.mockupImageFour || "",
+    galleryImages: Array.isArray(saved.galleryImages)
+      ? saved.galleryImages.filter(Boolean)
+      : [saved.mockupImageOne, saved.mockupImageTwo, saved.mockupImageThree, saved.mockupImageFour].filter(Boolean),
+    format: saved.format || "",
+    size: saved.size || "",
+    material: saved.material || "",
+    finish: saved.finish || "",
+    dielineImage: saved.dielineImage || "",
+    logoImage: saved.logoImage || "",
+    constructionImage: saved.constructionImage || "",
+    variationImages: images("variationImages"),
+    colors: saved.colors || "",
+    typefaces: saved.typefaces || "",
+    formats: saved.formats || "",
+    blocks: Array.isArray(saved.blocks) ? saved.blocks : [],
   };
 }
 
@@ -2147,7 +2264,62 @@ function initDashboard() {
     syncProjectTools();
   }
 
+  // An image in a list of images (logo variations). Works for any list: the field name is the list.
+  function renderProjectListImage(field, value = "", index = 0, label = "Image") {
+    const preview = value
+      ? '<img src="' + escapeHtml(value) + '" alt="' + escapeHtml(label) + " " + (index + 1) + '" />'
+      : "<small>No image selected</small>";
+    return `
+      <article class="dashboard-project-gallery-image" data-dashboard-list-item>
+        <header>
+          <strong>${escapeHtml(label)} ${index + 1} <small data-dashboard-image-size></small></strong>
+          <button type="button" data-dashboard-list-remove aria-label="Remove image" title="Remove image">
+            <i class="ri-delete-bin-line"></i><span>Remove</span>
+          </button>
+        </header>
+        <input type="file" accept="image/*" data-dashboard-list-upload />
+        <input name="${field}" value="${escapeHtml(value)}" placeholder="Paste image URL" data-dashboard-list-url />
+        <div class="dashboard-detail-image-preview" data-dashboard-list-preview>${preview}</div>
+      </article>`;
+  }
+
+  // Changing the project type redraws the form for that type and keeps everything typed so far.
+  function switchProjectType(select) {
+    const form = select.closest("form");
+    if (!form) return;
+    const formData = new FormData(form);
+    const previous = getProjectType(editingItem);
+    const detail = readProjectDetail(formData);
+    // UI/UX sample text, and the old type's default role and service, would be wrong on another kind of project.
+    if (previous === "uiux") {
+      Object.entries(UIUX_SAMPLE_TEXT).forEach(([field, sample]) => {
+        if (detail[field] === sample) detail[field] = "";
+      });
+    }
+    const oldDefaults = getProjectDetailDefaults({ ...editingItem, detail: {} });
+    if (detail.role === oldDefaults.role) detail.role = "";
+    if (detail.service === oldDefaults.service) detail.service = "";
+    editingItem = {
+      ...editingItem,
+      projectType: select.value,
+      title: String(formData.get("title") || ""),
+      summary: String(formData.get("summary") || ""),
+      status: String(formData.get("status") || editingItem.status || "Draft"),
+      tags: String(formData.get("tags") || ""),
+      link: String(formData.get("link") || ""),
+      featured: formData.get("featured") === "true",
+      detail,
+    };
+    const scroll = window.scrollY;
+    renderProjectEditor();
+    window.scrollTo(0, scroll);
+    app.querySelector("[data-dashboard-project-type]")?.focus();
+  }
+
   function renderProjectEditor() {
+    const type = getProjectType(editingItem);
+    const kind = PROJECT_TYPES[type];
+    const shows = (id) => kind.sections.includes(id);
     const detail = getProjectDetailDefaults(editingItem);
     const tools = String(editingItem.tags || "")
       .split(",")
@@ -2156,28 +2328,188 @@ function initDashboard() {
     const statusOptions = ["Active", "Draft", "Disabled"]
       .map((status) => `<option ${editingItem.status === status ? "selected" : ""}>${status}</option>`)
       .join("");
-    // The form follows the case study page from top to bottom; each block says where its content appears.
-    const sections = [
-      ["basics", "Basics"],
-      ["overview", "Overview"],
-      ["snapshots", "Snapshots"],
-      ["process", "Process"],
-      ["final", "Final design"],
-      ["blocks", "Extra blocks"],
-      ["outcome", "Outcome"],
-    ];
+    const typeOptions = Object.entries(PROJECT_TYPES)
+      .map(([value, item]) => `<option value="${value}" ${value === type ? "selected" : ""}>${item.label}</option>`)
+      .join("");
+    // Section ids stay the same for every type; the names follow the type.
+    const ids = { research: "snapshots", gallery: "final" };
+    const names = {
+      basics: "Basics",
+      overview: "Overview",
+      research: kind.research[0],
+      process: "Process",
+      dieline: "Dieline and specs",
+      logo: "The logo",
+      variations: "Variations",
+      brand: "Color and type",
+      gallery: kind.gallery[0],
+      blocks: "Extra blocks",
+      outcome: "Outcome",
+    };
     const block = (id, title, note, body) => `
-      <section class="dashboard-form-block" id="project-${id}">
+      <section class="dashboard-form-block" id="project-${ids[id] || id}">
         <header class="dashboard-form-block__head">
           <h3>${title}</h3>
           <p>${note}</p>
         </header>
         ${body}
       </section>`;
+    // Fields of other types stay in the form, hidden, so switching type or saving never loses them.
+    const keep = (name, value) => `<input type="hidden" name="${name}" value="${escapeHtml(value || "")}" />`;
+    const steps = [
+      ["detailResearch", detail.research],
+      ["detailWireframes", detail.wireframes],
+      ["detailDesign", detail.design],
+      ["detailPrototype", detail.prototype],
+    ];
+    const stepTitles = Array.isArray(detail.stepTitles) ? detail.stepTitles : [];
+    const isVisual = type !== "uiux";
+
+    const sections = {
+      basics: block("basics", "Basics", "Shown on project cards and at the top of the case study.", `
+        <div class="dashboard-form-grid">
+          <label class="dashboard-form__wide">Project type <small>Each type has its own case study layout. Switching keeps what you have typed.</small>
+            <select name="projectType" data-dashboard-project-type>${typeOptions}</select>
+          </label>
+          <label class="dashboard-form__wide">Project name<input name="title" value="${escapeHtml(editingItem.title)}" placeholder="Peaceblend" required /></label>
+          <label class="dashboard-form__wide">Short description <small>One line on cards and under the title</small>
+            <textarea name="summary" rows="2" maxlength="180" placeholder="${type === "uiux" ? "UI/UX design for a calm sleep supplement brand." : type === "packaging" ? "Packaging for a calm sleep supplement." : type === "logo" ? "A logo and identity for a calm sleep supplement brand." : "Posters and banners for a product launch."}" data-dashboard-summary-input>${escapeHtml(editingItem.summary)}</textarea>
+            <small class="dashboard-counter" data-dashboard-summary-count>${String(editingItem.summary || "").length}/180</small>
+          </label>
+          <label>Client or brand <small>Optional</small><input name="detailClient" value="${escapeHtml(detail.client || "")}" placeholder="Peaceblend" /></label>
+          <label>Role<input name="detailRole" value="${escapeHtml(detail.role || "")}" placeholder="${kind.role}" /></label>
+          <label>Service<input name="detailService" value="${escapeHtml(detail.service || "")}" placeholder="${kind.service}" /></label>
+          <label>Year<input name="detailYear" value="${escapeHtml(detail.year || "")}" placeholder="2026" /></label>
+          <label>Region<input name="detailRegion" value="${escapeHtml(detail.region || "")}" placeholder="Vietnam" /></label>
+          <div class="dashboard-form__wide dashboard-field">
+            <label for="project-tools-input">Tools <small>Type a tool and press Enter</small></label>
+            <div class="dashboard-project-tools" data-dashboard-tools>
+              ${tools.map((tool) => renderToolChip(tool)).join("")}
+              <input id="project-tools-input" type="text" autocomplete="off" placeholder="${tools.length ? "Add another" : isVisual ? "Illustrator, Photoshop…" : "Figma, Photoshop…"}" data-dashboard-tool-input />
+              <input type="hidden" name="tags" value="${escapeHtml(tools.join(", "))}" data-dashboard-tools-value />
+            </div>
+          </div>
+          <label class="dashboard-form__wide">${kind.link[0]} <small>Optional. Adds a "${kind.link[1]}" button</small><input name="link" value="${escapeHtml(editingItem.link || getDefaultItemLink(activeType))}" placeholder="https://" /></label>
+        </div>`),
+
+      overview: block("overview", "Overview", "The Overview card. The overview line is skipped when it repeats the short description.", `
+        <div class="dashboard-form-grid">
+          <label class="dashboard-form__wide">Overview<textarea name="detailOverview" rows="3">${escapeHtml(detail.overview)}</textarea></label>
+          <label>${kind.challenge}<textarea name="detailProblem" rows="4" placeholder="${isVisual ? "What the client needed, and why." : ""}">${escapeHtml(detail.problem)}</textarea></label>
+          ${isVisual ? `<label>The idea <small>The concept behind the design</small><textarea name="detailConcept" rows="4" placeholder="The one idea the design is built on.">${escapeHtml(detail.concept)}</textarea></label>` : keep("detailConcept", detail.concept)}
+          <label>The goal<textarea name="detailGoal" rows="4">${escapeHtml(detail.goal)}</textarea></label>
+          <label>${isVisual ? "Problems to solve" : "Pain points"} <small>One per line</small><textarea name="detailPainPoints" rows="4">${escapeHtml(detail.painPoints)}</textarea></label>
+          <label class="${isVisual ? "dashboard-form__wide" : ""}">What I did <small>One per line</small><textarea name="detailResponsibilities" rows="4" placeholder="${type === "packaging" ? "Packaging concept\nDieline\nLabel artwork\nPrint files" : type === "logo" ? "Logo design\nColor palette\nTypography\nBrand guidelines" : type === "print" ? "Key visual\nPosters\nSocial banners\nPrint files" : ""}">${escapeHtml(detail.responsibilities)}</textarea></label>
+        </div>`),
+
+      research: block("research", kind.research[0], `${kind.research[1]} Any size or shape: the page lines them up in rows and keeps each one whole; visitors can open them full screen.`, `
+        <div class="dashboard-project-gallery dashboard-project-gallery--research">
+          <div class="dashboard-flex-blocks__head">
+            <small>Nothing is cropped. A very tall image shows its top and scrolls on hover. The order here is the order on the page.</small>
+            <button type="button" data-dashboard-add-research-image><i class="ri-add-line"></i> Add image</button>
+          </div>
+          <div class="dashboard-detail-editor__grid dashboard-detail-editor__grid--mockups" data-dashboard-research-images>
+            ${detail.researchImages.map((image, index) => renderProjectResearchImageField(image, `saved-research-${index}`, index)).join("")}
+          </div>
+        </div>`),
+
+      process: block("process", "Process", "Four steps joined by arrows. Leave a step name empty to use the suggested one; leave a step empty to skip it.", `
+        <div class="dashboard-form-grid">
+          ${steps
+            .map(
+              ([name, value], index) => `
+          <div class="dashboard-step-field">
+            <label>Step ${index + 1}<input name="detailStepTitle" value="${escapeHtml(stepTitles[index] || "")}" placeholder="${kind.steps[index]}" aria-label="Step ${index + 1} name" /></label>
+            <textarea name="${name}" rows="4" aria-label="Step ${index + 1} text" placeholder="What happened in this step.">${escapeHtml(value)}</textarea>
+          </div>`
+            )
+            .join("")}
+          ${type === "uiux"
+            ? `<div class="dashboard-form__wide">${renderProjectImageField("Wireframe image (optional, shown under the steps)", "detailWireframeImage", detail.wireframeImage)}</div>`
+            : keep("detailWireframeImage", detail.wireframeImage)}
+        </div>`),
+
+      dieline: block("dieline", "Dieline and specs", "The flat dieline beside the pack's specs. Fill in only what applies.", `
+        <div class="dashboard-form-grid">
+          <label>Format<input name="detailFormat" value="${escapeHtml(detail.format)}" placeholder="Folding box, pouch, bottle label…" /></label>
+          <label>Size<input name="detailSize" value="${escapeHtml(detail.size)}" placeholder="120 × 60 × 40 mm" /></label>
+          <label>Material<input name="detailMaterial" value="${escapeHtml(detail.material)}" placeholder="Kraft board 350 gsm" /></label>
+          <label>Finish<input name="detailFinish" value="${escapeHtml(detail.finish)}" placeholder="Matte lamination, gold foil" /></label>
+          <div class="dashboard-form__wide">${renderProjectImageField("Dieline image (the flat, unfolded pack)", "detailDielineImage", detail.dielineImage)}</div>
+        </div>`),
+
+      logo: block("logo", "The logo", "Shown large on a plain card, then the construction grid.", `
+        <div class="dashboard-form-grid">
+          <div>${renderProjectImageField("Main logo (PNG with a transparent background works best)", "detailLogoImage", detail.logoImage)}</div>
+          <div>${renderProjectImageField("Construction grid (optional)", "detailConstructionImage", detail.constructionImage)}</div>
+        </div>`),
+
+      variations: block("variations", "Variations", "Other versions of the logo, each on its own tile: secondary, icon, one color, on dark.", `
+        <div class="dashboard-project-gallery">
+          <div class="dashboard-flex-blocks__head">
+            <small>The order here is the order on the page.</small>
+            <button type="button" data-dashboard-list-add="detailVariationImage"><i class="ri-add-line"></i> Add variation</button>
+          </div>
+          <div class="dashboard-detail-editor__grid dashboard-detail-editor__grid--mockups" data-dashboard-list="detailVariationImage" data-dashboard-list-label="Variation">
+            ${detail.variationImages.map((image, index) => renderProjectListImage("detailVariationImage", image, index, "Variation")).join("")}
+          </div>
+        </div>`),
+
+      brand: block("brand", "Color and type", "Color swatches and the typefaces used. Optional.", `
+        <div class="dashboard-form-grid">
+          <label>Colors <small>One per line: a name, then the HEX code</small><textarea name="detailColors" rows="5" placeholder="Forest green #2E7D4F&#10;Cream #F4EFE6&#10;Ink #17171A">${escapeHtml(detail.colors)}</textarea></label>
+          <label>Typefaces <small>One per line: what it is for, then the name</small><textarea name="detailTypefaces" rows="5" placeholder="Headings: Playfair Display&#10;Body: Be Vietnam Pro">${escapeHtml(detail.typefaces)}</textarea></label>
+        </div>`),
+
+      gallery: block("gallery", kind.gallery[0], kind.gallery[1], `
+        <div class="dashboard-project-gallery">
+          ${type === "print"
+            ? `<label class="dashboard-gallery-formats">Formats and sizes <small>One per line, shown above the artworks</small><textarea name="detailFormats" rows="3" placeholder="Poster · A2&#10;Facebook cover · 1640 × 624&#10;Instagram post · 1080 × 1350">${escapeHtml(detail.formats)}</textarea></label>`
+            : ""}
+          <div class="dashboard-flex-blocks__head">
+            <small>Any size, nothing is cropped. Shown large, in page order.</small>
+            <button type="button" data-dashboard-add-gallery-image><i class="ri-add-line"></i> Add image</button>
+          </div>
+          <div class="dashboard-detail-editor__grid dashboard-detail-editor__grid--mockups" data-dashboard-gallery-images>
+            ${detail.galleryImages.map((image, index) => renderProjectGalleryImageField(image, `saved-gallery-${index}`, index)).join("")}
+          </div>
+        </div>`),
+
+      blocks: block("blocks", "Extra blocks", "Any extra text or images, shown near the end of the case study. Optional.", `
+        <div class="dashboard-flex-blocks">
+          <div class="dashboard-flex-blocks__head">
+            <small>Add as many as the project needs.</small>
+            <div>
+              <button type="button" data-dashboard-add-detail-block="text"><i class="ri-text"></i> Add text</button>
+              <button type="button" data-dashboard-add-detail-block="image"><i class="ri-image-add-line"></i> Add image</button>
+            </div>
+          </div>
+          <div data-dashboard-flex-blocks>
+            ${detail.blocks.map((item, index) => renderProjectFlexibleBlock(item, `saved-${index}`)).join("")}
+          </div>
+        </div>`),
+
+      outcome: block("outcome", "Outcome", "The dark panel near the end of the case study.", `
+        <div class="dashboard-form-grid">
+          <label class="dashboard-form__wide">Result <small>One or two sentences, shown large</small><textarea name="detailImpact" rows="3">${escapeHtml(detail.impact)}</textarea></label>
+          <label>What I learned<textarea name="detailLearned" rows="4">${escapeHtml(detail.learned)}</textarea></label>
+          <label>Next steps <small>One per line</small><textarea name="detailNextSteps" rows="4">${escapeHtml(detail.nextSteps)}</textarea></label>
+        </div>`),
+    };
+
+    // What the sections of the other types hold, kept as hidden fields.
+    const kept = [
+      shows("dieline") ? "" : ["detailFormat", "detailSize", "detailMaterial", "detailFinish", "detailDielineImage"]
+        .map((name) => keep(name, detail[name.charAt(6).toLowerCase() + name.slice(7)])).join(""),
+      shows("logo") ? "" : keep("detailLogoImage", detail.logoImage) + keep("detailConstructionImage", detail.constructionImage),
+      shows("variations") ? "" : detail.variationImages.map((image) => keep("detailVariationImage", image)).join(""),
+      shows("brand") ? "" : keep("detailColors", detail.colors) + keep("detailTypefaces", detail.typefaces),
+      type === "print" ? "" : keep("detailFormats", detail.formats),
+    ].join("");
 
     listNode.className = "dashboard-project-editor";
     listNode.innerHTML = `
-      <form class="dashboard-project-editor__form" data-dashboard-form>
+      <form class="dashboard-project-editor__form" data-dashboard-form data-project-type="${type}">
         <aside class="dashboard-project-editor__side">
           <section class="dashboard-project-editor__card">
             <h3 class="dashboard-project-editor__card-title">Publish</h3>
@@ -2213,15 +2545,15 @@ function initDashboard() {
           </section>
 
           <nav class="dashboard-project-editor__nav" aria-label="Form sections">
-            ${sections.map(([id, label]) => `<button type="button" data-dashboard-jump="${id}">${label}</button>`).join("")}
+            ${kind.sections.map((id) => `<button type="button" data-dashboard-jump="${ids[id] || id}">${names[id]}</button>`).join("")}
           </nav>
         </aside>
 
         <section class="dashboard-project-editor__panel">
           <header>
             <div>
-              <p>Project</p>
-              <h2>${editingItem.id ? escapeHtml(editingItem.title || "Edit project") : "New project"}</h2>
+              <p>${editingItem.id ? PROJECT_TYPES[type].label : "New project"}</p>
+              <h2>${editingItem.id ? escapeHtml(editingItem.title || "Edit project") : escapeHtml(PROJECT_TYPES[type].label)}</h2>
             </div>
             <button type="button" data-dashboard-close aria-label="Close editor">
               <i class="ri-close-line"></i>
@@ -2231,89 +2563,8 @@ function initDashboard() {
             <input type="hidden" name="owner" value="${escapeHtml(editingItem.owner || "Vien Nguyen")}" />
             <input type="hidden" name="date" value="${escapeHtml(editingItem.date || new Date().toISOString().slice(0, 10))}" />
             <input type="hidden" name="metric" value="${escapeHtml(editingItem.metric || "1200x1000")}" />
-
-            ${block("basics", "Basics", "Shown on project cards and at the top of the case study.", `
-              <div class="dashboard-form-grid">
-                <label class="dashboard-form__wide">Project name<input name="title" value="${escapeHtml(editingItem.title)}" placeholder="Peaceblend" required /></label>
-                <label class="dashboard-form__wide">Short description <small>One line on cards and under the title</small>
-                  <textarea name="summary" rows="2" maxlength="180" placeholder="UI/UX design for a calm sleep supplement brand." data-dashboard-summary-input>${escapeHtml(editingItem.summary)}</textarea>
-                  <small class="dashboard-counter" data-dashboard-summary-count>${String(editingItem.summary || "").length}/180</small>
-                </label>
-                <label>Role<input name="detailRole" value="${escapeHtml(detail.role || "")}" placeholder="UI/UX Designer" /></label>
-                <label>Service<input name="detailService" value="${escapeHtml(detail.service || "")}" placeholder="UI/UX Design" /></label>
-                <label>Year<input name="detailYear" value="${escapeHtml(detail.year || "")}" placeholder="2026" /></label>
-                <label>Region<input name="detailRegion" value="${escapeHtml(detail.region || "")}" placeholder="Vietnam" /></label>
-                <div class="dashboard-form__wide dashboard-field">
-                  <label for="project-tools-input">Tools <small>Type a tool and press Enter</small></label>
-                  <div class="dashboard-project-tools" data-dashboard-tools>
-                    ${tools.map((tool) => renderToolChip(tool)).join("")}
-                    <input id="project-tools-input" type="text" autocomplete="off" placeholder="${tools.length ? "Add another" : "Figma, Photoshop…"}" data-dashboard-tool-input />
-                    <input type="hidden" name="tags" value="${escapeHtml(tools.join(", "))}" data-dashboard-tools-value />
-                  </div>
-                </div>
-                <label class="dashboard-form__wide">Live site <small>Optional. Adds a "Visit the live site" button</small><input name="link" value="${escapeHtml(editingItem.link || getDefaultItemLink(activeType))}" placeholder="https://" /></label>
-              </div>`)}
-
-            ${block("overview", "Overview", "The Overview card. The overview line is skipped when it repeats the short description.", `
-              <div class="dashboard-form-grid">
-                <label class="dashboard-form__wide">Overview<textarea name="detailOverview" rows="3">${escapeHtml(detail.overview)}</textarea></label>
-                <label>The challenge<textarea name="detailProblem" rows="4">${escapeHtml(detail.problem)}</textarea></label>
-                <label>The goal<textarea name="detailGoal" rows="4">${escapeHtml(detail.goal)}</textarea></label>
-                <label>Pain points <small>One per line</small><textarea name="detailPainPoints" rows="4">${escapeHtml(detail.painPoints)}</textarea></label>
-                <label>What I did <small>One per line</small><textarea name="detailResponsibilities" rows="4">${escapeHtml(detail.responsibilities)}</textarea></label>
-              </div>`)}
-
-            ${block("snapshots", "Snapshots", "Images of any size: wide, tall or square. The page lines them up in rows and keeps each one whole; visitors can open them full screen.", `
-              <div class="dashboard-project-gallery dashboard-project-gallery--research">
-                <div class="dashboard-flex-blocks__head">
-                  <small>Nothing is cropped. A very tall image, such as a full-page screenshot, shows its top and scrolls on hover. The order here is the order on the page.</small>
-                  <button type="button" data-dashboard-add-research-image><i class="ri-add-line"></i> Add image</button>
-                </div>
-                <div class="dashboard-detail-editor__grid dashboard-detail-editor__grid--mockups" data-dashboard-research-images>
-                  ${detail.researchImages.map((image, index) => renderProjectResearchImageField(image, `saved-research-${index}`, index)).join("")}
-                </div>
-              </div>`)}
-
-            ${block("process", "Process", "Four steps joined by arrows, from research to prototype.", `
-              <div class="dashboard-form-grid">
-                <label>1 · Research<textarea name="detailResearch" rows="4">${escapeHtml(detail.research)}</textarea></label>
-                <label>2 · Structure and wireframes<textarea name="detailWireframes" rows="4">${escapeHtml(detail.wireframes)}</textarea></label>
-                <label>3 · Visual design<textarea name="detailDesign" rows="4">${escapeHtml(detail.design)}</textarea></label>
-                <label>4 · Prototype<textarea name="detailPrototype" rows="4">${escapeHtml(detail.prototype)}</textarea></label>
-                <div class="dashboard-form__wide">${renderProjectImageField("Wireframe image (optional, shown under the steps)", "detailWireframeImage", detail.wireframeImage)}</div>
-              </div>`)}
-
-            ${block("final", "Final design", "Finished screens, shown larger. Optional.", `
-              <div class="dashboard-project-gallery">
-                <div class="dashboard-flex-blocks__head">
-                  <small>Any size, nothing is cropped. Shown larger than snapshots, in page order.</small>
-                  <button type="button" data-dashboard-add-gallery-image><i class="ri-add-line"></i> Add image</button>
-                </div>
-                <div class="dashboard-detail-editor__grid dashboard-detail-editor__grid--mockups" data-dashboard-gallery-images>
-                  ${detail.galleryImages.map((image, index) => renderProjectGalleryImageField(image, `saved-gallery-${index}`, index)).join("")}
-                </div>
-              </div>`)}
-
-            ${block("blocks", "Extra blocks", "Any extra text or images, shown after the final design. Optional.", `
-              <div class="dashboard-flex-blocks">
-                <div class="dashboard-flex-blocks__head">
-                  <small>Add as many as the project needs.</small>
-                  <div>
-                    <button type="button" data-dashboard-add-detail-block="text"><i class="ri-text"></i> Add text</button>
-                    <button type="button" data-dashboard-add-detail-block="image"><i class="ri-image-add-line"></i> Add image</button>
-                  </div>
-                </div>
-                <div data-dashboard-flex-blocks>
-                  ${detail.blocks.map((item, index) => renderProjectFlexibleBlock(item, `saved-${index}`)).join("")}
-                </div>
-              </div>`)}
-
-            ${block("outcome", "Outcome", "The dark panel near the end of the case study.", `
-              <div class="dashboard-form-grid">
-                <label class="dashboard-form__wide">Result <small>One or two sentences, shown large</small><textarea name="detailImpact" rows="3">${escapeHtml(detail.impact)}</textarea></label>
-                <label>What I learned<textarea name="detailLearned" rows="4">${escapeHtml(detail.learned)}</textarea></label>
-                <label>Next steps <small>One per line</small><textarea name="detailNextSteps" rows="4">${escapeHtml(detail.nextSteps)}</textarea></label>
-              </div>`)}
+            ${kept}
+            ${kind.sections.map((id) => sections[id]).join("")}
           </div>
           <footer>
             <button class="dashboard-button dashboard-button--secondary" type="button" data-dashboard-close>Cancel</button>
@@ -2622,6 +2873,23 @@ function initDashboard() {
     const removeResearchImageButton = event.target.closest("[data-dashboard-remove-research-image]");
     const featureButton = event.target.closest("[data-dashboard-feature]");
     const jumpButton = event.target.closest("[data-dashboard-jump]");
+    const listAddButton = event.target.closest("[data-dashboard-list-add]");
+    const listRemoveButton = event.target.closest("[data-dashboard-list-remove]");
+
+    if (listAddButton) {
+      const field = listAddButton.dataset.dashboardListAdd;
+      const listNodeForField = app.querySelector(`[data-dashboard-list="${field}"]`);
+      if (listNodeForField) {
+        const index = listNodeForField.querySelectorAll("[data-dashboard-list-item]").length;
+        listNodeForField.insertAdjacentHTML("beforeend", renderProjectListImage(field, "", index, listNodeForField.dataset.dashboardListLabel || "Image"));
+      }
+      return;
+    }
+
+    if (listRemoveButton) {
+      listRemoveButton.closest("[data-dashboard-list-item]")?.remove();
+      return;
+    }
 
     if (jumpButton) {
       app.querySelector(`#project-${jumpButton.dataset.dashboardJump}`)?.scrollIntoView({ behavior: "smooth", block: "start" });
@@ -2780,6 +3048,23 @@ function initDashboard() {
   );
 
   app.addEventListener("change", async (event) => {
+    const projectTypeSelect = event.target.closest("[data-dashboard-project-type]");
+    if (projectTypeSelect) {
+      switchProjectType(projectTypeSelect);
+      return;
+    }
+
+    const listUploadInput = event.target.closest("[data-dashboard-list-upload]");
+    if (listUploadInput && listUploadInput.files?.length) {
+      const itemNode = listUploadInput.closest("[data-dashboard-list-item]");
+      const dataUrl = await prepareImageKeepingShape(listUploadInput.files[0]);
+      const urlInput = itemNode?.querySelector("[data-dashboard-list-url]");
+      const preview = itemNode?.querySelector("[data-dashboard-list-preview]");
+      if (urlInput) urlInput.value = dataUrl;
+      if (preview) preview.innerHTML = `<img src="${dataUrl}" alt="Image preview" />`;
+      return;
+    }
+
     const researchUploadInput = event.target.closest("[data-dashboard-research-image-upload]");
 
     if (researchUploadInput && researchUploadInput.files?.length) {
@@ -3069,6 +3354,18 @@ function initDashboard() {
     addProjectTools(parts.join(","));
   });
 
+  // A pasted image URL in a list of images shows its preview.
+  app.addEventListener("input", (event) => {
+    const urlInput = event.target.closest?.("[data-dashboard-list-url]");
+    if (!urlInput) return;
+    const preview = urlInput.closest("[data-dashboard-list-item]")?.querySelector("[data-dashboard-list-preview]");
+    if (preview) {
+      preview.innerHTML = urlInput.value.trim()
+        ? `<img src="${escapeHtml(urlInput.value.trim())}" alt="Image preview" />`
+        : "<small>No image selected</small>";
+    }
+  });
+
   app.addEventListener("focusout", (event) => {
     const toolInput = event.target.closest?.("[data-dashboard-tool-input]");
     if (!toolInput || !toolInput.value.trim()) return;
@@ -3131,55 +3428,8 @@ function initDashboard() {
     };
 
     if (activeType === "projects") {
-      const blockTypes = formData.getAll("detailBlockType");
-      const blockTitles = formData.getAll("detailBlockTitle");
-      const blockTexts = formData.getAll("detailBlockText");
-      const blockImages = formData.getAll("detailBlockImage");
-      const researchImages = formData
-        .getAll("detailResearchImage")
-        .map((image) => String(image || "").trim())
-        .filter(Boolean);
-      const galleryImages = formData
-        .getAll("detailGalleryImage")
-        .map((image) => String(image || "").trim())
-        .filter(Boolean);
-      const detailBlocks = blockTypes
-        .map((type, index) => ({
-          type: String(type || "text") === "image" ? "image" : "text",
-          title: String(blockTitles[index] || "").trim(),
-          text: String(blockTexts[index] || "").trim(),
-          image: String(blockImages[index] || "").trim(),
-        }))
-        .filter((block) => block.title || block.text || block.image);
-
-      item.detail = {
-        region: String(formData.get("detailRegion") || "").trim(),
-        year: String(formData.get("detailYear") || "").trim(),
-        role: String(formData.get("detailRole") || "").trim(),
-        service: String(formData.get("detailService") || "").trim(),
-        overview: String(formData.get("detailOverview") || "").trim(),
-        problem: String(formData.get("detailProblem") || "").trim(),
-        goal: String(formData.get("detailGoal") || "").trim(),
-        responsibilities: String(formData.get("detailResponsibilities") || "").trim(),
-        research: String(formData.get("detailResearch") || "").trim(),
-        painPoints: String(formData.get("detailPainPoints") || "").trim(),
-        wireframes: String(formData.get("detailWireframes") || "").trim(),
-        design: String(formData.get("detailDesign") || "").trim(),
-        prototype: String(formData.get("detailPrototype") || "").trim(),
-        impact: String(formData.get("detailImpact") || "").trim(),
-        learned: String(formData.get("detailLearned") || "").trim(),
-        nextSteps: String(formData.get("detailNextSteps") || "").trim(),
-        researchImageOne: String(formData.get("detailResearchImageOne") || "").trim(),
-        researchImageTwo: String(formData.get("detailResearchImageTwo") || "").trim(),
-        researchImages,
-        wireframeImage: String(formData.get("detailWireframeImage") || "").trim(),
-        mockupImageOne: String(formData.get("detailMockupImageOne") || "").trim(),
-        mockupImageTwo: String(formData.get("detailMockupImageTwo") || "").trim(),
-        mockupImageThree: String(formData.get("detailMockupImageThree") || "").trim(),
-        mockupImageFour: String(formData.get("detailMockupImageFour") || "").trim(),
-        galleryImages,
-        blocks: detailBlocks,
-      };
+      item.projectType = getProjectType({ projectType: String(formData.get("projectType") || "") });
+      item.detail = readProjectDetail(formData);
       item.featured = formData.get("featured") === "true";
       // Keep fields this form does not edit (for example a custom slug) instead of dropping them.
       Object.entries(editingItem || {}).forEach(([key, value]) => {

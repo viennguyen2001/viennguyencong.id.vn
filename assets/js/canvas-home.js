@@ -146,7 +146,7 @@
     return [
       ["Year", text(detail.year) || text(project.date).slice(0, 4)],
       ["Tools", text(project.tags)],
-      ["Live site", hostOf(project.link)],
+      [{ packaging: "Shop", logo: "Website", print: "Link" }[project.projectType] || "Live site", hostOf(project.link)],
     ].filter(([, value]) => value);
   };
   const workCard = (project, large) => {
