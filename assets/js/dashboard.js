@@ -1240,24 +1240,38 @@ function optimizeImageForStorage(file, options = {}) {
   });
 }
 
-function cropImageToSquare(file, size = 1000, quality = 0.84) {
+// Snapshots and final screens keep their own shape: nothing is cropped. A small file is kept as it is
+// (PNG quality and transparency stay); a larger one is scaled to at most 1600 px wide and 16 megapixels,
+// which keeps even a full-page screenshot whole and light enough to upload.
+function prepareImageKeepingShape(file, maxWidth = 1600, maxPixels = 16000000, keepBelowBytes = 2500000) {
   return new Promise((resolve, reject) => {
     const reader = new FileReader();
     reader.onload = () => {
+      const original = String(reader.result || "");
       const image = new Image();
       image.onload = () => {
-        const sourceSize = Math.min(image.naturalWidth, image.naturalHeight);
-        const sourceX = Math.max(0, (image.naturalWidth - sourceSize) / 2);
-        const sourceY = Math.max(0, (image.naturalHeight - sourceSize) / 2);
+        const width = image.naturalWidth;
+        const height = image.naturalHeight;
+        if (!width || !height) {
+          resolve(original);
+          return;
+        }
+        const scale = Math.min(1, maxWidth / width, Math.sqrt(maxPixels / (width * height)));
+        if (scale === 1 && file.size <= keepBelowBytes) {
+          resolve(original);
+          return;
+        }
         const canvas = document.createElement("canvas");
-        canvas.width = size;
-        canvas.height = size;
+        canvas.width = Math.max(1, Math.round(width * scale));
+        canvas.height = Math.max(1, Math.round(height * scale));
         const context = canvas.getContext("2d");
-        context.drawImage(image, sourceX, sourceY, sourceSize, sourceSize, 0, 0, size, size);
-        resolve(canvas.toDataURL("image/jpeg", quality));
+        context.fillStyle = "#ffffff"; // JPEG has no transparency
+        context.fillRect(0, 0, canvas.width, canvas.height);
+        context.drawImage(image, 0, 0, canvas.width, canvas.height);
+        resolve(canvas.toDataURL("image/jpeg", 0.86));
       };
       image.onerror = () => reject(new Error("Không đọc được ảnh đã chọn."));
-      image.src = String(reader.result || "");
+      image.src = original;
     };
     reader.onerror = reject;
     reader.readAsDataURL(file);
@@ -1956,7 +1970,7 @@ function initDashboard() {
     return `
       <article class="dashboard-project-gallery-image" data-dashboard-gallery-image="${key}">
         <header>
-          <strong>Screen ${index + 1} <small>1000 × 1000 px</small></strong>
+          <strong>Screen ${index + 1} <small data-dashboard-image-size></small></strong>
           <button type="button" data-dashboard-remove-gallery-image aria-label="Remove project image" title="Remove image">
             <i class="ri-delete-bin-line"></i><span>Remove</span>
           </button>
@@ -1978,7 +1992,7 @@ function initDashboard() {
     return `
       <article class="dashboard-project-gallery-image" data-dashboard-research-image="${key}">
         <header>
-          <strong>Snapshot ${index + 1} <small>1000 × 1000 px</small></strong>
+          <strong>Snapshot ${index + 1} <small data-dashboard-image-size></small></strong>
           <button type="button" data-dashboard-remove-research-image aria-label="Remove research image" title="Remove image">
             <i class="ri-delete-bin-line"></i><span>Remove</span>
           </button>
@@ -2249,10 +2263,10 @@ function initDashboard() {
                 <label>What I did <small>One per line</small><textarea name="detailResponsibilities" rows="4">${escapeHtml(detail.responsibilities)}</textarea></label>
               </div>`)}
 
-            ${block("snapshots", "Snapshots", "A grid of square images that visitors can open full screen.", `
+            ${block("snapshots", "Snapshots", "Images of any size: wide, tall or square. The page lines them up in rows and keeps each one whole; visitors can open them full screen.", `
               <div class="dashboard-project-gallery dashboard-project-gallery--research">
                 <div class="dashboard-flex-blocks__head">
-                  <small>Uploads are cropped to a square (1000 × 1000 px). The order here is the order on the page.</small>
+                  <small>Nothing is cropped. A very tall image, such as a full-page screenshot, shows its top and scrolls on hover. The order here is the order on the page.</small>
                   <button type="button" data-dashboard-add-research-image><i class="ri-add-line"></i> Add image</button>
                 </div>
                 <div class="dashboard-detail-editor__grid dashboard-detail-editor__grid--mockups" data-dashboard-research-images>
@@ -2272,7 +2286,7 @@ function initDashboard() {
             ${block("final", "Final design", "Finished screens, shown larger. Optional.", `
               <div class="dashboard-project-gallery">
                 <div class="dashboard-flex-blocks__head">
-                  <small>Square images (1000 × 1000 px), in page order.</small>
+                  <small>Any size, nothing is cropped. Shown larger than snapshots, in page order.</small>
                   <button type="button" data-dashboard-add-gallery-image><i class="ri-add-line"></i> Add image</button>
                 </div>
                 <div class="dashboard-detail-editor__grid dashboard-detail-editor__grid--mockups" data-dashboard-gallery-images>
@@ -2753,12 +2767,24 @@ function initDashboard() {
     }
   });
 
+  // Snapshot and screen cards show the image's real size once it loads.
+  app.addEventListener(
+    "load",
+    (event) => {
+      const image = event.target;
+      if (!(image instanceof HTMLImageElement) || !image.closest(".dashboard-detail-image-preview")) return;
+      const label = image.closest(".dashboard-project-gallery-image")?.querySelector("[data-dashboard-image-size]");
+      if (label && image.naturalWidth) label.textContent = `${image.naturalWidth} × ${image.naturalHeight} px`;
+    },
+    true
+  );
+
   app.addEventListener("change", async (event) => {
     const researchUploadInput = event.target.closest("[data-dashboard-research-image-upload]");
 
     if (researchUploadInput && researchUploadInput.files?.length) {
       const fieldName = researchUploadInput.dataset.dashboardResearchImageUpload;
-      const dataUrl = await cropImageToSquare(researchUploadInput.files[0]);
+      const dataUrl = await prepareImageKeepingShape(researchUploadInput.files[0]);
       const urlInput = app.querySelector(`[data-dashboard-research-image-url="${fieldName}"]`);
       const preview = app.querySelector(`[data-dashboard-research-image-preview="${fieldName}"]`);
 
@@ -2775,7 +2801,7 @@ function initDashboard() {
 
     if (galleryUploadInput && galleryUploadInput.files?.length) {
       const fieldName = galleryUploadInput.dataset.dashboardGalleryImageUpload;
-      const dataUrl = await cropImageToSquare(galleryUploadInput.files[0]);
+      const dataUrl = await prepareImageKeepingShape(galleryUploadInput.files[0]);
       const urlInput = app.querySelector(`[data-dashboard-gallery-image-url="${fieldName}"]`);
       const preview = app.querySelector(`[data-dashboard-gallery-image-preview="${fieldName}"]`);
 

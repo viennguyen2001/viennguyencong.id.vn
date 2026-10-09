@@ -108,6 +108,107 @@
     if (description) document.querySelector('meta[name="description"]')?.setAttribute("content", description);
   };
 
+  /* ---------- Image shapes ---------- */
+  // Snapshots and final screens keep their own shape: nothing is cropped to a square.
+  // Each image's width / height ratio is measured when it loads and remembered, so the next visit lays out at once.
+  const RATIO_KEY = "vien-image-ratios";
+  const TALL = 0.4; // narrower than a phone screen, such as a full-page screenshot: shown from the top, scrolls on hover
+  const WIDE = 5; // wider than this is trimmed at the sides in the grid; the viewer shows it whole
+  let ratios = {};
+  try {
+    ratios = JSON.parse(window.localStorage.getItem(RATIO_KEY) || "{}") || {};
+  } catch (error) {}
+  let saveTimer = 0;
+  const rememberRatio = (src, ratio) => {
+    if (!src || src.length > 600 || Math.abs((ratios[src] || 0) - ratio) < 0.001) return;
+    ratios[src] = Math.round(ratio * 10000) / 10000;
+    window.clearTimeout(saveTimer);
+    saveTimer = window.setTimeout(() => {
+      try {
+        window.localStorage.setItem(RATIO_KEY, JSON.stringify(Object.fromEntries(Object.entries(ratios).slice(-300))));
+      } catch (error) {}
+    }, 400);
+  };
+  const shapeItem = (item, ratio) => {
+    if (!item || !(ratio > 0)) return;
+    item.style.setProperty("--r", Math.min(WIDE, Math.max(TALL, ratio)).toFixed(4));
+    item.classList.toggle("is-tall", ratio < TALL);
+    // A longer image pans for longer, so the speed feels the same.
+    if (ratio < TALL) item.style.setProperty("--pan", `${Math.min(8, Math.max(2.5, 0.9 / ratio)).toFixed(1)}s`);
+  };
+  // Where each row ends, chosen for the whole grid at once so every row lands close to the target height
+  // (a greedy fill can leave one row much taller than the rest). A short last row keeps the target height
+  // instead of stretching. Without this, CSS alone still gives justified rows.
+  const layoutGrid = (grid) => {
+    const items = [...grid.children];
+    const width = grid.clientWidth;
+    if (!width || items.length < 2 || grid.classList.contains("case-grid--single")) return;
+    const style = getComputedStyle(grid);
+    const gap = parseFloat(style.columnGap) || 0;
+    const target = parseFloat(style.getPropertyValue("--row")) || 300;
+    const shapes = items.map((item) => parseFloat(item.style.getPropertyValue("--r")) || 1);
+    const heightOf = (from, to) => {
+      let sum = 0;
+      for (let index = from; index < to; index += 1) sum += shapes[index];
+      return (width - gap * (to - from - 1)) / sum;
+    };
+    const isLooseLastRow = (height) => height > target * 1.15;
+    const best = [0];
+    const start = [0];
+    for (let end = 1; end <= items.length; end += 1) {
+      best[end] = Infinity;
+      for (let from = end - 1; from >= 0; from -= 1) {
+        const height = heightOf(from, end);
+        if (height < target * 0.4 && end - from > 1) break; // more images would only make the row shorter
+        const cost = end === items.length && isLooseLastRow(height) ? 0 : Math.log(height / target) ** 2;
+        if (best[from] + cost < best[end]) {
+          best[end] = best[from] + cost;
+          start[end] = from;
+        }
+      }
+    }
+    const rows = [];
+    for (let end = items.length; end > 0; end = start[end]) rows.unshift([start[end], end]);
+    rows.forEach(([from, end], row) => {
+      const loose = row === rows.length - 1 && isLooseLastRow(heightOf(from, end));
+      // A short last row matches the row above it (never shorter than the target), so the grid reads as one block.
+      const above = row ? heightOf(...rows[row - 1]) : target;
+      const height = loose ? Math.min(heightOf(from, end), Math.max(target, above)) : heightOf(from, end);
+      for (let index = from; index < end; index += 1) {
+        // 1px under the exact width so the row always fits; growing in proportion fills it again exactly.
+        items[index].style.setProperty("--basis", `${Math.max(0, shapes[index] * height - (loose ? 0 : 1)).toFixed(2)}px`);
+        items[index].style.setProperty("--grow", loose ? "0" : String(shapes[index]));
+      }
+    });
+    grid.classList.add("is-laid-out");
+  };
+  let layoutFrame = 0;
+  const layoutGrids = () => {
+    window.cancelAnimationFrame(layoutFrame);
+    layoutFrame = window.requestAnimationFrame(() => main.querySelectorAll(".case-grid").forEach(layoutGrid));
+  };
+  const gridObserver = "ResizeObserver" in window ? new ResizeObserver(layoutGrids) : null;
+
+  const shapeGrids = () => {
+    main.querySelectorAll(".case-grid img[data-src]").forEach((image) => {
+      const item = image.closest("li");
+      const src = image.dataset.src;
+      shapeItem(item, ratios[src]);
+      const measure = () => {
+        if (!image.naturalWidth || !image.naturalHeight) return;
+        const ratio = image.naturalWidth / image.naturalHeight;
+        shapeItem(item, ratio);
+        rememberRatio(src, ratio);
+        layoutGrids();
+      };
+      if (image.complete) measure();
+      else image.addEventListener("load", measure, { once: true });
+    });
+    gridObserver?.disconnect();
+    main.querySelectorAll(".case-grid").forEach((grid) => gridObserver?.observe(grid));
+    layoutGrids();
+  };
+
   /* ---------- The case study ---------- */
   let viewerImages = [];
 
@@ -144,7 +245,7 @@
     const thumb = (src, index, label) => `
       <li>
         <button class="case-grid__item" type="button" data-view="${index}" aria-label="${esc(label)}">
-          <img src="${esc(cld(src, "f_auto,q_auto,w_800"))}" alt="" width="1000" height="1000" loading="lazy" decoding="async" />
+          <img src="${esc(cld(src, "f_auto,q_auto,c_limit,w_1200,h_2400"))}" alt="" loading="lazy" decoding="async" data-src="${esc(src)}" />
         </button>
       </li>`;
 
@@ -230,7 +331,7 @@
         <section class="section wrap" aria-labelledby="snapshots-title">
           <div class="section__head">
             <h2 class="section__title" id="snapshots-title">Snapshots</h2>
-            <p class="section__lead">Screens from the project. Select one to see it larger.</p>
+            <p class="section__lead">Screens from the project. Select one to see it whole.</p>
           </div>
           <ul class="case-grid${snapshots.length === 1 ? " case-grid--single" : ""}">
             ${snapshots.map((src, index) => thumb(src, index, `Open image ${index + 1} of ${viewerImages.length}`)).join("")}
@@ -263,9 +364,9 @@
         <section class="section wrap" aria-labelledby="final-title">
           <div class="section__head">
             <h2 class="section__title" id="final-title">Final design</h2>
-            <p class="section__lead">The finished screens. Select one to see it larger.</p>
+            <p class="section__lead">The finished screens. Select one to see it whole.</p>
           </div>
-          <ul class="case-grid case-grid--large">
+          <ul class="case-grid case-grid--large${finals.length === 1 ? " case-grid--single" : ""}">
             ${finals.map((src, index) => thumb(src, snapshots.length + index, `Open image ${snapshots.length + index + 1} of ${viewerImages.length}`)).join("")}
           </ul>
         </section>` : ""}
@@ -298,6 +399,7 @@
         ${nextCard}
       </article>`;
 
+    shapeGrids();
     main.removeAttribute("aria-busy");
     setMeta(`${title} – ${SITE}`, summary);
     // Old /single-project/?id=N links move to the project's own address.
@@ -358,18 +460,30 @@
   /* ---------- Image viewer ---------- */
   const viewer = document.querySelector("[data-viewer]");
   const viewerImage = viewer?.querySelector("[data-viewer-image]");
+  const viewerStage = viewer?.querySelector("[data-viewer-stage]");
   const viewerCount = viewer?.querySelector("[data-viewer-count]");
+  const VIEWER_SIZE = "f_auto,q_auto,c_limit,w_2000";
+  // A tall image (a full-page screenshot) opens at reading width and scrolls, instead of shrinking to fit the screen.
+  const setTall = (ratio) => viewer?.classList.toggle("viewer--tall", Boolean(viewerStage) && ratio > 0 && ratio < TALL);
+  viewerImage?.addEventListener("load", () => {
+    if (!viewerImage.naturalWidth) return;
+    const ratio = viewerImage.naturalWidth / viewerImage.naturalHeight;
+    setTall(ratio);
+    rememberRatio(viewerImages[current]?.src, ratio);
+  });
   let current = 0;
   let opener = null;
   const preload = (index) => {
     const item = viewerImages[(index + viewerImages.length) % viewerImages.length];
-    if (item) new Image().src = cld(item.src, "f_auto,q_auto,w_2000");
+    if (item) new Image().src = cld(item.src, VIEWER_SIZE);
   };
   const show = (index) => {
     if (!viewerImages.length || !viewerImage) return;
     current = (index + viewerImages.length) % viewerImages.length;
     const item = viewerImages[current];
-    viewerImage.src = cld(item.src, "f_auto,q_auto,w_2000");
+    setTall(ratios[item.src] || 0);
+    if (viewerStage) viewerStage.scrollTop = 0;
+    viewerImage.src = cld(item.src, VIEWER_SIZE);
     viewerImage.alt = item.alt;
     viewerCount.textContent = `${current + 1} / ${viewerImages.length}`;
     viewer.classList.toggle("viewer--single", viewerImages.length < 2);
