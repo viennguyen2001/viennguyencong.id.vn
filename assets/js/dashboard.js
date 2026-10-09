@@ -514,8 +514,9 @@ const dashboardVersionStorageKey = "nino-dashboard-content-version";
 const dashboardStorageKey = "nino-dashboard-content";
 const siteLogoStorageKey = "nino-site-logo";
 const siteFaviconStorageKey = "nino-site-favicon";
-const defaultSiteLogo = "./assets/images/logo.png?v=20260711-vien-brand-assets-v1";
-const defaultSiteFavicon = "./assets/images/favicon.png?v=20260711-vien-brand-assets-v1";
+// Absolute paths: the project pages live in sub-folders (/projectdetail/<slug>/) without a <base> tag.
+const defaultSiteLogo = "/assets/images/logo.png?v=20260929-vien-brand-assets-v2";
+const defaultSiteFavicon = "/assets/images/favicon.png?v=20260929-vien-brand-assets-v2";
 const dashboardAuthKey = "nino-dashboard-authenticated";
 const dashboardStatuses = [
   { label: "All Projects", value: "All" },
@@ -3883,6 +3884,8 @@ function initManagedContentSections() {
 window.vienSite = {
   getData: () => getDashboardData(),
   getProjectLink: (project) => getProjectDetailLink(project),
+  getProjectSlug: (project) => getProjectSlug(project),
+  getProjectDetail: (project) => getProjectDetailDefaults(project),
 };
 
 document.addEventListener("DOMContentLoaded", async () => {
