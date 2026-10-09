@@ -119,11 +119,13 @@
     else list.innerHTML = html;
   };
 
-  // Starred projects first; otherwise the first three published ones, in dashboard order.
+  // The projects starred in the dashboard ("Show on homepage"), in dashboard order; the first is shown large.
+  // (With an even number, the last one is also shown large; see renderWork.)
+  // With none starred, the first three published projects.
   const pickProjects = (data) => {
     const published = (data.projects || []).filter(isPublished);
     const featured = published.filter((project) => project.featured === true);
-    return (featured.length ? featured : published).slice(0, 3);
+    return featured.length ? featured : published.slice(0, 3);
   };
   const projectMeta = (project) => {
     const detail = project.detail || {};
@@ -172,8 +174,13 @@
     const projects = pickProjects(data);
     if (!projects.length) return;
     const [first, ...rest] = projects;
+    // The rest go two to a row. A project left on its own at the end is shown large, so no row is half empty.
+    const paired = rest.slice(0, rest.length - (rest.length % 2));
+    const last = rest.length % 2 ? rest[rest.length - 1] : null;
     $("[data-work]").innerHTML =
-      workCard(first, true) + (rest.length ? `<div class="work__pair">${rest.map((project) => workCard(project, false)).join("")}</div>` : "");
+      workCard(first, true) +
+      (paired.length ? `<div class="work__pair">${paired.map((project) => workCard(project, false)).join("")}</div>` : "") +
+      (last ? workCard(last, true) : "");
   };
 
   const renderAbout = (data) => {

@@ -1467,7 +1467,12 @@ function initDashboard() {
       return;
     }
 
-    const statuses = activeType === "contact" ? contactStatuses : dashboardStatuses;
+    const statuses =
+      activeType === "contact"
+        ? contactStatuses
+        : activeType === "projects"
+          ? [...dashboardStatuses, { label: "On homepage", value: "Featured" }]
+          : dashboardStatuses;
 
     statusNode.innerHTML = statuses
       .map(
@@ -1490,7 +1495,9 @@ function initDashboard() {
     return data[activeType].filter((item) => {
       const searchable = `${item.title} ${item.owner} ${item.email || ""} ${item.summary} ${item.tags}`.toLowerCase();
       const matchesQuery = normalizedQuery ? searchable.includes(normalizedQuery) : true;
-      const matchesStatus = activeStatus === "All" || item.status === activeStatus;
+      const matchesStatus =
+        activeStatus === "All" ||
+        (activeStatus === "Featured" ? item.featured === true : item.status === activeStatus);
 
       return matchesQuery && matchesStatus;
     });
@@ -1649,7 +1656,24 @@ function initDashboard() {
             ? "dashboard-card-grid dashboard-card-grid--compact-list"
             : "dashboard-card-grid";
 
-    listNode.innerHTML = items
+    // Which projects the homepage shows: the starred ones, in list order (the first is shown large).
+    const starredActive = activeType === "projects"
+      ? (data.projects || []).filter((project) => project.featured === true && project.status === "Active")
+      : [];
+    const starredHidden = activeType === "projects"
+      ? (data.projects || []).filter((project) => project.featured === true && project.status !== "Active").length
+      : 0;
+    const homepageNote = activeType === "projects"
+      ? `<div class="dashboard-note">
+          <i class="ri-star-line" aria-hidden="true"></i>
+          <p><strong>Homepage.</strong> ${starredActive.length
+            ? `${starredActive.length} starred project${starredActive.length > 1 ? "s" : ""} shown in Selected work, in this order. The first one is shown large.`
+            : "No project is starred yet, so the homepage shows the first three active projects."}${starredHidden ? ` ${starredHidden} starred project${starredHidden > 1 ? "s are" : " is"} not Active, so ${starredHidden > 1 ? "they stay" : "it stays"} hidden.` : ""}
+          Use the star on a card to choose.</p>
+        </div>`
+      : "";
+
+    listNode.innerHTML = homepageNote + items
       .map((item) => {
         const tags = String(item.tags || "")
           .split(",")
@@ -1857,10 +1881,11 @@ function initDashboard() {
         }
 
         return `
-          <article class="dashboard-content-card">
+          <article class="dashboard-content-card${activeType === "projects" && item.featured === true ? " is-featured" : ""}">
             <a class="dashboard-content-card__media" href="${escapeHtml(item.link || getDefaultItemLink(activeType))}">
               <img src="${escapeHtml(cardImage)}" alt="${escapeHtml(item.title)}" />
               <span class="dashboard-status dashboard-status--${String(item.status).toLowerCase()}">${escapeHtml(item.status)}</span>
+              ${activeType === "projects" && item.featured === true ? '<span class="dashboard-home-badge"><i class="ri-star-fill" aria-hidden="true"></i>Homepage</span>' : ""}
             </a>
             <div class="dashboard-content-card__body">
               <div>
@@ -1873,6 +1898,9 @@ function initDashboard() {
               </div>
               <div class="dashboard-content-card__actions">
                 <a href="${escapeHtml(item.link || getDefaultItemLink(activeType))}">Open <i class="ri-arrow-right-line"></i></a>
+                ${activeType === "projects"
+                  ? `<button type="button" class="dashboard-feature-toggle${item.featured === true ? " is-on" : ""}" aria-pressed="${item.featured === true}" aria-label="${item.featured === true ? "Remove from homepage" : "Show on homepage"}: ${escapeHtml(item.title)}" title="${item.featured === true ? "Remove from homepage" : "Show on homepage"}" data-dashboard-feature="${item.id}"><i class="${item.featured === true ? "ri-star-fill" : "ri-star-line"}"></i></button>`
+                  : ""}
                 <button type="button" aria-label="Edit ${escapeHtml(item.title)}" data-dashboard-edit="${item.id}">
                   <i class="ri-edit-line"></i>
                 </button>
@@ -1928,7 +1956,7 @@ function initDashboard() {
     return `
       <article class="dashboard-project-gallery-image" data-dashboard-gallery-image="${key}">
         <header>
-          <strong>Project image ${index + 1} <small>1000 x 1000px</small></strong>
+          <strong>Screen ${index + 1} <small>1000 × 1000 px</small></strong>
           <button type="button" data-dashboard-remove-gallery-image aria-label="Remove project image" title="Remove image">
             <i class="ri-delete-bin-line"></i><span>Remove</span>
           </button>
@@ -1950,7 +1978,7 @@ function initDashboard() {
     return `
       <article class="dashboard-project-gallery-image" data-dashboard-research-image="${key}">
         <header>
-          <strong>Research image ${index + 1} <small>1000 x 1000px</small></strong>
+          <strong>Snapshot ${index + 1} <small>1000 × 1000 px</small></strong>
           <button type="button" data-dashboard-remove-research-image aria-label="Remove research image" title="Remove image">
             <i class="ri-delete-bin-line"></i><span>Remove</span>
           </button>
@@ -2073,52 +2101,114 @@ function initDashboard() {
     `;
   }
 
+  function renderToolChip(tool) {
+    return `<span data-dashboard-tool="${escapeHtml(tool)}">${escapeHtml(tool)}<button type="button" data-dashboard-tool-remove="${escapeHtml(tool)}" aria-label="Remove ${escapeHtml(tool)}">×</button></span>`;
+  }
+
+  // The tool chips are the source of truth; the hidden "tags" field is what gets saved.
+  function syncProjectTools() {
+    const box = app.querySelector("[data-dashboard-tools]");
+    if (!box) return;
+    const names = [...box.querySelectorAll("[data-dashboard-tool]")].map((chip) => chip.dataset.dashboardTool);
+    const field = box.querySelector("[data-dashboard-tools-value]");
+    const input = box.querySelector("[data-dashboard-tool-input]");
+    if (field) field.value = names.join(", ");
+    if (input) input.placeholder = names.length ? "Add another" : "Figma, Photoshop…";
+  }
+
+  function addProjectTools(value) {
+    const box = app.querySelector("[data-dashboard-tools]");
+    const input = box?.querySelector("[data-dashboard-tool-input]");
+    if (!box || !input) return;
+    const existing = [...box.querySelectorAll("[data-dashboard-tool]")].map((chip) => chip.dataset.dashboardTool.toLowerCase());
+    String(value || "")
+      .split(",")
+      .map((tool) => tool.trim())
+      .filter(Boolean)
+      .forEach((tool) => {
+        if (existing.includes(tool.toLowerCase())) return;
+        existing.push(tool.toLowerCase());
+        input.insertAdjacentHTML("beforebegin", renderToolChip(tool));
+      });
+    syncProjectTools();
+  }
+
   function renderProjectEditor() {
     const detail = getProjectDetailDefaults(editingItem);
     const tools = String(editingItem.tags || "")
       .split(",")
       .map((tag) => tag.trim())
       .filter(Boolean);
+    const statusOptions = ["Active", "Draft", "Disabled"]
+      .map((status) => `<option ${editingItem.status === status ? "selected" : ""}>${status}</option>`)
+      .join("");
+    // The form follows the case study page from top to bottom; each block says where its content appears.
+    const sections = [
+      ["basics", "Basics"],
+      ["overview", "Overview"],
+      ["snapshots", "Snapshots"],
+      ["process", "Process"],
+      ["final", "Final design"],
+      ["blocks", "Extra blocks"],
+      ["outcome", "Outcome"],
+    ];
+    const block = (id, title, note, body) => `
+      <section class="dashboard-form-block" id="project-${id}">
+        <header class="dashboard-form-block__head">
+          <h3>${title}</h3>
+          <p>${note}</p>
+        </header>
+        ${body}
+      </section>`;
 
     listNode.className = "dashboard-project-editor";
     listNode.innerHTML = `
       <form class="dashboard-project-editor__form" data-dashboard-form>
         <aside class="dashboard-project-editor__side">
           <section class="dashboard-project-editor__card">
+            <h3 class="dashboard-project-editor__card-title">Publish</h3>
+            <label>Status<select name="status">${statusOptions}</select></label>
+            <label class="dashboard-switch">
+              <input type="checkbox" name="featured" value="true" ${editingItem.featured === true ? "checked" : ""} />
+              <span class="dashboard-switch__track" aria-hidden="true"></span>
+              <span class="dashboard-switch__text">
+                <strong>Show on homepage</strong>
+                <small>Appears in Selected work when the status is Active.</small>
+              </span>
+            </label>
+          </section>
+
+          <section class="dashboard-project-editor__card">
             <label class="dashboard-project-editor__label">
-              Thumbnail <em>*</em>
+              Cover image <em>*</em>
             </label>
             <div class="dashboard-project-thumb" data-dashboard-image-preview>
-              ${editingImage ? `<img src="${escapeHtml(editingImage)}" alt="${escapeHtml(editingItem.title || "Project thumbnail")}" />` : `
+              ${editingImage ? `<img src="${escapeHtml(editingImage)}" alt="${escapeHtml(editingItem.title || "Project cover")}" />` : `
                 <div class="dashboard-project-thumb__empty">
                   <i class="ri-image-line"></i>
                 </div>
               `}
             </div>
-            <label class="dashboard-project-thumb__edit" aria-label="Upload thumbnail">
+            <label class="dashboard-project-thumb__edit" aria-label="Upload cover image">
               <i class="ri-pencil-line"></i>
               <input name="imageUpload" type="file" accept="image/*" data-dashboard-image-upload />
             </label>
-            <p>Set the project thumbnail image. Only *.png, *.jpg and *.jpeg image files are accepted.</p>
+            <p>Used on project cards and at the top of the case study. 1200 × 1000 px, PNG or JPG.</p>
             <input name="image" value="${escapeHtml(editingImage)}" placeholder="Or paste image URL" data-dashboard-image-url />
             <small data-dashboard-image-message>${escapeHtml(editingImageMessage)}</small>
           </section>
 
-          <section class="dashboard-project-editor__card">
-            <label class="dashboard-project-editor__label">
-              Status <em>*</em>
-            </label>
-            <select name="status">
-              <option ${editingItem.status === "Active" ? "selected" : ""}>Active</option>
-              <option ${editingItem.status === "Draft" ? "selected" : ""}>Draft</option>
-              <option ${editingItem.status === "Disabled" ? "selected" : ""}>Disabled</option>
-            </select>
-          </section>
+          <nav class="dashboard-project-editor__nav" aria-label="Form sections">
+            ${sections.map(([id, label]) => `<button type="button" data-dashboard-jump="${id}">${label}</button>`).join("")}
+          </nav>
         </aside>
 
         <section class="dashboard-project-editor__panel">
           <header>
-            <h2>${editingItem.id ? "Edit Project" : "Add Project"}</h2>
+            <div>
+              <p>Project</p>
+              <h2>${editingItem.id ? escapeHtml(editingItem.title || "Edit project") : "New project"}</h2>
+            </div>
             <button type="button" data-dashboard-close aria-label="Close editor">
               <i class="ri-close-line"></i>
             </button>
@@ -2128,25 +2218,92 @@ function initDashboard() {
             <input type="hidden" name="date" value="${escapeHtml(editingItem.date || new Date().toISOString().slice(0, 10))}" />
             <input type="hidden" name="metric" value="${escapeHtml(editingItem.metric || "1200x1000")}" />
 
-            <label>Project Name<input name="title" value="${escapeHtml(editingItem.title)}" placeholder="Enter your title here" required /></label>
-            <label>Role<input name="detailRole" value="${escapeHtml(detail.role || "")}" placeholder="Enter your role here" /></label>
-            <label>Category / Type<input name="detailService" value="${escapeHtml(detail.service || "")}" placeholder="Value" /></label>
-            <label>Tools Used
-              <div class="dashboard-project-tools" data-dashboard-tools>
-                ${tools.map((tool) => `<span>${escapeHtml(tool)} <button type="button" data-dashboard-tool-remove="${escapeHtml(tool)}">×</button></span>`).join("")}
-                <input name="tags" value="${escapeHtml(editingItem.tags)}" placeholder="Figma, Photoshop, Illustrator" />
-              </div>
-            </label>
-            <label>Description<textarea name="summary" rows="5" maxlength="180" placeholder="Enter your title here" data-dashboard-summary-input>${escapeHtml(editingItem.summary)}</textarea><small data-dashboard-summary-count>${String(editingItem.summary || "").length}/180</small></label>
-            <label>Demo Project<input name="link" value="${escapeHtml(editingItem.link || getDefaultItemLink(activeType))}" placeholder="Enter your title here" /></label>
+            ${block("basics", "Basics", "Shown on project cards and at the top of the case study.", `
+              <div class="dashboard-form-grid">
+                <label class="dashboard-form__wide">Project name<input name="title" value="${escapeHtml(editingItem.title)}" placeholder="Peaceblend" required /></label>
+                <label class="dashboard-form__wide">Short description <small>One line on cards and under the title</small>
+                  <textarea name="summary" rows="2" maxlength="180" placeholder="UI/UX design for a calm sleep supplement brand." data-dashboard-summary-input>${escapeHtml(editingItem.summary)}</textarea>
+                  <small class="dashboard-counter" data-dashboard-summary-count>${String(editingItem.summary || "").length}/180</small>
+                </label>
+                <label>Role<input name="detailRole" value="${escapeHtml(detail.role || "")}" placeholder="UI/UX Designer" /></label>
+                <label>Service<input name="detailService" value="${escapeHtml(detail.service || "")}" placeholder="UI/UX Design" /></label>
+                <label>Year<input name="detailYear" value="${escapeHtml(detail.year || "")}" placeholder="2026" /></label>
+                <label>Region<input name="detailRegion" value="${escapeHtml(detail.region || "")}" placeholder="Vietnam" /></label>
+                <div class="dashboard-form__wide dashboard-field">
+                  <label for="project-tools-input">Tools <small>Type a tool and press Enter</small></label>
+                  <div class="dashboard-project-tools" data-dashboard-tools>
+                    ${tools.map((tool) => renderToolChip(tool)).join("")}
+                    <input id="project-tools-input" type="text" autocomplete="off" placeholder="${tools.length ? "Add another" : "Figma, Photoshop…"}" data-dashboard-tool-input />
+                    <input type="hidden" name="tags" value="${escapeHtml(tools.join(", "))}" data-dashboard-tools-value />
+                  </div>
+                </div>
+                <label class="dashboard-form__wide">Live site <small>Optional. Adds a "Visit the live site" button</small><input name="link" value="${escapeHtml(editingItem.link || getDefaultItemLink(activeType))}" placeholder="https://" /></label>
+              </div>`)}
 
-          <details class="dashboard-project-detail" open>
-              <summary>Project detail information</summary>
-              ${renderProjectDetailFields()}
-            </details>
+            ${block("overview", "Overview", "The Overview card. The overview line is skipped when it repeats the short description.", `
+              <div class="dashboard-form-grid">
+                <label class="dashboard-form__wide">Overview<textarea name="detailOverview" rows="3">${escapeHtml(detail.overview)}</textarea></label>
+                <label>The challenge<textarea name="detailProblem" rows="4">${escapeHtml(detail.problem)}</textarea></label>
+                <label>The goal<textarea name="detailGoal" rows="4">${escapeHtml(detail.goal)}</textarea></label>
+                <label>Pain points <small>One per line</small><textarea name="detailPainPoints" rows="4">${escapeHtml(detail.painPoints)}</textarea></label>
+                <label>What I did <small>One per line</small><textarea name="detailResponsibilities" rows="4">${escapeHtml(detail.responsibilities)}</textarea></label>
+              </div>`)}
+
+            ${block("snapshots", "Snapshots", "A grid of square images that visitors can open full screen.", `
+              <div class="dashboard-project-gallery dashboard-project-gallery--research">
+                <div class="dashboard-flex-blocks__head">
+                  <small>Uploads are cropped to a square (1000 × 1000 px). The order here is the order on the page.</small>
+                  <button type="button" data-dashboard-add-research-image><i class="ri-add-line"></i> Add image</button>
+                </div>
+                <div class="dashboard-detail-editor__grid dashboard-detail-editor__grid--mockups" data-dashboard-research-images>
+                  ${detail.researchImages.map((image, index) => renderProjectResearchImageField(image, `saved-research-${index}`, index)).join("")}
+                </div>
+              </div>`)}
+
+            ${block("process", "Process", "Four steps joined by arrows, from research to prototype.", `
+              <div class="dashboard-form-grid">
+                <label>1 · Research<textarea name="detailResearch" rows="4">${escapeHtml(detail.research)}</textarea></label>
+                <label>2 · Structure and wireframes<textarea name="detailWireframes" rows="4">${escapeHtml(detail.wireframes)}</textarea></label>
+                <label>3 · Visual design<textarea name="detailDesign" rows="4">${escapeHtml(detail.design)}</textarea></label>
+                <label>4 · Prototype<textarea name="detailPrototype" rows="4">${escapeHtml(detail.prototype)}</textarea></label>
+                <div class="dashboard-form__wide">${renderProjectImageField("Wireframe image (optional, shown under the steps)", "detailWireframeImage", detail.wireframeImage)}</div>
+              </div>`)}
+
+            ${block("final", "Final design", "Finished screens, shown larger. Optional.", `
+              <div class="dashboard-project-gallery">
+                <div class="dashboard-flex-blocks__head">
+                  <small>Square images (1000 × 1000 px), in page order.</small>
+                  <button type="button" data-dashboard-add-gallery-image><i class="ri-add-line"></i> Add image</button>
+                </div>
+                <div class="dashboard-detail-editor__grid dashboard-detail-editor__grid--mockups" data-dashboard-gallery-images>
+                  ${detail.galleryImages.map((image, index) => renderProjectGalleryImageField(image, `saved-gallery-${index}`, index)).join("")}
+                </div>
+              </div>`)}
+
+            ${block("blocks", "Extra blocks", "Any extra text or images, shown after the final design. Optional.", `
+              <div class="dashboard-flex-blocks">
+                <div class="dashboard-flex-blocks__head">
+                  <small>Add as many as the project needs.</small>
+                  <div>
+                    <button type="button" data-dashboard-add-detail-block="text"><i class="ri-text"></i> Add text</button>
+                    <button type="button" data-dashboard-add-detail-block="image"><i class="ri-image-add-line"></i> Add image</button>
+                  </div>
+                </div>
+                <div data-dashboard-flex-blocks>
+                  ${detail.blocks.map((item, index) => renderProjectFlexibleBlock(item, `saved-${index}`)).join("")}
+                </div>
+              </div>`)}
+
+            ${block("outcome", "Outcome", "The dark panel near the end of the case study.", `
+              <div class="dashboard-form-grid">
+                <label class="dashboard-form__wide">Result <small>One or two sentences, shown large</small><textarea name="detailImpact" rows="3">${escapeHtml(detail.impact)}</textarea></label>
+                <label>What I learned<textarea name="detailLearned" rows="4">${escapeHtml(detail.learned)}</textarea></label>
+                <label>Next steps <small>One per line</small><textarea name="detailNextSteps" rows="4">${escapeHtml(detail.nextSteps)}</textarea></label>
+              </div>`)}
           </div>
           <footer>
-            <button class="dashboard-button dashboard-button--primary" type="submit">Save</button>
+            <button class="dashboard-button dashboard-button--secondary" type="button" data-dashboard-close>Cancel</button>
+            <button class="dashboard-button dashboard-button--primary" type="submit"><i class="ri-save-line"></i> Save project</button>
           </footer>
         </section>
       </form>
@@ -2449,6 +2606,27 @@ function initDashboard() {
     const removeGalleryImageButton = event.target.closest("[data-dashboard-remove-gallery-image]");
     const addResearchImageButton = event.target.closest("[data-dashboard-add-research-image]");
     const removeResearchImageButton = event.target.closest("[data-dashboard-remove-research-image]");
+    const featureButton = event.target.closest("[data-dashboard-feature]");
+    const jumpButton = event.target.closest("[data-dashboard-jump]");
+
+    if (jumpButton) {
+      app.querySelector(`#project-${jumpButton.dataset.dashboardJump}`)?.scrollIntoView({ behavior: "smooth", block: "start" });
+      return;
+    }
+
+    if (featureButton) {
+      // Star or unstar a project for the homepage, and save straight away.
+      const itemId = Number(featureButton.dataset.dashboardFeature);
+      data = {
+        ...data,
+        projects: (data.projects || []).map((item) =>
+          item.id === itemId ? { ...item, featured: item.featured !== true } : item
+        ),
+      };
+      setDashboardData(data);
+      render();
+      return;
+    }
 
     if (addResearchImageButton) {
       const researchNode = app.querySelector("[data-dashboard-research-images]");
@@ -2492,18 +2670,16 @@ function initDashboard() {
       return;
     }
 
+    const toolsBox = event.target.closest("[data-dashboard-tools]");
+    if (toolsBox && !toolRemoveButton && event.target === toolsBox) {
+      toolsBox.querySelector("[data-dashboard-tool-input]")?.focus();
+      return;
+    }
+
     if (toolRemoveButton) {
-      const toolsInput = app.querySelector(".dashboard-project-tools input[name='tags']");
-      if (toolsInput) {
-        const toolToRemove = toolRemoveButton.dataset.dashboardToolRemove;
-        toolsInput.value = String(toolsInput.value || "")
-          .split(",")
-          .map((tool) => tool.trim())
-          .filter((tool) => tool && tool !== toolToRemove)
-          .join(", ");
-        const chip = toolRemoveButton.closest("span");
-        chip?.remove();
-      }
+      toolRemoveButton.closest("[data-dashboard-tool]")?.remove();
+      syncProjectTools();
+      app.querySelector("[data-dashboard-tool-input]")?.focus();
       return;
     }
 
@@ -2845,6 +3021,35 @@ function initDashboard() {
     }
   });
 
+  app.addEventListener("keydown", (event) => {
+    const toolInput = event.target.closest?.("[data-dashboard-tool-input]");
+    if (!toolInput || event.isComposing) return;
+    if (event.key === "Enter" || event.key === ",") {
+      event.preventDefault();
+      addProjectTools(toolInput.value);
+      toolInput.value = "";
+    } else if (event.key === "Backspace" && !toolInput.value) {
+      const chips = app.querySelectorAll("[data-dashboard-tools] [data-dashboard-tool]");
+      chips[chips.length - 1]?.remove();
+      syncProjectTools();
+    }
+  });
+
+  app.addEventListener("input", (event) => {
+    const toolInput = event.target.closest?.("[data-dashboard-tool-input]");
+    if (!toolInput || !toolInput.value.includes(",")) return;
+    const parts = toolInput.value.split(",");
+    toolInput.value = parts.pop().trimStart();
+    addProjectTools(parts.join(","));
+  });
+
+  app.addEventListener("focusout", (event) => {
+    const toolInput = event.target.closest?.("[data-dashboard-tool-input]");
+    if (!toolInput || !toolInput.value.trim()) return;
+    addProjectTools(toolInput.value);
+    toolInput.value = "";
+  });
+
   app.addEventListener("submit", async (event) => {
     const logoForm = event.target.closest("[data-dashboard-logo-form]");
 
@@ -2874,6 +3079,12 @@ function initDashboard() {
     }
 
     event.preventDefault();
+
+    const pendingTool = form.querySelector("[data-dashboard-tool-input]");
+    if (pendingTool?.value.trim()) {
+      addProjectTools(pendingTool.value);
+      pendingTool.value = "";
+    }
 
     const formData = new FormData(form);
     const item = {
@@ -2943,6 +3154,11 @@ function initDashboard() {
         galleryImages,
         blocks: detailBlocks,
       };
+      item.featured = formData.get("featured") === "true";
+      // Keep fields this form does not edit (for example a custom slug) instead of dropping them.
+      Object.entries(editingItem || {}).forEach(([key, value]) => {
+        if (!(key in item)) item[key] = value;
+      });
       const exists = data.projects.some((contentItem) => contentItem.id === item.id);
       data = {
         ...data,
