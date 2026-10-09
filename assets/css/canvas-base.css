@@ -165,6 +165,66 @@ a { color: inherit; }
 .footer__bottom { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 12px 24px; padding-top: 24px; border-top: 1px solid var(--control); color: var(--muted); font-size: 14px; }
 .social--footer { margin-top: 0; font-size: 14px; }
 
+/* Social links as icons. The icons are a 41-glyph subset of Remix Icon v4.2.0
+   (Apache License 2.0, https://remixicon.com), so the page loads 6 KB instead of the whole set. */
+@font-face { font-family: "social-icons"; font-style: normal; font-weight: 400; font-display: block; src: url("/assets/fonts/social-icons.woff2") format("woff2"); }
+.social-icon { font-family: "social-icons"; font-style: normal; font-weight: 400; line-height: 1; -webkit-font-smoothing: antialiased; }
+.social-icon.ri-facebook-circle-fill::before { content: "\ecba"; }
+.social-icon.ri-facebook-circle-line::before { content: "\ecbb"; }
+.social-icon.ri-facebook-fill::before { content: "\ecbc"; }
+.social-icon.ri-facebook-line::before { content: "\ecbd"; }
+.social-icon.ri-instagram-fill::before { content: "\ee65"; }
+.social-icon.ri-instagram-line::before { content: "\ee66"; }
+.social-icon.ri-tiktok-fill::before { content: "\f372"; }
+.social-icon.ri-tiktok-line::before { content: "\f373"; }
+.social-icon.ri-linkedin-fill::before { content: "\eeb5"; }
+.social-icon.ri-linkedin-line::before { content: "\eeb6"; }
+.social-icon.ri-linkedin-box-fill::before { content: "\eeb3"; }
+.social-icon.ri-linkedin-box-line::before { content: "\eeb4"; }
+.social-icon.ri-github-fill::before { content: "\edca"; }
+.social-icon.ri-github-line::before { content: "\edcb"; }
+.social-icon.ri-behance-fill::before { content: "\eab9"; }
+.social-icon.ri-behance-line::before { content: "\eaba"; }
+.social-icon.ri-dribbble-fill::before { content: "\ec63"; }
+.social-icon.ri-dribbble-line::before { content: "\ec64"; }
+.social-icon.ri-youtube-fill::before { content: "\f2d4"; }
+.social-icon.ri-youtube-line::before { content: "\f2d5"; }
+.social-icon.ri-twitter-x-fill::before { content: "\f3e6"; }
+.social-icon.ri-twitter-x-line::before { content: "\f3e7"; }
+.social-icon.ri-threads-fill::before { content: "\f3e0"; }
+.social-icon.ri-threads-line::before { content: "\f3e1"; }
+.social-icon.ri-pinterest-fill::before { content: "\efff"; }
+.social-icon.ri-pinterest-line::before { content: "\f000"; }
+.social-icon.ri-telegram-fill::before { content: "\f1ef"; }
+.social-icon.ri-telegram-line::before { content: "\f1f0"; }
+.social-icon.ri-whatsapp-fill::before { content: "\f2bb"; }
+.social-icon.ri-whatsapp-line::before { content: "\f2bc"; }
+.social-icon.ri-discord-fill::before { content: "\ec37"; }
+.social-icon.ri-discord-line::before { content: "\ec38"; }
+.social-icon.ri-medium-fill::before { content: "\ef2b"; }
+.social-icon.ri-medium-line::before { content: "\ef2c"; }
+.social-icon.ri-messenger-fill::before { content: "\ef49"; }
+.social-icon.ri-messenger-line::before { content: "\ef4a"; }
+.social-icon.ri-global-line::before { content: "\edcf"; }
+.social-icon.ri-global-fill::before { content: "\edce"; }
+.social-icon.ri-mail-line::before { content: "\eef6"; }
+.social-icon.ri-mail-fill::before { content: "\eef3"; }
+.social-icon.ri-link::before { content: "\eeb2"; }
+.social--icons { gap: 10px; margin-top: 32px; }
+.social--icons a {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 44px;
+  height: 44px;
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  color: var(--ink);
+  font-size: 20px;
+  transition: background-color 0.15s ease, border-color 0.15s ease, color 0.15s ease;
+}
+.social--icons a:hover { border-color: var(--ink); background: var(--ink); color: var(--canvas); text-decoration: none; }
+
 /* Placeholders while content loads for the first time */
 .is-loading { min-height: 120px; background: var(--hover); }
 
@@ -229,5 +289,5 @@ a { color: inherit; }
   .footer__email { margin-bottom: 80px; }
 }
 @media (prefers-reduced-motion: reduce) {
-  .btn, .frame { transition: none; }
+  .btn, .frame, .social--icons a { transition: none; }
 }
