@@ -168,6 +168,40 @@ a { color: inherit; }
 /* Placeholders while content loads for the first time */
 .is-loading { min-height: 120px; background: var(--hover); }
 
+/* Continuous scrolling strip (marquee.js). Pauses on hover or keyboard focus; still with "reduce motion". */
+.marquee {
+  --marquee-gap: 12px;
+  position: relative;
+  min-width: 0;
+  overflow: hidden;
+  -webkit-mask-image: linear-gradient(90deg, transparent, #000 48px, #000 calc(100% - 48px), transparent);
+  mask-image: linear-gradient(90deg, transparent, #000 48px, #000 calc(100% - 48px), transparent);
+}
+.marquee__track { display: flex; flex-wrap: wrap; gap: var(--marquee-gap); width: auto; padding: 2px 0; }
+.marquee.is-running .marquee__track, .marquee.is-measuring .marquee__track { flex-wrap: nowrap; width: max-content; }
+.marquee.is-running .marquee__track { animation: marquee var(--marquee-duration, 30s) linear infinite; }
+.marquee:not(.is-running) { -webkit-mask-image: none; mask-image: none; }
+.marquee:hover .marquee__track, .marquee:focus-within .marquee__track { animation-play-state: paused; }
+.marquee__track > li { flex: 0 0 auto; }
+@keyframes marquee { to { transform: translateX(calc(-50% - var(--marquee-gap) / 2)); } }
+
+/* Company logos sit on white tiles in both themes, so dark wordmarks stay readable. */
+.logo-tile {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 156px;
+  height: 72px;
+  padding: 0 28px;
+  border-radius: 14px;
+  background: #ffffff;
+}
+.logo-tile img { width: auto; max-width: 168px; height: 34px; object-fit: contain; }
+.logo-tile__name { color: #17171a; font-size: 18px; font-weight: 700; line-height: 1.2; letter-spacing: -0.01em; white-space: nowrap; }
+@media (prefers-color-scheme: dark) {
+  .logo-tile { background: #f2f2ef; }
+}
+
 /* ---------- Responsive ---------- */
 @media (max-width: 1100px) {
   .steps { --step-gap: 40px; grid-template-columns: repeat(2, minmax(0, 1fr)); }

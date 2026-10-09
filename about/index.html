@@ -19,8 +19,8 @@
     <link rel="preload" href="/assets/fonts/be-vietnam-pro/be-vietnam-pro-latin-800-normal.woff2" as="font" type="font/woff2" crossorigin />
     <link rel="preload" href="/assets/fonts/be-vietnam-pro/be-vietnam-pro-latin-400-normal.woff2" as="font" type="font/woff2" crossorigin />
     <link rel="stylesheet" href="/assets/css/site-toolbar.css?v=20261009-1" />
-    <link rel="stylesheet" href="/assets/css/canvas-base.css?v=20261009-2" />
-    <link rel="stylesheet" href="/assets/css/canvas-about.css?v=20261009-1" />
+    <link rel="stylesheet" href="/assets/css/canvas-base.css?v=20261009-3" />
+    <link rel="stylesheet" href="/assets/css/canvas-about.css?v=20261009-2" />
   </head>
   <body class="canvas-about">
     <a class="skip-link" href="#main">Skip to content</a>
@@ -73,11 +73,13 @@
         </dl>
         <div class="about-clients">
           <h2 class="about-clients__title">Worked with</h2>
-          <ul class="about-clients__list" data-about-clients>
-            <li>Jenoss</li>
-            <li>Net5s</li>
-            <li>Sapp Academy</li>
-          </ul>
+          <div class="marquee about-clients__marquee" data-marquee>
+            <ul class="marquee__track" data-about-clients>
+              <li class="logo-tile"><img src="https://res.cloudinary.com/tpwni7f3/image/upload/f_auto,q_auto,h_72/v1783747908/vien-portfolio/site-content-companies-0-image.png" alt="Jenoss" width="128" height="36" decoding="async" /></li>
+              <li class="logo-tile"><img src="https://res.cloudinary.com/tpwni7f3/image/upload/f_auto,q_auto,h_72/v1783747909/vien-portfolio/site-content-companies-1-image.png" alt="Net5s" width="90" height="36" decoding="async" /></li>
+              <li class="logo-tile"><img src="https://res.cloudinary.com/tpwni7f3/image/upload/f_auto,q_auto,h_72/v1783747992/vien-portfolio/site-content-companies-2-image.png" alt="Sapp Academy" width="72" height="36" decoding="async" /></li>
+            </ul>
+          </div>
         </div>
       </section>
 
@@ -123,13 +125,15 @@
           <h2 class="section__title" id="tools-title">Tools I use</h2>
           <p class="section__lead">The software behind the work, from first sketch to final export.</p>
         </div>
-        <ul class="tools" data-about-tools>
-          <li class="tool"><img src="https://res.cloudinary.com/tpwni7f3/image/upload/f_auto,q_auto,w_96/v1783748036/vien-portfolio/site-content-skills-2-image.png" alt="" width="40" height="40" loading="lazy" /><span>Figma</span></li>
-          <li class="tool"><img src="https://res.cloudinary.com/tpwni7f3/image/upload/f_auto,q_auto,w_96/v1783748026/vien-portfolio/site-content-skills-1-image.png" alt="" width="40" height="40" loading="lazy" /><span>Photoshop</span></li>
-          <li class="tool"><img src="https://res.cloudinary.com/tpwni7f3/image/upload/f_auto,q_auto,w_96/v1783748025/vien-portfolio/site-content-skills-0-image.png" alt="" width="40" height="40" loading="lazy" /><span>Illustrator</span></li>
-          <li class="tool"><img src="https://res.cloudinary.com/tpwni7f3/image/upload/f_auto,q_auto,w_96/v1783748045/vien-portfolio/site-content-skills-3-image.png" alt="" width="40" height="40" loading="lazy" /><span>CapCut</span></li>
-          <li class="tool"><img src="https://res.cloudinary.com/tpwni7f3/image/upload/f_auto,q_auto,w_96/v1783748046/vien-portfolio/site-content-skills-4-image.png" alt="" width="40" height="40" loading="lazy" /><span>Premiere Pro</span></li>
-        </ul>
+        <div class="marquee" data-marquee>
+          <ul class="marquee__track" data-about-tools>
+            <li class="tool"><img src="https://res.cloudinary.com/tpwni7f3/image/upload/f_auto,q_auto,w_96/v1783748036/vien-portfolio/site-content-skills-2-image.png" alt="" width="40" height="40" loading="lazy" /><span>Figma</span></li>
+            <li class="tool"><img src="https://res.cloudinary.com/tpwni7f3/image/upload/f_auto,q_auto,w_96/v1783748026/vien-portfolio/site-content-skills-1-image.png" alt="" width="40" height="40" loading="lazy" /><span>Photoshop</span></li>
+            <li class="tool"><img src="https://res.cloudinary.com/tpwni7f3/image/upload/f_auto,q_auto,w_96/v1783748025/vien-portfolio/site-content-skills-0-image.png" alt="" width="40" height="40" loading="lazy" /><span>Illustrator</span></li>
+            <li class="tool"><img src="https://res.cloudinary.com/tpwni7f3/image/upload/f_auto,q_auto,w_96/v1783748045/vien-portfolio/site-content-skills-3-image.png" alt="" width="40" height="40" loading="lazy" /><span>CapCut</span></li>
+            <li class="tool"><img src="https://res.cloudinary.com/tpwni7f3/image/upload/f_auto,q_auto,w_96/v1783748046/vien-portfolio/site-content-skills-4-image.png" alt="" width="40" height="40" loading="lazy" /><span>Premiere Pro</span></li>
+          </ul>
+        </div>
       </section>
 
       <section class="section wrap" aria-labelledby="education-title">
@@ -182,6 +186,7 @@
 
     <script defer src="/index.contact-dedupe.js?v=20261009-case"></script>
     <script defer src="/assets/js/site-toolbar.js?v=20261009-1"></script>
-    <script defer src="/assets/js/about.js?v=20261009-1"></script>
+    <script defer src="/assets/js/marquee.js?v=20261009-1"></script>
+    <script defer src="/assets/js/about.js?v=20261009-2"></script>
   </body>
 </html>

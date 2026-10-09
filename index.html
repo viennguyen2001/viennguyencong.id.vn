@@ -19,8 +19,8 @@
     <link rel="preload" href="/assets/fonts/be-vietnam-pro/be-vietnam-pro-latin-800-normal.woff2" as="font" type="font/woff2" crossorigin />
     <link rel="preload" href="/assets/fonts/be-vietnam-pro/be-vietnam-pro-latin-400-normal.woff2" as="font" type="font/woff2" crossorigin />
     <link rel="stylesheet" href="/assets/css/site-toolbar.css?v=20261009-1" />
-    <link rel="stylesheet" href="/assets/css/canvas-base.css?v=20261009-2" />
-    <link rel="stylesheet" href="/assets/css/canvas-home.css?v=20261009-3" />
+    <link rel="stylesheet" href="/assets/css/canvas-base.css?v=20261009-3" />
+    <link rel="stylesheet" href="/assets/css/canvas-home.css?v=20261009-4" />
   </head>
   <body class="canvas-home">
     <a class="skip-link" href="#main">Skip to content</a>
@@ -62,11 +62,13 @@
 
       <section class="clients wrap" aria-labelledby="clients-title">
         <h2 class="clients__title" id="clients-title">Worked with</h2>
-        <ul class="clients__list" data-clients>
-          <li>Jenoss</li>
-          <li>Net5s</li>
-          <li>Sapp Academy</li>
-        </ul>
+        <div class="marquee clients__marquee" data-marquee>
+          <ul class="marquee__track" data-clients>
+            <li class="logo-tile"><img src="https://res.cloudinary.com/tpwni7f3/image/upload/f_auto,q_auto,h_72/v1783747908/vien-portfolio/site-content-companies-0-image.png" alt="Jenoss" width="128" height="36" decoding="async" /></li>
+            <li class="logo-tile"><img src="https://res.cloudinary.com/tpwni7f3/image/upload/f_auto,q_auto,h_72/v1783747909/vien-portfolio/site-content-companies-1-image.png" alt="Net5s" width="90" height="36" decoding="async" /></li>
+            <li class="logo-tile"><img src="https://res.cloudinary.com/tpwni7f3/image/upload/f_auto,q_auto,h_72/v1783747992/vien-portfolio/site-content-companies-2-image.png" alt="Sapp Academy" width="72" height="36" decoding="async" /></li>
+          </ul>
+        </div>
       </section>
 
       <section class="section wrap" id="work" aria-labelledby="work-title">
@@ -286,6 +288,7 @@
 
     <script defer src="/index.contact-dedupe.js?v=20261009-case"></script>
     <script defer src="/assets/js/site-toolbar.js?v=20261009-1"></script>
-    <script defer src="/assets/js/canvas-home.js?v=20261009-1"></script>
+    <script defer src="/assets/js/marquee.js?v=20261009-1"></script>
+    <script defer src="/assets/js/canvas-home.js?v=20261009-2"></script>
   </body>
 </html>

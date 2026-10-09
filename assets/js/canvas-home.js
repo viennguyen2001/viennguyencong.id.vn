@@ -96,13 +96,27 @@
     if (image && !isPlaceholderImage(hero.image) && image.getAttribute("src") !== hero.image) image.src = hero.image;
   };
 
+  // Company logos from the dashboard, on a strip that keeps moving (marquee.js). A company without a logo shows its name.
+  const cld = (src, transform) => {
+    const match = text(src).match(/^(https:\/\/res\.cloudinary\.com\/[^/]+\/image\/upload\/)(v\d+\/.+)$/);
+    return match ? `${match[1]}${transform}/${match[2]}` : text(src);
+  };
+  const logoTile = (company) => {
+    const image = text(company.image);
+    const hasLogo = image && !/assets\/images\/client-logos\//.test(image);
+    return hasLogo
+      ? `<li class="logo-tile"><img src="${esc(cld(image, "f_auto,q_auto,h_72"))}" alt="${esc(company.title)}" height="36" decoding="async" /></li>`
+      : `<li class="logo-tile"><span class="logo-tile__name">${esc(company.title)}</span></li>`;
+  };
   const renderClients = (data) => {
-    const names = (data.companies || [])
+    const companies = (data.companies || [])
       .filter(isPublished)
-      .map((company) => text(company.title))
-      .filter((name) => name && !/^partner \d+$/i.test(name));
-    if (!names.length) return;
-    $("[data-clients]").innerHTML = names.map((name) => `<li>${esc(name)}</li>`).join("");
+      .filter((company) => text(company.title) && !/^partner \d+$/i.test(text(company.title)));
+    if (!companies.length) return;
+    const list = $("[data-clients]");
+    const html = companies.map(logoTile).join("");
+    if (window.vienMarquee) window.vienMarquee.setItems(list.closest("[data-marquee]"), html);
+    else list.innerHTML = html;
   };
 
   // Starred projects first; otherwise the first three published ones, in dashboard order.

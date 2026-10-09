@@ -64,12 +64,31 @@
     image.src = hero.image;
   };
 
+  // Lists on a strip that keeps moving (marquee.js); without it, they are written straight into the list.
+  const fillStrip = (selector, html) => {
+    const list = $(selector);
+    if (!list) return;
+    if (window.vienMarquee && list.closest("[data-marquee]")) window.vienMarquee.setItems(list.closest("[data-marquee]"), html);
+    else list.innerHTML = html;
+  };
+
+  // Company logos from the dashboard. A company without a logo shows its name.
   const renderClients = (data) => {
-    const names = (data.companies || [])
+    const companies = (data.companies || [])
       .filter(isActive)
-      .map((company) => text(company.title))
-      .filter((name) => name && !/^partner \d+$/i.test(name));
-    if (names.length) $("[data-about-clients]").innerHTML = names.map((name) => `<li>${esc(name)}</li>`).join("");
+      .filter((company) => text(company.title) && !/^partner \d+$/i.test(text(company.title)));
+    if (!companies.length) return;
+    fillStrip(
+      "[data-about-clients]",
+      companies
+        .map((company) => {
+          const image = text(company.image);
+          return image && !/assets\/images\/client-logos\//.test(image)
+            ? `<li class="logo-tile"><img src="${esc(cld(image, "f_auto,q_auto,h_72"))}" alt="${esc(company.title)}" height="36" decoding="async" /></li>`
+            : `<li class="logo-tile"><span class="logo-tile__name">${esc(company.title)}</span></li>`;
+        })
+        .join("")
+    );
   };
 
   const timelineItem = (item, linkLabel) => {
@@ -113,14 +132,14 @@
       .filter((item) => text(item.title))
       .sort((a, b) => Number(a.metric || 99) - Number(b.metric || 99));
     if (!items.length) return;
-    $("[data-about-tools]").innerHTML = items
+    fillStrip("[data-about-tools]", items
       .map((item) => {
         const icon = isPlaceholderImage(item.image)
           ? `<span class="tool__initial" aria-hidden="true">${esc(text(item.title).charAt(0))}</span>`
           : `<img src="${esc(cld(item.image, "f_auto,q_auto,w_96"))}" alt="" width="40" height="40" loading="lazy" />`;
         return `<li class="tool">${icon}<span>${esc(item.title)}</span></li>`;
       })
-      .join("");
+      .join(""));
   };
 
   const renderSocial = (data) => {
