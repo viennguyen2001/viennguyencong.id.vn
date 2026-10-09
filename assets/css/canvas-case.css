@@ -53,12 +53,38 @@ html:has(.viewer[open]) { overflow: hidden; }
 .chips li { padding: 6px 14px; border-radius: 999px; background: var(--hover); font-size: 14px; font-weight: 500; line-height: 1.4; }
 
 /* ---------- Image grids ---------- */
-.case-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 20px; }
-.case-grid--large { grid-template-columns: repeat(2, minmax(0, 1fr)); }
-.case-grid--single { grid-template-columns: minmax(0, 620px); }
+/* Every image keeps its own shape. Images share a row at one height and each row fills the width,
+   like a photo album. --r is the image's width / height, set by case-study.js once the image is known:
+   an item's width grows in proportion to it, so every image in a row ends up the same height. */
+.case-grid {
+  --row: 360px; /* the height a row aims for */
+  --row-max: 600px; /* no row grows taller than this (single image, or before the layout script runs) */
+  --gap: 20px;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-start;
+  gap: var(--gap);
+}
+/* Takes the spare room in the last row, so a short last row keeps the normal height instead of stretching. */
+.case-grid::after { content: ""; flex: 1000 1 0px; margin-left: calc(-1 * var(--gap)); }
+.case-grid > li {
+  --r: 1;
+  flex: var(--r) 1 calc(var(--r) * var(--row));
+  min-width: 0;
+  max-width: calc(var(--r) * var(--row-max));
+  aspect-ratio: var(--r);
+}
+/* case-study.js picks where each row ends for the whole grid; --basis and --grow then size each image. */
+.case-grid.is-laid-out > li { flex: var(--grow, 0) 1 var(--basis, auto); max-width: none; }
+.case-grid--large { --row: 560px; --row-max: 800px; }
+/* One image on its own is shown large, at its own shape. */
+.case-grid--single::after { content: none; }
+.case-grid--single > li { flex: 0 1 auto; width: calc(var(--r) * var(--row-max)); max-width: 100%; }
 .case-grid__item {
+  position: relative;
   display: block;
   width: 100%;
+  height: 100%;
   padding: 0;
   overflow: hidden;
   border: 0;
@@ -70,8 +96,21 @@ html:has(.viewer[open]) { overflow: hidden; }
   transition: outline-color 0.15s ease;
 }
 .case-grid__item:hover, .case-grid__item:focus-visible { outline-color: var(--selection); }
-.case-grid__item img { width: 100%; aspect-ratio: 1 / 1; object-fit: cover; background: var(--hover); transition: transform 0.4s ease; }
+.case-grid__item img { display: block; width: 100%; height: 100%; object-fit: cover; background: var(--hover); transition: transform 0.4s ease; }
 .case-grid__item:hover img { transform: scale(1.025); }
+/* A very tall image (a full-page screenshot) shows its top, fades out at the bottom, and pans down on hover. */
+.case-grid > li.is-tall .case-grid__item img { object-position: 50% 0%; transition: object-position var(--pan, 4s) ease-in-out; }
+.case-grid > li.is-tall .case-grid__item:is(:hover, :focus-visible) img { object-position: 50% 100%; transform: none; }
+.case-grid > li.is-tall .case-grid__item::after {
+  content: "";
+  position: absolute;
+  inset: auto 0 0;
+  height: 28%;
+  background: linear-gradient(to top, rgba(0, 0, 0, 0.32), transparent);
+  pointer-events: none;
+  transition: opacity 0.3s ease;
+}
+.case-grid > li.is-tall .case-grid__item:is(:hover, :focus-visible)::after { opacity: 0; }
 
 /* ---------- Process ---------- */
 @media (min-width: 1101px) {
@@ -150,7 +189,11 @@ html:has(.viewer[open]) { overflow: hidden; }
 .viewer::backdrop { background: rgba(12, 12, 14, 0.95); }
 .viewer__bar { display: flex; align-items: center; justify-content: space-between; padding: 16px 20px; }
 .viewer__count { font-size: 14px; font-variant-numeric: tabular-nums; opacity: 0.8; }
-.viewer__image { place-self: center; width: auto; max-width: min(92vw, 1100px); height: auto; max-height: calc(100% - 32px); border-radius: 12px; object-fit: contain; }
+.viewer__stage { display: grid; grid-template: minmax(0, 1fr) / minmax(0, 1fr); place-items: center; min-height: 0; padding: 0 16px 16px; overflow: hidden; }
+.viewer__image { width: auto; max-width: min(92vw, 1100px); height: auto; max-height: 100%; border-radius: 12px; object-fit: contain; }
+/* A tall image opens at reading width and scrolls. */
+.viewer--tall .viewer__stage { grid-template-rows: auto; place-items: start center; overflow-y: auto; overscroll-behavior: contain; }
+.viewer--tall .viewer__image { max-height: none; margin-bottom: 72px; }
 .viewer__button {
   display: inline-flex;
   align-items: center;
@@ -179,7 +222,8 @@ html:has(.viewer[open]) { overflow: hidden; }
   .case-hero__panel { max-width: 480px; margin-top: 0; }
   .case-loading__panel { display: none; }
   .case-overview { grid-template-columns: minmax(0, 1fr); }
-  .case-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 14px; }
+  .case-grid { --row: 300px; --row-max: 480px; --gap: 14px; }
+  .case-grid--large { --row: 420px; --row-max: 640px; }
   .case-blocks, .case-outcome__grid { grid-template-columns: minmax(0, 1fr); }
 }
 @media (max-width: 640px) {
@@ -187,15 +231,18 @@ html:has(.viewer[open]) { overflow: hidden; }
   .case-hero__lead { font-size: 17px; }
   .case-cover img, .case-loading__cover { aspect-ratio: 6 / 5; }
   .case-overview__grid { grid-template-columns: minmax(0, 1fr); }
-  .case-grid { gap: 10px; }
+  .case-grid { --row: 170px; --row-max: 340px; --gap: 10px; }
+  .case-grid--large { --row: 300px; --row-max: 560px; }
   .case-grid__item { border-radius: 10px; }
-  .case-grid--large { grid-template-columns: minmax(0, 1fr); }
   .case-block { padding: 24px; }
   .viewer__bar { padding: 12px 14px; }
-  .viewer__image { max-width: 100%; max-height: calc(100% - 96px); border-radius: 0; }
+  .viewer__stage { padding: 0 0 80px; }
+  .viewer__image { max-width: 100%; border-radius: 0; }
   .viewer__nav { top: auto; bottom: 20px; transform: none; }
 }
 @media (prefers-reduced-motion: reduce) {
   .case-grid__item, .case-grid__item img { transition: none; }
   .case-grid__item:hover img { transform: none; }
+  .case-grid > li.is-tall .case-grid__item img { transition: none; }
+  .case-grid > li.is-tall .case-grid__item:is(:hover, :focus-visible) img { object-position: 50% 0%; }
 }

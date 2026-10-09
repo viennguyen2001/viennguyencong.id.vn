@@ -584,8 +584,9 @@
 .dashboard-project-gallery-image header, .dashboard-flex-block header { display: flex; align-items: center; justify-content: space-between; gap: 8px; font-size: 13px; }
 .dashboard-project-gallery-image header small { color: var(--faint); font-weight: 400; }
 .dashboard-project-gallery-image header button:hover, .dashboard-flex-block header button:hover { border-color: var(--danger); background: var(--danger-bg); color: var(--danger); }
-.dashboard-project-gallery-image .dashboard-detail-image-preview { min-height: 0; aspect-ratio: 1 / 1; }
-.dashboard-project-gallery-image .dashboard-detail-image-preview img { height: 100%; max-height: none; object-fit: cover; }
+/* The whole image is shown, whatever its shape, as it will appear on the page (nothing is cropped). */
+.dashboard-project-gallery-image .dashboard-detail-image-preview { min-height: 0; aspect-ratio: 4 / 3; background: var(--hover); }
+.dashboard-project-gallery-image .dashboard-detail-image-preview img { width: 100%; height: 100%; max-height: none; object-fit: contain; }
 [data-dashboard-flex-blocks] { display: grid; gap: 12px; }
 [data-dashboard-flex-blocks]:empty { display: none; }
 
