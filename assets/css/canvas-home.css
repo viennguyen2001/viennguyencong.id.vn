@@ -83,4 +83,5 @@
   .service { padding: 24px; }
   .contact { padding: 28px 20px; }
   .form__row { grid-template-columns: minmax(0, 1fr); }
+  .contact__links { font-size: 16px; }
 }

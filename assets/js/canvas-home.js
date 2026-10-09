@@ -212,11 +212,37 @@
       .join("");
   };
 
+  // Icons available in social-icons.woff2 (see canvas-base.css). The dashboard stores an icon class per link;
+  // when it is not one of these, the icon follows the link's address.
+  const SOCIAL_ICONS = new Set(["facebook-circle-fill", "facebook-circle-line", "facebook-fill", "facebook-line", "instagram-fill", "instagram-line", "tiktok-fill", "tiktok-line", "linkedin-fill", "linkedin-line", "linkedin-box-fill", "linkedin-box-line", "github-fill", "github-line", "behance-fill", "behance-line", "dribbble-fill", "dribbble-line", "youtube-fill", "youtube-line", "twitter-x-fill", "twitter-x-line", "threads-fill", "threads-line", "pinterest-fill", "pinterest-line", "telegram-fill", "telegram-line", "whatsapp-fill", "whatsapp-line", "discord-fill", "discord-line", "medium-fill", "medium-line", "messenger-fill", "messenger-line", "global-line", "global-fill", "mail-line", "mail-fill", "link"]);
+  const SOCIAL_BY_HOST = [
+    [/facebook\.com|fb\.com/, "facebook-circle-fill"], [/instagram\.com/, "instagram-line"], [/tiktok\.com/, "tiktok-fill"],
+    [/linkedin\.com/, "linkedin-fill"], [/github\.com/, "github-line"], [/behance\.net/, "behance-line"],
+    [/dribbble\.com/, "dribbble-line"], [/youtube\.com|youtu\.be/, "youtube-fill"], [/(^|\.)x\.com|twitter\.com/, "twitter-x-line"],
+    [/threads\.net/, "threads-line"], [/pinterest\./, "pinterest-line"], [/t\.me|telegram\./, "telegram-line"],
+    [/wa\.me|whatsapp\./, "whatsapp-line"], [/discord\./, "discord-fill"], [/medium\.com/, "medium-fill"], [/m\.me|messenger\.com/, "messenger-line"],
+  ];
+  const socialIcon = (item) => {
+    const own = text(item.owner).replace(/^ri-/, "");
+    if (SOCIAL_ICONS.has(own)) return `ri-${own}`;
+    if (/^mailto:/i.test(text(item.link))) return "ri-mail-line";
+    let host = "";
+    try {
+      host = new URL(text(item.link)).hostname.replace(/^www\./, "");
+    } catch (error) {}
+    const match = SOCIAL_BY_HOST.find(([pattern]) => pattern.test(host));
+    return `ri-${match ? match[1] : "global-line"}`;
+  };
   const renderSocial = (data) => {
     const items = (data.social || []).filter(isPublished).filter((item) => text(item.link) && text(item.link) !== "#");
     $$("[data-social]").forEach((list) => {
+      const asIcons = list.dataset.social === "icons";
       list.innerHTML = items
-        .map((item) => `<li><a href="${esc(item.link)}" target="_blank" rel="noopener noreferrer">${esc(item.title)}</a></li>`)
+        .map((item) =>
+          asIcons
+            ? `<li><a href="${esc(item.link)}" target="_blank" rel="noopener noreferrer" aria-label="${esc(item.title)}" title="${esc(item.title)}"><i class="social-icon ${socialIcon(item)}" aria-hidden="true"></i></a></li>`
+            : `<li><a href="${esc(item.link)}" target="_blank" rel="noopener noreferrer">${esc(item.title)}</a></li>`
+        )
         .join("");
       list.hidden = items.length === 0;
     });
