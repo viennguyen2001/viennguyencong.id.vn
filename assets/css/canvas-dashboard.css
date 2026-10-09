@@ -689,6 +689,11 @@
   .dashboard-form-block { padding: 18px 16px; }
 }
 
+/* Process steps: an editable name above each step's text */
+.dashboard-step-field { display: grid; gap: 8px; align-content: start; }
+/* Print projects: formats and sizes above the artworks */
+.dashboard-page .dashboard-project-editor label.dashboard-gallery-formats { margin-bottom: 16px; }
+
 /* ---------- Sign in ---------- */
 .dashboard-login {
   position: fixed;
