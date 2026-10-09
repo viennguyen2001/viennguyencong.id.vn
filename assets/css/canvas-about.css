@@ -10,7 +10,7 @@
   align-items: end;
   padding-top: clamp(56px, 7vw, 96px);
 }
-.about-hero__title { font-size: clamp(48px, 9vw, 112px); font-weight: 800; line-height: 0.98; letter-spacing: -0.04em; }
+.about-hero__title { font-size: clamp(48px, 9vw, 112px); font-weight: 800; line-height: 0.98; letter-spacing: -0.035em; }
 .about-hero__lead { max-width: 34em; margin-top: 32px; font-size: clamp(20px, 2.1vw, 26px); line-height: 1.5; letter-spacing: -0.01em; }
 .about-hero__meta { display: flex; flex-wrap: wrap; gap: 8px 24px; margin-top: 28px; color: var(--muted); font-size: 15px; line-height: 1.4; }
 .about-hero__available { display: inline-flex; align-items: center; gap: 8px; color: var(--ink); font-weight: 500; }
