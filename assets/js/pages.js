@@ -51,6 +51,7 @@
     return `
       <article class="work-card">
         <a class="frame" href="${esc(linkOf(project))}">
+          ${project.projectType === "video" ? '<span class="frame__badge"><svg width="12" height="12" viewBox="0 0 12 12" aria-hidden="true"><path d="M3 1.8v8.4L10 6z" fill="currentColor" /></svg>Video</span>' : ""}
           ${image ? `<img class="frame__image" src="${esc(cld(image, "f_auto,q_auto,w_1400"))}" alt="" width="1200" height="1000" loading="lazy" decoding="async" />` : '<span class="frame__image" aria-hidden="true"></span>'}
           <div class="frame__caption">
             <div class="frame__text">

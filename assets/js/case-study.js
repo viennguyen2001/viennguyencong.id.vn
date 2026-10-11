@@ -27,7 +27,7 @@
   // Cloudinary resizes on the fly: smaller files for thumbnails, modern formats everywhere.
   const cld = (src, transform) => {
     const url = text(src);
-    const match = url.match(/^(https:\/\/res\.cloudinary\.com\/[^/]+\/image\/upload\/)(v\d+\/.+)$/);
+    const match = url.match(/^(https:\/\/res\.cloudinary\.com\/[^/]+\/(?:image|video)\/upload\/)(v\d+\/.+)$/);
     return match ? `${match[1]}${transform}/${match[2]}` : url;
   };
 
@@ -222,6 +222,20 @@
   };
   const gridObserver = "ResizeObserver" in window ? new ResizeObserver(layoutGrids) : null;
 
+  // A video file's real shape, once known, sets its box (and relays out its row).
+  const measureVideos = () => {
+    main.querySelectorAll("video[data-video-measure]").forEach((video) => {
+      const apply = () => {
+        if (!video.videoWidth || !video.videoHeight) return;
+        const box = video.closest(".case-grid > li") || video.closest(".case-film__frame");
+        box?.style.setProperty("--r", (video.videoWidth / video.videoHeight).toFixed(4));
+        layoutGrids();
+      };
+      if (video.readyState >= 1) apply();
+      else video.addEventListener("loadedmetadata", apply, { once: true });
+    });
+  };
+
   const shapeGrids = () => {
     main.querySelectorAll(".case-grid img[data-src]").forEach((image) => {
       const item = image.closest("li");
@@ -286,7 +300,68 @@
       gallery: ["Artworks", "The final pieces. Select one to see it whole."],
       order: ["overview", "gallery", "process", "research", "brand", "blocks", "outcome"],
     },
+    video: {
+      steps: ["Script and storyboard", "Look and characters", "Generation", "Edit, voice and sound"],
+      processLead: "From the script to the final cut, with AI at every stage.",
+      cta: "Watch the video",
+      linkLabel: "Watch",
+      challenge: "The brief",
+      research: ["Storyboard", "Keyframes and boards that set up each shot. Select one to see it whole."],
+      gallery: ["Stills", "Frames from the finished video. Select one to see it whole."],
+      order: ["overview", "process", "research", "pipeline", "videos", "gallery", "blocks", "outcome"],
+    },
   };
+
+  // What a video link plays as: an embedded player or a video file. Keep in step with getVideoInfo in dashboard.js.
+  const videoInfo = (url) => {
+    const link = text(url);
+    if (!link) return null;
+    let match;
+    if ((match = link.match(/(?:youtube\.com\/(?:watch\?(?:.*&)?v=|shorts\/|embed\/|live\/)|youtu\.be\/)([\w-]{11})/))) {
+      return { kind: "iframe", src: `https://www.youtube-nocookie.com/embed/${match[1]}?rel=0`, ratio: /shorts\//.test(link) ? 9 / 16 : 0, likely: 16 / 9 };
+    }
+    if ((match = link.match(/vimeo\.com\/(?:video\/)?(\d+)/))) return { kind: "iframe", src: `https://player.vimeo.com/video/${match[1]}`, ratio: 0, likely: 16 / 9 };
+    if ((match = link.match(/tiktok\.com\/.*\/video\/(\d+)/))) return { kind: "iframe", src: `https://www.tiktok.com/player/v1/${match[1]}`, ratio: 9 / 16 };
+    if ((match = link.match(/instagram\.com\/(?:reel|reels|p)\/([\w-]+)/))) return { kind: "iframe", src: `https://www.instagram.com/reel/${match[1]}/embed`, ratio: 9 / 16 };
+    if ((match = link.match(/drive\.google\.com\/file\/d\/([\w-]+)/))) return { kind: "iframe", src: `https://drive.google.com/file/d/${match[1]}/preview`, ratio: 0 };
+    if (/facebook\.com\/.+\/videos\/|facebook\.com\/(?:watch|reel)|fb\.watch\//.test(link)) {
+      return { kind: "iframe", src: `https://www.facebook.com/plugins/video.php?href=${encodeURIComponent(link)}&show_text=false`, ratio: 0 };
+    }
+    if (/\.(mp4|webm|mov|m4v)(\?|#|$)/i.test(link) || /res\.cloudinary\.com\/[^/]+\/video\/upload\//.test(link)) return { kind: "file", src: link, ratio: 0 };
+    return { kind: "link", src: link, ratio: 0 };
+  };
+  // "9:16" → 0.5625
+  const aspectOf = (value) => {
+    const match = text(value).match(/^(\d+(?:\.\d+)?)\s*[:x×/]\s*(\d+(?:\.\d+)?)$/);
+    return match ? Number(match[1]) / Number(match[2]) : 0;
+  };
+  // A frame from a Cloudinary video, used as its poster when there is no cover image.
+  const videoPoster = (src) => {
+    const match = text(src).match(/^(https:\/\/res\.cloudinary\.com\/[^/]+\/video\/upload\/)(?:[^/]+\/)*?(v\d+\/.+)\.\w+$/);
+    return match ? `${match[1]}so_0,f_jpg,q_auto,w_1600/${match[2]}.jpg` : "";
+  };
+  // One video: a player that fills its box (the box sets the shape), or a link when the page cannot play it.
+  const videoPlayer = (url, title, poster = "") => {
+    const info = videoInfo(url);
+    if (!info) return "";
+    if (info.kind === "iframe") {
+      return `<iframe src="${esc(info.src)}" title="${esc(title)}" loading="lazy" allow="autoplay; encrypted-media; picture-in-picture; fullscreen" allowfullscreen></iframe>`;
+    }
+    if (info.kind === "file") {
+      // Cloudinary converts on the fly: asking for .mp4 means an iPhone .mov (HEVC) still plays in every browser.
+      const src = /res\.cloudinary\.com/.test(info.src) ? cld(info.src.replace(/\.(mov|m4v|webm|mkv|avi)$/i, ".mp4"), "q_auto") : info.src;
+      // A Cloudinary video's own first frame fits its shape; otherwise the project's cover image.
+      const cover = videoPoster(info.src) || poster;
+      return `<video src="${esc(src)}" controls playsinline preload="metadata"${cover ? ` poster="${esc(cover)}"` : ""} data-video-measure></video>`;
+    }
+    return `<a class="case-video__link" href="${esc(info.src)}" target="_blank" rel="noopener noreferrer">Watch the video ${arrowIcon}<span class="sr-only"> (opens in a new tab)</span></a>`;
+  };
+  // "Views: 1.2M" → { label: "Views", value: "1.2M" }
+  const parsePairs = (value) =>
+    lines(value).map((line) => {
+      const at = line.indexOf(":");
+      return at > 0 ? { label: line.slice(0, at).trim(), value: line.slice(at + 1).trim() } : { label: "", value: line };
+    }).filter((item) => item.value);
   const typeOf = (project) => (TYPES[project?.projectType] ? project.projectType : "uiux");
 
   // "Forest green #2E7D4F" → a swatch. Lines without a HEX code are skipped.
@@ -390,6 +465,15 @@
     const colors = parseColors(detail.colors);
     const typefaces = parseTypefaces(detail.typefaces);
     const formats = type === "print" ? lines(detail.formats) : [];
+    const pipeline = type === "video" ? parsePairs(detail.pipeline) : [];
+    const prompt = type === "video" ? text(detail.prompt) : "";
+    const videos = type === "video" ? unique((Array.isArray(detail.videos) ? detail.videos : []).map(text)) : [];
+    const metrics = parsePairs(detail.metrics);
+    // AI video: the main video takes the cover's place; the cover image becomes its poster.
+    const film = type === "video" ? videoInfo(detail.videoMain) : null;
+    // The shape of a link that does not say: the Format field for the main video, the platform's usual shape for the others.
+    const filmRatio = (film && film.ratio) || aspectOf(detail.aspect) || (film && film.likely) || 16 / 9;
+    const liveLink = live || (film && film.kind === "link" ? film.src : "");
 
     // Every image that opens in the viewer, numbered in page order as the sections are drawn.
     viewerImages = [];
@@ -434,6 +518,7 @@
         </div>
         <article class="work-card work-card--large">
           <a class="frame" href="${esc(linkOf(next))}">
+            ${next.projectType === "video" ? '<span class="frame__badge"><svg width="12" height="12" viewBox="0 0 12 12" aria-hidden="true"><path d="M3 1.8v8.4L10 6z" fill="currentColor" /></svg>Video</span>' : ""}
             ${image ? `<img class="frame__image" src="${esc(cld(image, "f_auto,q_auto,w_1400"))}" alt="" width="1200" height="1000" loading="lazy" decoding="async" />` : '<span class="frame__image" aria-hidden="true"></span>'}
             <div class="frame__caption">
               <div class="frame__text">
@@ -589,6 +674,40 @@
         </section>`
           : "",
 
+      // AI video: which tool did what, and a prompt visitors can copy.
+      pipeline: () =>
+        pipeline.length || prompt
+          ? `
+        <section class="section wrap" aria-labelledby="pipeline-title">
+          ${head("pipeline", pipeline.length ? "Tools and workflow" : "Prompt", pipeline.length ? "The AI tools behind each stage." : "")}
+          ${pipeline.length ? `<ol class="case-pipeline">${pipeline.map((item, index) => `<li><span class="case-pipeline__stage">${esc(item.label || `Step ${index + 1}`)}</span><strong>${esc(item.value)}</strong></li>`).join("")}</ol>` : ""}
+          ${prompt ? `
+          <figure class="case-prompt">
+            <figcaption><span>Sample prompt</span><button class="case-prompt__copy" type="button" data-copy>Copy</button></figcaption>
+            <pre><code>${esc(prompt)}</code></pre>
+          </figure>` : ""}
+        </section>`
+          : "",
+
+      // AI video: other cuts and versions, in rows like the images.
+      videos: () => {
+        const items = videos.map((url) => ({ url, info: videoInfo(url) })).filter((item) => item.info);
+        return items.length
+          ? `
+        <section class="section wrap" aria-labelledby="videos-title">
+          ${head("videos", "More videos", "Other cuts and versions.")}
+          <ul class="case-grid case-grid--videos${items.length === 1 ? " case-grid--single" : ""}">
+            ${items
+              .map(({ url, info }, index) => {
+                const ratio = info.ratio || info.likely || aspectOf(detail.aspect) || 16 / 9;
+                return `<li style="--r: ${ratio.toFixed(4)}"><div class="case-video">${videoPlayer(url, `${title}, video ${index + 2}`)}</div></li>`;
+              })
+              .join("")}
+          </ul>
+        </section>`
+          : "";
+      },
+
       blocks: () =>
         blocks.length
           ? `
@@ -606,12 +725,13 @@
           : "",
 
       outcome: () =>
-        text(detail.impact) || text(detail.learned) || nextSteps.length
+        text(detail.impact) || text(detail.learned) || nextSteps.length || metrics.length
           ? `
         <section class="section wrap" aria-labelledby="outcome-title">
           <div class="case-outcome">
             <h2 class="case-outcome__label" id="outcome-title">Outcome</h2>
             ${text(detail.impact) ? `<p class="case-outcome__statement">${esc(detail.impact)}</p>` : ""}
+            ${metrics.length ? `<dl class="case-metrics">${metrics.map((item) => `<div><dt>${esc(item.label)}</dt><dd>${esc(item.value)}</dd></div>`).join("")}</dl>` : ""}
             <div class="case-outcome__grid">
               ${text(detail.learned) ? `<div><h3>What I learned</h3><p>${esc(detail.learned)}</p></div>` : ""}
               ${nextSteps.length ? `<div><h3>Next steps</h3><ul>${nextSteps.map((item) => `<li>${esc(item)}</li>`).join("")}</ul></div>` : ""}
@@ -643,14 +763,23 @@
               ["Role", detail.role],
               ["Services", detail.service],
               ["Tools", tools],
+              ...(type === "video"
+                ? [
+                    ["Length", detail.length],
+                    ["Format", detail.aspect],
+                    ["Platform", detail.platform],
+                  ]
+                : []),
               ["Year", text(detail.year) || text(project.date).slice(0, 4)],
               ["Region", detail.region],
             ])}</dl>
-            ${live ? `<a class="btn btn--primary case-hero__live" href="${esc(live)}" target="_blank" rel="noopener noreferrer">${esc(kind.cta)} ${arrowIcon}<span class="sr-only"> (opens in a new tab)</span></a>` : ""}
+            ${liveLink ? `<a class="btn btn--primary case-hero__live" href="${esc(liveLink)}" target="_blank" rel="noopener noreferrer">${esc(kind.cta)} ${arrowIcon}<span class="sr-only"> (opens in a new tab)</span></a>` : ""}
           </aside>
         </header>
 
-        ${cover ? `<figure class="case-cover wrap"><img src="${esc(cld(cover, "f_auto,q_auto,w_2000"))}" alt="${esc(title)}" width="1200" height="1000" fetchpriority="high" decoding="async" /></figure>` : ""}
+        ${film && film.kind !== "link"
+          ? `<figure class="case-film wrap"><div class="case-film__frame" style="--r: ${filmRatio.toFixed(4)}">${videoPlayer(detail.videoMain, `${title}, video`, cover ? cld(cover, "f_auto,q_auto,w_2000") : "")}</div></figure>`
+          : cover ? `<figure class="case-cover wrap"><img src="${esc(cld(cover, "f_auto,q_auto,w_2000"))}" alt="${esc(title)}" width="1200" height="1000" fetchpriority="high" decoding="async" /></figure>` : ""}
 
         ${body}
 
@@ -661,6 +790,7 @@
       button.setAttribute("aria-label", `Open image ${Number(button.dataset.view) + 1} of ${viewerImages.length}`);
     });
     shapeGrids();
+    measureVideos();
     showTypefaces();
     main.removeAttribute("aria-busy");
     setMeta(`${title} – ${SITE}`, summary);
@@ -763,6 +893,15 @@
     viewer.showModal();
   };
   main.addEventListener("click", (event) => {
+    const copyButton = event.target.closest("[data-copy]");
+    if (copyButton) {
+      const code = copyButton.closest(".case-prompt")?.querySelector("code")?.textContent || "";
+      navigator.clipboard?.writeText(code).then(() => {
+        copyButton.textContent = "Copied";
+        window.setTimeout(() => (copyButton.textContent = "Copy"), 1600);
+      }).catch(() => {});
+      return;
+    }
     const trigger = event.target.closest("[data-view]");
     if (trigger) openViewer(Number(trigger.dataset.view), trigger);
   });

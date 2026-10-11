@@ -184,6 +184,59 @@ html:has(.viewer[open]) { overflow: hidden; }
 .case-typeface__name { font-size: 17px; font-weight: 600; line-height: 1.3; }
 .case-typeface:not(.is-loaded) .case-typeface__name { margin-top: auto; font-size: 30px; font-weight: 700; letter-spacing: -0.02em; }
 
+/* ---------- AI video ---------- */
+/* The main video, in place of the cover: never taller than the screen, so a vertical video stays whole. */
+.case-film { margin-top: clamp(48px, 6vw, 80px); }
+.case-film__frame {
+  --r: 1.7778;
+  position: relative;
+  width: min(100%, calc((100svh - 140px) * var(--r)));
+  aspect-ratio: var(--r);
+  margin-inline: auto;
+  overflow: hidden;
+  border-radius: var(--radius-card);
+  background: #000000;
+}
+.case-film__frame :is(iframe, video),
+.case-video :is(iframe, video) { position: absolute; inset: 0; width: 100%; height: 100%; border: 0; object-fit: contain; background: #000000; }
+/* More videos sit in rows like the images; the row layout sizes each box by its --r */
+.case-grid--videos { --row: 420px; --row-max: 640px; }
+.case-video { position: relative; width: 100%; height: 100%; overflow: hidden; border-radius: 14px; background: #000000; }
+.case-video__link { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; gap: 8px; color: #ffffff; font-weight: 600; text-decoration: none; }
+
+/* Which tool did what: a row of steps */
+.case-pipeline { display: flex; flex-wrap: wrap; gap: 12px 32px; counter-reset: stage; }
+.case-pipeline li { position: relative; display: grid; gap: 2px; min-width: 150px; padding: 16px 20px; border-radius: 14px; background: var(--frame); }
+.case-pipeline li:not(:last-child)::after {
+  content: "";
+  position: absolute;
+  top: 50%;
+  right: -21px;
+  width: 9px;
+  height: 12px;
+  transform: translateY(-50%);
+  background: var(--faint);
+  -webkit-mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 9 12'%3E%3Cpath d='M1.5 1.5 7 6l-5.5 4.5' fill='none' stroke='%23000' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E") center / contain no-repeat;
+  mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 9 12'%3E%3Cpath d='M1.5 1.5 7 6l-5.5 4.5' fill='none' stroke='%23000' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E") center / contain no-repeat;
+}
+.case-pipeline__stage { color: var(--muted); font-size: 13px; line-height: 1.4; }
+.case-pipeline strong { font-size: 17px; font-weight: 600; line-height: 1.35; }
+.case-pipeline + .case-prompt { margin-top: 24px; }
+
+/* A sample prompt visitors can copy */
+.case-prompt { max-width: 860px; overflow: hidden; border-radius: 14px; background: var(--frame); }
+.case-prompt figcaption { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 10px 12px 10px 20px; border-bottom: 1px solid var(--line); color: var(--muted); font-size: 13px; }
+.case-prompt__copy { min-height: 32px; padding: 0 14px; border: 1px solid var(--line); border-radius: 8px; background: var(--frame); color: var(--ink); font: 500 13px/1 var(--font); cursor: pointer; }
+.case-prompt__copy:hover { background: var(--hover); }
+.case-prompt pre { margin: 0; padding: 18px 20px 20px; white-space: pre-wrap; overflow-wrap: anywhere; }
+.case-prompt code { font: 400 15px/1.65 ui-monospace, "SF Mono", Menlo, Consolas, monospace; letter-spacing: 0; }
+
+/* Results in numbers, in the Outcome panel */
+.case-metrics { display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 24px; margin-top: 36px; }
+.case-metrics div { display: flex; flex-direction: column-reverse; justify-content: flex-end; gap: 6px; }
+.case-metrics dd { font-size: clamp(36px, 4.4vw, 56px); font-weight: 800; line-height: 1; letter-spacing: -0.03em; font-variant-numeric: tabular-nums; }
+.case-metrics dt { font-size: 14px; line-height: 1.4; opacity: 0.72; }
+
 /* Print: formats and sizes above the artworks */
 .case-formats { margin-top: 18px; }
 
@@ -297,6 +350,7 @@ html:has(.viewer[open]) { overflow: hidden; }
   .case-grid--large { --row: 420px; --row-max: 640px; }
   .case-blocks, .case-outcome__grid { grid-template-columns: minmax(0, 1fr); }
   .case-spec, .case-spec--specs-only { grid-template-columns: minmax(0, 1fr); }
+  .case-grid--videos { --row: 360px; --row-max: 560px; }
 }
 @media (max-width: 640px) {
   .case-hero { padding-top: 40px; }
@@ -308,6 +362,11 @@ html:has(.viewer[open]) { overflow: hidden; }
   .case-grid__item { border-radius: 10px; }
   .case-block { padding: 24px; }
   .case-tiles { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; }
+  .case-grid--videos { --row: 2000px; --row-max: 540px; } /* on phones each video gets a row of its own, big enough to watch */
+  .case-film__frame { width: min(100%, calc((100svh - 120px) * var(--r))); }
+  .case-pipeline { flex-direction: column; gap: 10px; }
+  .case-pipeline li::after { display: none; }
+  .case-metrics { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 20px; }
   .case-tile { border-radius: 10px; }
   .case-swatches, .case-typefaces { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; }
   .case-swatch { min-height: 128px; padding: 14px; font-size: 12px; }
