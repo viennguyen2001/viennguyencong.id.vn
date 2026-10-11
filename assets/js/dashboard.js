@@ -1097,6 +1097,17 @@ const PROJECT_TYPES = {
     challenge: "The brief",
     sections: ["basics", "overview", "gallery", "process", "research", "brand", "blocks", "outcome"],
   },
+  video: {
+    label: "AI video",
+    role: "AI Video Creator",
+    service: "AI video production",
+    steps: ["Script and storyboard", "Look and characters", "Generation", "Edit, voice and sound"],
+    research: ["Storyboard", "Keyframes and boards that set up each shot."],
+    gallery: ["Stills", "Frames from the finished video."],
+    link: ["Watch link", "Watch the video"],
+    challenge: "The brief",
+    sections: ["basics", "overview", "film", "process", "research", "pipeline", "videos", "gallery", "blocks", "outcome"],
+  },
 };
 
 const getProjectType = (item = {}) => (PROJECT_TYPES[item.projectType] ? item.projectType : "uiux");
@@ -1178,8 +1189,64 @@ function readProjectDetail(formData) {
     colors: value("detailColors"),
     typefaces: value("detailTypefaces"),
     formats: value("detailFormats"),
+    // AI video
+    videoMain: value("detailVideoMain"),
+    aspect: value("detailAspect"),
+    length: value("detailLength"),
+    platform: value("detailPlatform"),
+    pipeline: value("detailPipeline"),
+    prompt: value("detailPrompt"),
+    videos: list("detailVideo"),
+    // Any type: results in numbers, shown in the Outcome panel
+    metrics: value("detailMetrics"),
     blocks,
   };
+}
+
+// What a video link plays as: an embedded player (YouTube, Vimeo, TikTok, Instagram, Google Drive, Facebook)
+// or a video file. Keep in step with videoInfo in assets/js/case-study.js.
+function getVideoInfo(url) {
+  const link = String(url || "").trim();
+  if (!link) return null;
+  let match;
+  if ((match = link.match(/(?:youtube\.com\/(?:watch\?(?:.*&)?v=|shorts\/|embed\/|live\/)|youtu\.be\/)([\w-]{11})/))) {
+    return { kind: "iframe", src: `https://www.youtube-nocookie.com/embed/${match[1]}?rel=0`, ratio: /shorts\//.test(link) ? 9 / 16 : 0 };
+  }
+  if ((match = link.match(/vimeo\.com\/(?:video\/)?(\d+)/))) return { kind: "iframe", src: `https://player.vimeo.com/video/${match[1]}`, ratio: 0 };
+  if ((match = link.match(/tiktok\.com\/.*\/video\/(\d+)/))) return { kind: "iframe", src: `https://www.tiktok.com/player/v1/${match[1]}`, ratio: 9 / 16 };
+  if ((match = link.match(/instagram\.com\/(?:reel|reels|p)\/([\w-]+)/))) return { kind: "iframe", src: `https://www.instagram.com/reel/${match[1]}/embed`, ratio: 9 / 16 };
+  if ((match = link.match(/drive\.google\.com\/file\/d\/([\w-]+)/))) return { kind: "iframe", src: `https://drive.google.com/file/d/${match[1]}/preview`, ratio: 0 };
+  if (/facebook\.com\/.+\/videos\/|facebook\.com\/(?:watch|reel)|fb\.watch\//.test(link)) {
+    return { kind: "iframe", src: `https://www.facebook.com/plugins/video.php?href=${encodeURIComponent(link)}&show_text=false`, ratio: 0 };
+  }
+  if (/\.(mp4|webm|mov|m4v)(\?|#|$)/i.test(link) || /res\.cloudinary\.com\/[^/]+\/video\/upload\//.test(link)) return { kind: "file", src: link, ratio: 0 };
+  return { kind: "link", src: link, ratio: 0 };
+}
+
+// Video files go straight to Cloudinary when they are picked (they are too large to keep in the browser until Save).
+const MAX_VIDEO_BYTES = 100 * 1024 * 1024;
+function uploadVideoToCloudinary(file, onProgress) {
+  return new Promise((resolve, reject) => {
+    const request = new XMLHttpRequest();
+    request.open("POST", `https://api.cloudinary.com/v1_1/${cloudinaryCloudName}/video/upload`);
+    request.upload.addEventListener("progress", (event) => {
+      if (event.lengthComputable) onProgress(event.loaded / event.total);
+    });
+    request.addEventListener("load", () => {
+      let payload = {};
+      try {
+        payload = JSON.parse(request.responseText || "{}");
+      } catch (error) {}
+      if (request.status >= 200 && request.status < 300 && payload.secure_url) resolve(payload.secure_url);
+      else reject(new Error(payload.error?.message || `Upload failed (${request.status})`));
+    });
+    request.addEventListener("error", () => reject(new Error("Network error")));
+    const formData = new FormData();
+    formData.append("file", file);
+    formData.append("upload_preset", cloudinaryUploadPreset);
+    formData.append("folder", "vien-portfolio/videos");
+    request.send(formData);
+  });
 }
 
 function getProjectDetailDefaults(item = {}) {
@@ -1232,6 +1299,14 @@ function getProjectDetailDefaults(item = {}) {
     colors: saved.colors || "",
     typefaces: saved.typefaces || "",
     formats: saved.formats || "",
+    videoMain: saved.videoMain || "",
+    aspect: saved.aspect || (type === "video" ? "9:16" : ""),
+    length: saved.length || "",
+    platform: saved.platform || "",
+    pipeline: saved.pipeline || "",
+    prompt: saved.prompt || "",
+    videos: Array.isArray(saved.videos) ? saved.videos.filter(Boolean) : [],
+    metrics: saved.metrics || "",
     blocks: Array.isArray(saved.blocks) ? saved.blocks : [],
   };
 }
@@ -2283,6 +2358,34 @@ function initDashboard() {
       </article>`;
   }
 
+  function renderVideoPreview(url) {
+    const info = getVideoInfo(url);
+    if (!info) return "<small>No video yet</small>";
+    if (info.kind === "iframe") {
+      return `<iframe src="${escapeHtml(info.src)}" title="Video preview" loading="lazy" allow="encrypted-media; picture-in-picture; fullscreen" allowfullscreen></iframe>`;
+    }
+    if (info.kind === "file") return `<video src="${escapeHtml(info.src)}" controls playsinline preload="metadata"></video>`;
+    return "<small>This link cannot be played on the page. It will show as a link.</small>";
+  }
+
+  // A video: paste a link or upload a file (sent to Cloudinary straight away, up to 100 MB).
+  function renderProjectVideoItem(field, value = "", index = 0, label = "Video", removable = true) {
+    return `
+      <article class="dashboard-project-gallery-image dashboard-video-item" data-dashboard-video-item>
+        <header>
+          <strong>${escapeHtml(label)}${removable ? ` ${index + 1}` : ""}</strong>
+          ${removable ? `<button type="button" data-dashboard-video-remove aria-label="Remove video" title="Remove video"><i class="ri-delete-bin-line"></i><span>Remove</span></button>` : ""}
+        </header>
+        <input name="${field}" value="${escapeHtml(value)}" placeholder="Paste a YouTube, TikTok, Vimeo, Drive, Facebook or Instagram link" data-dashboard-video-url />
+        <label class="dashboard-video-upload">
+          <i class="ri-upload-2-line" aria-hidden="true"></i> Or upload a video file (MP4, up to 100 MB)
+          <input type="file" accept="video/*" data-dashboard-video-upload />
+        </label>
+        <small class="dashboard-video-status" data-dashboard-video-status aria-live="polite"></small>
+        <div class="dashboard-detail-image-preview dashboard-video-preview" data-dashboard-video-preview>${renderVideoPreview(value)}</div>
+      </article>`;
+  }
+
   // Changing the project type redraws the form for that type and keeps everything typed so far.
   function switchProjectType(select) {
     const form = select.closest("form");
@@ -2343,6 +2446,9 @@ function initDashboard() {
       variations: "Variations",
       brand: "Color and type",
       gallery: kind.gallery[0],
+      film: "The video",
+      pipeline: "Tools and prompt",
+      videos: "More videos",
       blocks: "Extra blocks",
       outcome: "Outcome",
     };
@@ -2373,7 +2479,7 @@ function initDashboard() {
           </label>
           <label class="dashboard-form__wide">Project name<input name="title" value="${escapeHtml(editingItem.title)}" placeholder="Peaceblend" required /></label>
           <label class="dashboard-form__wide">Short description <small>One line on cards and under the title</small>
-            <textarea name="summary" rows="2" maxlength="180" placeholder="${type === "uiux" ? "UI/UX design for a calm sleep supplement brand." : type === "packaging" ? "Packaging for a calm sleep supplement." : type === "logo" ? "A logo and identity for a calm sleep supplement brand." : "Posters and banners for a product launch."}" data-dashboard-summary-input>${escapeHtml(editingItem.summary)}</textarea>
+            <textarea name="summary" rows="2" maxlength="180" placeholder="${{ uiux: "UI/UX design for a calm sleep supplement brand.", packaging: "Packaging for a calm sleep supplement.", logo: "A logo and identity for a calm sleep supplement brand.", print: "Posters and banners for a product launch.", video: "A 30-second AI video ad for a calm sleep supplement." }[type]}" data-dashboard-summary-input>${escapeHtml(editingItem.summary)}</textarea>
             <small class="dashboard-counter" data-dashboard-summary-count>${String(editingItem.summary || "").length}/180</small>
           </label>
           <label>Client or brand <small>Optional</small><input name="detailClient" value="${escapeHtml(detail.client || "")}" placeholder="Peaceblend" /></label>
@@ -2385,7 +2491,7 @@ function initDashboard() {
             <label for="project-tools-input">Tools <small>Type a tool and press Enter</small></label>
             <div class="dashboard-project-tools" data-dashboard-tools>
               ${tools.map((tool) => renderToolChip(tool)).join("")}
-              <input id="project-tools-input" type="text" autocomplete="off" placeholder="${tools.length ? "Add another" : isVisual ? "Illustrator, Photoshop…" : "Figma, Photoshop…"}" data-dashboard-tool-input />
+              <input id="project-tools-input" type="text" autocomplete="off" placeholder="${tools.length ? "Add another" : type === "video" ? "Midjourney, Kling, CapCut…" : isVisual ? "Illustrator, Photoshop…" : "Figma, Photoshop…"}" data-dashboard-tool-input />
               <input type="hidden" name="tags" value="${escapeHtml(tools.join(", "))}" data-dashboard-tools-value />
             </div>
           </div>
@@ -2399,7 +2505,7 @@ function initDashboard() {
           ${isVisual ? `<label>The idea <small>The concept behind the design</small><textarea name="detailConcept" rows="4" placeholder="The one idea the design is built on.">${escapeHtml(detail.concept)}</textarea></label>` : keep("detailConcept", detail.concept)}
           <label>The goal<textarea name="detailGoal" rows="4">${escapeHtml(detail.goal)}</textarea></label>
           <label>${isVisual ? "Problems to solve" : "Pain points"} <small>One per line</small><textarea name="detailPainPoints" rows="4">${escapeHtml(detail.painPoints)}</textarea></label>
-          <label class="${isVisual ? "dashboard-form__wide" : ""}">What I did <small>One per line</small><textarea name="detailResponsibilities" rows="4" placeholder="${type === "packaging" ? "Packaging concept\nDieline\nLabel artwork\nPrint files" : type === "logo" ? "Logo design\nColor palette\nTypography\nBrand guidelines" : type === "print" ? "Key visual\nPosters\nSocial banners\nPrint files" : ""}">${escapeHtml(detail.responsibilities)}</textarea></label>
+          <label class="${isVisual ? "dashboard-form__wide" : ""}">What I did <small>One per line</small><textarea name="detailResponsibilities" rows="4" placeholder="${{ packaging: "Packaging concept\nDieline\nLabel artwork\nPrint files", logo: "Logo design\nColor palette\nTypography\nBrand guidelines", print: "Key visual\nPosters\nSocial banners\nPrint files", video: "Script\nStoryboard\nImage generation\nVideo generation\nVoice and music\nEdit" }[type] || ""}">${escapeHtml(detail.responsibilities)}</textarea></label>
         </div>`),
 
       research: block("research", kind.research[0], `${kind.research[1]} Any size or shape: the page lines them up in rows and keeps each one whole; visitors can open them full screen.`, `
@@ -2475,6 +2581,35 @@ function initDashboard() {
           </div>
         </div>`),
 
+      film: block("film", "The video", "The main video, shown at the top of the case study in place of the cover image. The cover image is still used on project cards.", `
+        <div class="dashboard-form-grid">
+          <div class="dashboard-form__wide">${renderProjectVideoItem("detailVideoMain", detail.videoMain, 0, "Main video", false)}</div>
+          <label>Format <small>For links where the shape cannot be detected</small>
+            <select name="detailAspect">${[["9:16", "9:16 vertical"], ["16:9", "16:9 landscape"], ["1:1", "1:1 square"], ["4:5", "4:5 portrait"]]
+              .map(([value, name]) => `<option value="${value}" ${detail.aspect === value ? "selected" : ""}>${name}</option>`)
+              .join("")}</select>
+          </label>
+          <label>Length<input name="detailLength" value="${escapeHtml(detail.length)}" placeholder="0:30" /></label>
+          <label class="dashboard-form__wide">Platform<input name="detailPlatform" value="${escapeHtml(detail.platform)}" placeholder="TikTok, Facebook Ads" /></label>
+        </div>`),
+
+      pipeline: block("pipeline", "Tools and prompt", "Which AI tool did what, and a sample prompt visitors can copy. Optional.", `
+        <div class="dashboard-form-grid">
+          <label>Workflow <small>One per line: the stage, then the tool</small><textarea name="detailPipeline" rows="6" placeholder="Script: ChatGPT&#10;Images: Midjourney&#10;Video: Kling&#10;Voice: ElevenLabs&#10;Edit: CapCut">${escapeHtml(detail.pipeline)}</textarea></label>
+          <label>Sample prompt<textarea name="detailPrompt" rows="6" placeholder="A close-up of a glass bottle on a stone counter, morning light…">${escapeHtml(detail.prompt)}</textarea></label>
+        </div>`),
+
+      videos: block("videos", "More videos", "Other cuts and versions: a 15-second cut, square, other languages. Each plays on the page.", `
+        <div class="dashboard-project-gallery">
+          <div class="dashboard-flex-blocks__head">
+            <small>The order here is the order on the page.</small>
+            <button type="button" data-dashboard-video-add="detailVideo"><i class="ri-add-line"></i> Add video</button>
+          </div>
+          <div class="dashboard-video-list" data-dashboard-video-list="detailVideo">
+            ${detail.videos.map((url, index) => renderProjectVideoItem("detailVideo", url, index, "Video")).join("")}
+          </div>
+        </div>`),
+
       blocks: block("blocks", "Extra blocks", "Any extra text or images, shown near the end of the case study. Optional.", `
         <div class="dashboard-flex-blocks">
           <div class="dashboard-flex-blocks__head">
@@ -2494,6 +2629,7 @@ function initDashboard() {
           <label class="dashboard-form__wide">Result <small>One or two sentences, shown large</small><textarea name="detailImpact" rows="3">${escapeHtml(detail.impact)}</textarea></label>
           <label>What I learned<textarea name="detailLearned" rows="4">${escapeHtml(detail.learned)}</textarea></label>
           <label>Next steps <small>One per line</small><textarea name="detailNextSteps" rows="4">${escapeHtml(detail.nextSteps)}</textarea></label>
+          <label class="dashboard-form__wide">Results in numbers <small>Optional. One per line: what, then the number. Shown large.</small><textarea name="detailMetrics" rows="3" placeholder="Views: 1.2M&#10;Click-through rate: 3.4%&#10;Cost per purchase: $8">${escapeHtml(detail.metrics)}</textarea></label>
         </div>`),
     };
 
@@ -2505,6 +2641,10 @@ function initDashboard() {
       shows("variations") ? "" : detail.variationImages.map((image) => keep("detailVariationImage", image)).join(""),
       shows("brand") ? "" : keep("detailColors", detail.colors) + keep("detailTypefaces", detail.typefaces),
       type === "print" ? "" : keep("detailFormats", detail.formats),
+      shows("film") ? "" : ["detailVideoMain", "detailAspect", "detailLength", "detailPlatform"]
+        .map((name) => keep(name, detail[name.charAt(6).toLowerCase() + name.slice(7)])).join(""),
+      shows("pipeline") ? "" : keep("detailPipeline", detail.pipeline) + keep("detailPrompt", detail.prompt),
+      shows("videos") ? "" : detail.videos.map((url) => keep("detailVideo", url)).join(""),
     ].join("");
 
     listNode.className = "dashboard-project-editor";
@@ -2876,6 +3016,25 @@ function initDashboard() {
     const listAddButton = event.target.closest("[data-dashboard-list-add]");
     const listRemoveButton = event.target.closest("[data-dashboard-list-remove]");
 
+    const videoAddButton = event.target.closest("[data-dashboard-video-add]");
+    const videoRemoveButton = event.target.closest("[data-dashboard-video-remove]");
+
+    if (videoAddButton) {
+      const field = videoAddButton.dataset.dashboardVideoAdd;
+      const videoList = app.querySelector(`[data-dashboard-video-list="${field}"]`);
+      if (videoList) {
+        const index = videoList.querySelectorAll("[data-dashboard-video-item]").length;
+        videoList.insertAdjacentHTML("beforeend", renderProjectVideoItem(field, "", index, "Video"));
+        videoList.lastElementChild?.querySelector("[data-dashboard-video-url]")?.focus();
+      }
+      return;
+    }
+
+    if (videoRemoveButton) {
+      videoRemoveButton.closest("[data-dashboard-video-item]")?.remove();
+      return;
+    }
+
     if (listAddButton) {
       const field = listAddButton.dataset.dashboardListAdd;
       const listNodeForField = app.querySelector(`[data-dashboard-list="${field}"]`);
@@ -3051,6 +3210,47 @@ function initDashboard() {
     const projectTypeSelect = event.target.closest("[data-dashboard-project-type]");
     if (projectTypeSelect) {
       switchProjectType(projectTypeSelect);
+      return;
+    }
+
+    // A pasted video link shows its player once the field is left.
+    const videoUrlInput = event.target.closest("[data-dashboard-video-url]");
+    if (videoUrlInput) {
+      const preview = videoUrlInput.closest("[data-dashboard-video-item]")?.querySelector("[data-dashboard-video-preview]");
+      if (preview) preview.innerHTML = renderVideoPreview(videoUrlInput.value);
+      return;
+    }
+
+    const videoUploadInput = event.target.closest("[data-dashboard-video-upload]");
+    if (videoUploadInput && videoUploadInput.files?.length) {
+      const itemNode = videoUploadInput.closest("[data-dashboard-video-item]");
+      const file = videoUploadInput.files[0];
+      const status = itemNode?.querySelector("[data-dashboard-video-status]");
+      const urlInput = itemNode?.querySelector("[data-dashboard-video-url]");
+      const preview = itemNode?.querySelector("[data-dashboard-video-preview]");
+      const say = (message) => {
+        if (status) status.textContent = message;
+      };
+      videoUploadInput.value = "";
+      if (file.size > MAX_VIDEO_BYTES) {
+        say("This file is over 100 MB. Upload it to YouTube or Google Drive and paste the link instead.");
+        return;
+      }
+      itemNode?.classList.add("is-uploading");
+      say("Uploading 0%…");
+      try {
+        const url = await uploadVideoToCloudinary(file, (share) =>
+          say(`Uploading ${Math.round(share * 100)}%…${itemNode?.dataset.saveWaiting ? " Save when it finishes." : ""}`)
+        );
+        if (urlInput) urlInput.value = url;
+        if (preview) preview.innerHTML = renderVideoPreview(url);
+        say("Uploaded. Save the project to keep it.");
+      } catch (error) {
+        say(`Upload failed: ${error.message}. Paste a link instead.`);
+      } finally {
+        itemNode?.classList.remove("is-uploading");
+        if (itemNode) delete itemNode.dataset.saveWaiting;
+      }
       return;
     }
 
@@ -3402,6 +3602,16 @@ function initDashboard() {
     }
 
     event.preventDefault();
+
+    // A video still uploading has no link yet: saving now would drop it.
+    const uploading = form.querySelector("[data-dashboard-video-item].is-uploading");
+    if (uploading) {
+      const status = uploading.querySelector("[data-dashboard-video-status]");
+      uploading.dataset.saveWaiting = "1";
+      if (status) status.textContent = `${status.textContent.replace(/ ?Save when it finishes\.$/, "").trim() || "Still uploading."} Save when it finishes.`;
+      uploading.scrollIntoView({ behavior: "smooth", block: "center" });
+      return;
+    }
 
     const pendingTool = form.querySelector("[data-dashboard-tool-input]");
     if (pendingTool?.value.trim()) {
