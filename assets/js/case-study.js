@@ -350,9 +350,11 @@
     if (info.kind === "file") {
       // Cloudinary converts on the fly: asking for .mp4 means an iPhone .mov (HEVC) still plays in every browser.
       const src = /res\.cloudinary\.com/.test(info.src) ? cld(info.src.replace(/\.(mov|m4v|webm|mkv|avi)$/i, ".mp4"), "q_auto") : info.src;
-      // A Cloudinary video's own first frame fits its shape; otherwise the project's cover image.
-      const cover = videoPoster(info.src) || poster;
-      return `<video src="${esc(src)}" controls playsinline preload="metadata"${cover ? ` poster="${esc(cover)}"` : ""} data-video-measure></video>`;
+      // The poster is the video's own first frame, so it always has the video's shape: Cloudinary makes one;
+      // for other files, "#t=0.1" asks the browser (Safari included) to show the frame at 0.1 s.
+      const cover = videoPoster(info.src);
+      const shown = cover || src.includes("#") ? src : `${src}#t=0.1`;
+      return `<video src="${esc(shown)}" controls playsinline preload="metadata"${cover ? ` poster="${esc(cover)}"` : ""} data-video-measure></video>`;
     }
     return `<a class="case-video__link" href="${esc(info.src)}" target="_blank" rel="noopener noreferrer">Watch the video ${arrowIcon}<span class="sr-only"> (opens in a new tab)</span></a>`;
   };
