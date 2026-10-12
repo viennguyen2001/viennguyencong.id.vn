@@ -127,6 +127,9 @@
 }
 .site-topbar .site-toolbar__cta:hover { background: var(--st-accent-hover); color: var(--st-on-accent); }
 
+/* "Get in touch" inside the menu: only on small screens, where the menu replaces the bar's links and button */
+.site-topbar .site-toolbar__nav li.site-toolbar__nav-cta { display: none; }
+
 .site-topbar .site-toolbar__menu {
   display: none;
   align-items: center;
@@ -167,10 +170,23 @@
   .site-topbar .site-toolbar__nav.is-open { display: flex; }
   .site-topbar .site-toolbar__nav a { padding: 12px; font-size: 16px; }
   .site-topbar .site-toolbar__menu { display: inline-flex; }
+  /* The bar keeps only the logo and the menu button; "Get in touch" moves to the end of the menu. */
+  .site-topbar .site-toolbar__cta { display: none; }
+  .site-topbar .site-toolbar__nav li.site-toolbar__nav-cta { display: block; margin-top: 6px; padding-top: 10px; border-top: 1px solid var(--st-line); }
+  .site-topbar .site-toolbar__nav .site-toolbar__nav-cta a {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 48px;
+    border-radius: 10px;
+    background: var(--st-accent);
+    color: var(--st-on-accent);
+    font-weight: 500;
+  }
+  .site-topbar .site-toolbar__nav .site-toolbar__nav-cta a:hover { background: var(--st-accent-hover); color: var(--st-on-accent); }
 }
 @media (max-width: 640px) {
   .site-topbar .site-toolbar { gap: 8px; padding: 0 8px 0 12px; }
-  .site-topbar .site-toolbar__cta { padding: 0 12px; }
 }
 @media (prefers-reduced-motion: reduce) {
   .site-topbar .site-toolbar__nav a,
