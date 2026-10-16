@@ -91,6 +91,8 @@
   const renderHero = (data) => {
     const hero = (data.hero || [])[0];
     if (!hero) return;
+    const heading = $("#hero-title");
+    if (heading) heading.textContent = text(hero.detail?.headline) || "UI/UX Designer.";
     if (text(hero.owner)) $("[data-hero-intro]").textContent = text(hero.owner);
     const image = $("[data-hero-image]");
     if (image && !isPlaceholderImage(hero.image) && image.getAttribute("src") !== hero.image) image.src = hero.image;
