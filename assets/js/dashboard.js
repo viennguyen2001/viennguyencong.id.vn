@@ -30,6 +30,7 @@ const dashboardSeed = {
       image: "assets/images/about/me.jpg",
       summary: "100+ reviews",
       detail: {
+        headline: "UI/UX Designer.",
         reviewScore: "(4.96 of 5)",
         reviewDescription: "Five-star reviews from my esteemed clients.",
         avatarOne: "assets/images/avatar/01.jpg",
@@ -442,7 +443,7 @@ const dashboardSeed = {
 
 const dashboardLabels = {
   hero: {
-    label: "Avata",
+    label: "Trang chủ / Avata",
     singular: "Avata",
     page: "/#home",
     helper: "Update the home avata image, intro text, review, and review avatars.",
@@ -855,6 +856,7 @@ function normalizeDashboardData(data) {
       image: item.image || "assets/images/about/me.jpg",
       tags: item.tags || "Get In touch",
       detail: {
+        headline: item.detail?.headline || "UI/UX Designer.",
         reviewScore: item.detail?.reviewScore || "(4.96 of 5)",
         reviewDescription: item.detail?.reviewDescription || "Five-star reviews from my esteemed clients.",
         avatarOne: item.detail?.avatarOne || "assets/images/avatar/01.jpg",
@@ -1733,7 +1735,7 @@ function initDashboard() {
           </a>
           <div class="dashboard-content-card__body">
             <span class="dashboard-content-card__role">Nội dung chính chủ</span>
-            <h3>${escapeHtml(heroItem.title)}</h3>
+            <h3>${escapeHtml(heroItem.detail?.headline || "UI/UX Designer.")}</h3>
             <p>${escapeHtml(heroItem.owner)}</p>
           </div>
           <div class="dashboard-content-card__actions">
@@ -2845,6 +2847,7 @@ function initDashboard() {
                   <h3>Nội dung chính chủ</h3>
                   <p>Only the owner intro content, CTA, and main avata image.</p>
                 </div>
+                <label class="dashboard-form__wide">Tiêu đề trang chủ<input name="heroHeadline" value="${escapeHtml(editingItem.detail?.headline || "UI/UX Designer.")}" required /></label>
                 <label>Avata title<input name="title" value="${escapeHtml(editingItem.title)}" required /></label>
                 <label>Button text<input name="tags" value="${escapeHtml(editingItem.tags || "Get In touch")}" /></label>
                 <label class="dashboard-form__wide">Intro text<textarea name="owner" rows="4">${escapeHtml(editingItem.owner)}</textarea></label>
@@ -3677,6 +3680,7 @@ function initDashboard() {
       item.summary = String(item.summary || "100+ reviews").split(score).join("").replace(/\s+/g, " ").trim();
       item.id = 501;
       item.detail = {
+        headline: String(formData.get("heroHeadline") || editingItem.detail?.headline || "UI/UX Designer.").trim(),
         reviewScore: String(formData.get("heroReviewScore") || editingItem.detail?.reviewScore || "(4.96 of 5)").trim(),
         reviewDescription: String(formData.get("heroReviewDescription") || editingItem.detail?.reviewDescription || "Five-star reviews from my esteemed clients.").trim(),
         avatarOne: String(formData.get("heroAvatarOne") || editingItem.detail?.avatarOne || "assets/images/avatar/01.jpg").trim(),
