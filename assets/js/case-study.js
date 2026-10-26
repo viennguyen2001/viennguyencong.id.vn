@@ -146,6 +146,21 @@
     const items = [...grid.children];
     const width = grid.clientWidth;
     if (!width || items.length < 2 || grid.classList.contains("case-grid--single")) return;
+    // Full-page screenshots need readable previews rather than narrow strips.
+    if (items.every((item) => item.classList.contains("is-tall"))) {
+      const columns = Math.min(items.length, width > 900 ? 3 : width > 560 ? 2 : 1);
+      const gap = parseFloat(getComputedStyle(grid).columnGap) || 0;
+      const basis = (width - gap * (columns - 1)) / columns;
+      items.forEach((item) => {
+        item.style.setProperty("--r", "0.75");
+        item.style.setProperty("--basis", `${Math.max(0, basis - 1)}px`);
+        item.style.setProperty("--grow", "1");
+        item.style.setProperty("--ml", "0px");
+        item.style.setProperty("--mr", "0px");
+      });
+      grid.classList.add("is-laid-out");
+      return;
+    }
     const style = getComputedStyle(grid);
     const gap = parseFloat(style.columnGap) || 0;
     const target = parseFloat(style.getPropertyValue("--row")) || 300;
