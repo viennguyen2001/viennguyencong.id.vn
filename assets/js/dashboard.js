@@ -1582,6 +1582,19 @@ function initDashboardAuth() {
   });
 }
 
+// Reorder only the visible projects, leaving hidden projects in their existing slots.
+function moveDashboardProject(projects, visibleIds, itemId, direction) {
+  const index = visibleIds.indexOf(itemId);
+  const target = index + direction;
+  if (index < 0 || target < 0 || target >= visibleIds.length) return projects;
+  const first = projects.findIndex((item) => item.id === itemId);
+  const second = projects.findIndex((item) => item.id === visibleIds[target]);
+  if (first < 0 || second < 0) return projects;
+  const ordered = [...projects];
+  [ordered[first], ordered[second]] = [ordered[second], ordered[first]];
+  return ordered;
+}
+
 function initDashboard() {
   const app = document.querySelector("[data-dashboard-app]");
 
@@ -1877,7 +1890,7 @@ function initDashboard() {
           <p><strong>Homepage.</strong> ${starredActive.length
             ? `${starredActive.length} starred project${starredActive.length > 1 ? "s" : ""} shown in Selected work, in this order. The first one is shown large.`
             : "No project is starred yet, so the homepage shows the first three active projects."}${starredHidden ? ` ${starredHidden} starred project${starredHidden > 1 ? "s are" : " is"} not Active, so ${starredHidden > 1 ? "they stay" : "it stays"} hidden.` : ""}
-          Use the star on a card to choose.</p>
+          Use the star on a card to choose. Use the up and down arrows to change display order.</p>
         </div>`
       : "";
 
@@ -2107,7 +2120,9 @@ function initDashboard() {
               <div class="dashboard-content-card__actions">
                 <a href="${escapeHtml(item.link || getDefaultItemLink(activeType))}">Open <i class="ri-arrow-right-line"></i></a>
                 ${activeType === "projects"
-                  ? `<button type="button" class="dashboard-feature-toggle${item.featured === true ? " is-on" : ""}" aria-pressed="${item.featured === true}" aria-label="${item.featured === true ? "Remove from homepage" : "Show on homepage"}: ${escapeHtml(item.title)}" title="${item.featured === true ? "Remove from homepage" : "Show on homepage"}" data-dashboard-feature="${item.id}"><i class="${item.featured === true ? "ri-star-fill" : "ri-star-line"}"></i></button>`
+                  ? `<button type="button" aria-label="Move up: ${escapeHtml(item.title)}" title="Move up" data-dashboard-move="${item.id}" data-direction="-1" ${items[0]?.id === item.id ? "disabled" : ""}><i class="ri-arrow-up-line" aria-hidden="true"></i></button>
+                     <button type="button" aria-label="Move down: ${escapeHtml(item.title)}" title="Move down" data-dashboard-move="${item.id}" data-direction="1" ${items[items.length - 1]?.id === item.id ? "disabled" : ""}><i class="ri-arrow-down-line" aria-hidden="true"></i></button>
+                     <button type="button" class="dashboard-feature-toggle${item.featured === true ? " is-on" : ""}" aria-pressed="${item.featured === true}" aria-label="${item.featured === true ? "Remove from homepage" : "Show on homepage"}: ${escapeHtml(item.title)}" title="${item.featured === true ? "Remove from homepage" : "Show on homepage"}" data-dashboard-feature="${item.id}"><i class="${item.featured === true ? "ri-star-fill" : "ri-star-line"}"></i></button>`
                   : ""}
                 <button type="button" aria-label="Edit ${escapeHtml(item.title)}" data-dashboard-edit="${item.id}">
                   <i class="ri-edit-line"></i>
@@ -3055,6 +3070,20 @@ function initDashboard() {
 
     if (jumpButton) {
       app.querySelector(`#project-${jumpButton.dataset.dashboardJump}`)?.scrollIntoView({ behavior: "smooth", block: "start" });
+      return;
+    }
+
+    const moveButton = event.target.closest("[data-dashboard-move]");
+    if (moveButton && activeType === "projects") {
+      const itemId = Number(moveButton.dataset.dashboardMove);
+      const direction = Number(moveButton.dataset.direction);
+      const projects = moveDashboardProject(data.projects || [], getFilteredItems().map((item) => item.id), itemId, direction);
+      if (projects !== data.projects) {
+        data = { ...data, projects };
+        setDashboardData(data);
+        render();
+        (app.querySelector(`[data-dashboard-move="${itemId}"][data-direction="${direction}"]:not(:disabled)`) || app.querySelector(`[data-dashboard-move="${itemId}"]:not(:disabled)`))?.focus();
+      }
       return;
     }
 

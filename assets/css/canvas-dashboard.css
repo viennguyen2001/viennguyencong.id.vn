@@ -815,3 +815,8 @@
 @media (prefers-reduced-motion: reduce) {
   .dashboard-page * { transition: none !important; }
 }
+
+/* Project ordering controls also fit narrow cards. */
+.dashboard-content-card__actions { flex-wrap: wrap; }
+.dashboard-content-card__actions button { flex-shrink: 0; }
+.dashboard-content-card__actions button[data-dashboard-move]:disabled { opacity: 0.35; cursor: not-allowed; pointer-events: none; }
