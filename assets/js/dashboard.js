@@ -1643,6 +1643,7 @@ function initDashboard() {
 
   function renderNav() {
     navNode.innerHTML = Object.keys(dashboardLabels)
+      .filter((type) => type !== "resume")
       .map((type) => {
         const item = dashboardLabels[type];
         const activeClass = type === activeType ? "is-active" : "";
