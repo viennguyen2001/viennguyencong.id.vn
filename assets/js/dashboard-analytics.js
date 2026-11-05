@@ -15,6 +15,10 @@
     <header class="dashboard-header"><div><h1>Thống kê truy cập</h1><span>Google Analytics · Portfolio · Dữ liệu từ khi cài mã đo</span></div>
     <a class="dashboard-button dashboard-button--secondary" href="https://analytics.google.com/analytics/web/#/p${PROPERTY}/reports/intelligenthome" target="_blank" rel="noopener noreferrer">Mở Google Analytics ↗</a></header>
     <details class="analytics-setup" open><summary>Kết nối Google Analytics</summary>
+      <label>Địa chỉ máy chủ thống kê<input data-analytics-server placeholder="https://…run.app" autocomplete="off" /></label>
+      <button type="button" class="dashboard-button dashboard-button--secondary" data-analytics-save-server>Lưu và dùng kết nối tự động</button>
+      <p>Khi máy chủ đã được cấu hình, báo cáo tự tải bằng tài khoản quản trị website, không cần kết nối Google mỗi lần.</p>
+      <hr />
       <p>Tạo OAuth Client ID loại Web application trong Google Cloud. Bật Google Analytics Data API và thêm https://viennguyencong.id.vn vào Authorized JavaScript origins. Nếu ứng dụng ở chế độ Testing, thêm email Google của bạn vào Test users.</p>
       <label>OAuth Client ID<input data-analytics-client placeholder="…apps.googleusercontent.com" autocomplete="off" /></label>
       <p>Chỉ nhập Client ID công khai. Không nhập Client secret. Quyền yêu cầu: chỉ đọc Analytics.</p>
@@ -32,6 +36,28 @@
   const $ = selector => panel.querySelector(selector);
   const status = message => { $("[data-analytics-status]").textContent = message; };
   try { $("[data-analytics-client]").value = localStorage.getItem("vien-analytics-client-id") || ""; } catch {}
+  let serverEndpoint = "";
+  try { serverEndpoint = localStorage.getItem("vien-analytics-server") || ""; } catch {}
+  const validServer = value => {
+    try { const url = new URL(value); return url.protocol === "https:" && !url.username && !url.password && url.pathname === "/" && !url.search && !url.hash && url.hostname.endsWith(".run.app"); } catch { return false; }
+  };
+  if (!validServer(serverEndpoint)) serverEndpoint = "";
+  $("[data-analytics-server]").value = serverEndpoint;
+  function serverControls() {
+    $("[data-analytics-connect]").hidden = Boolean(serverEndpoint);
+    $("[data-analytics-disconnect]").hidden = Boolean(serverEndpoint) || !token;
+    $("[data-analytics-refresh]").disabled = !serverEndpoint && !token;
+    if (serverEndpoint) panel.querySelector("details").open = false;
+  }
+  serverControls();
+  $("[data-analytics-save-server]").addEventListener("click",() => {
+    const value = $("[data-analytics-server]").value.trim().replace(/\/$/,"");
+    if (value && !validServer(value)) { status("Nhập URL Cloud Run dạng https://…run.app, không kèm đường dẫn."); return; }
+    reset(); serverEndpoint = value;
+    try { localStorage.setItem("vien-analytics-server",value); } catch {}
+    serverControls();
+    if (serverEndpoint) load(); else status("Đã tắt kết nối máy chủ. Bạn có thể dùng Kết nối Google.");
+  });
   const attachNav = () => {
     if (nav.querySelector("[data-analytics-nav]")) return;
     const button = document.createElement("button");
@@ -44,6 +70,7 @@
   observer.observe(nav, {childList:true}); attachNav();
   function reset() {
     token = ""; expires = 0; busy = false; version++;
+    $("[data-analytics-days]").disabled = false;
     $("[data-analytics-results]").replaceChildren();
     $("[data-analytics-refresh]").disabled = true;
     $("[data-analytics-disconnect]").hidden = true;
@@ -57,6 +84,7 @@
       main.classList.add("analytics-open"); panel.hidden = false;
       nav.querySelectorAll(".is-active").forEach(node => node.classList.remove("is-active"));
       nav.querySelector("[data-analytics-nav]")?.classList.add("is-active");
+      if (serverEndpoint) load();
     } else if (event.target.closest("[data-dashboard-type]")) {
       main.classList.remove("analytics-open"); panel.hidden = true;
     }
@@ -80,17 +108,30 @@
   const number = value => Number(value || 0).toLocaleString("vi-VN");
   const table = (title, data, labels) => `<article class="analytics-card"><h2>${esc(title)}</h2>${data.length ? `<table><thead><tr>${labels.map(label => `<th>${esc(label)}</th>`).join("")}</tr></thead><tbody>${data.map(row => `<tr><td>${esc(row.label)}</td>${row.values.map(value => `<td>${number(value)}</td>`).join("")}</tr>`).join("")}</tbody></table>` : "<p>Chưa có dữ liệu trong khoảng thời gian này.</p>"}</article>`;
   async function load() {
+    if (!app.classList.contains("is-authenticated")) return;
     if (busy) return;
-    if (!token || Date.now() >= expires) { status("Bấm Kết nối Google để đọc báo cáo."); return; }
+    if (!serverEndpoint && (!token || Date.now() >= expires)) { status("Bấm Kết nối Google để đọc báo cáo."); return; }
     busy = true; const request = ++version;
+    $("[data-analytics-days]").disabled = true;
     $("[data-analytics-refresh]").disabled = true;
     $("[data-analytics-results]").replaceChildren();
     status("Đang tải báo cáo…");
     const days = Number($("[data-analytics-days]").value);
+    const sessionUid = window.firebase?.auth().currentUser?.uid;
     const dateRanges = [{startDate:`${days-1}daysAgo`, endDate:"today"}];
     const query = (dimensions, metrics, limit) => ({dateRanges, dimensions:dimensions.map(name=>({name})), metrics:metrics.map(name=>({name})), ...(limit ? {limit, orderBys:[{metric:{metricName:metrics[0]},desc:true}]} : {})});
     try {
-      const results = await Promise.allSettled([
+      let results;
+      if (serverEndpoint) {
+        const user = window.firebase?.auth().currentUser;
+        if (!user) throw Error("Vui lòng đăng nhập lại dashboard.");
+        const idToken = await user.getIdToken();
+        const response = await fetch(`${serverEndpoint}/reports?days=${days}`, {headers:{Authorization:`Bearer ${idToken}`}, signal:AbortSignal.timeout(30000)});
+        const payload = await response.json();
+        if (!response.ok) throw Error(response.status === 403 ? "Tài khoản này chưa được cấp quyền đọc thống kê trên máy chủ." : response.status === 401 ? "Phiên dashboard hết hạn. Vui lòng đăng nhập lại." : "Không tải được báo cáo từ máy chủ. Kiểm tra cấu hình hoặc thử lại.");
+        if (!Array.isArray(payload.reports) || payload.reports.length !== 6) throw Error("Máy chủ trả về dữ liệu không hợp lệ.");
+        results = payload.reports.map(value => value ? {status:"fulfilled",value} : {status:"rejected",reason:Error("Report unavailable")});
+      } else results = await Promise.allSettled([
         report("runReport",query([],["totalUsers","sessions","screenPageViews"])),
         report("runRealtimeReport",{metrics:[{name:"activeUsers"}]}),
         report("runReport",query(["date"],["totalUsers","screenPageViews"])),
@@ -98,7 +139,7 @@
         report("runReport",query(["sessionDefaultChannelGroup"],["sessions"],8)),
         report("runReport",query(["deviceCategory"],["totalUsers"],8))
       ]);
-      if (request !== version || !app.classList.contains("is-authenticated")) return;
+      if (request !== version || !app.classList.contains("is-authenticated") || (serverEndpoint && sessionUid !== window.firebase?.auth().currentUser?.uid)) return;
       if (results.some(result => result.status === "rejected" && result.reason.expired)) { reset(); status("Phiên Google đã hết hạn. Bấm Kết nối Google lại."); return; }
       if (results.every(result => result.status === "rejected")) throw results[0].reason;
       const get = index => results[index].status === "fulfilled" ? rows(results[index].value) : null;
@@ -113,7 +154,7 @@
       $("[data-analytics-results]").innerHTML = html + "</div>";
       status(`Đã cập nhật lúc ${new Date().toLocaleTimeString("vi-VN")}. ${results.some(result=>result.status==="rejected") ? "Một số báo cáo chưa tải được." : "Báo cáo thông thường có thể cập nhật chậm hơn thời gian thực."}`);
     } catch (error) { if (request === version) status(error.message); }
-    finally { if (request === version) { busy = false; $("[data-analytics-refresh]").disabled = !token; } }
+    finally { if (request === version) { busy = false; $("[data-analytics-days]").disabled = false; $("[data-analytics-refresh]").disabled = !serverEndpoint && !token; } }
   }
   $("[data-analytics-refresh]").addEventListener("click",load);
   $("[data-analytics-days]").addEventListener("change",load);
@@ -145,6 +186,7 @@
   const script = document.createElement("script");
   script.src = "https://accounts.google.com/gsi/client"; script.async = true;
   script.onload = () => { $("[data-analytics-connect]").disabled = false; };
-  script.onerror = () => status("Không tải được đăng nhập Google. Kiểm tra mạng hoặc trình chặn quảng cáo rồi tải lại trang.");
+  script.onerror = () => { if (!serverEndpoint) status("Không tải được đăng nhập Google. Kiểm tra mạng hoặc trình chặn quảng cáo rồi tải lại trang."); };
   document.head.appendChild(script);
 })();
+
