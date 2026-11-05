@@ -1,0 +1,5 @@
+node_modules
+*.test.mjs
+*.json.key
+.env*
+README.md
