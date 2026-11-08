@@ -442,6 +442,7 @@
   let viewerImages = [];
 
   const renderProject = (project, data) => {
+    const isCvmap = project.slug === "cvmap";
     const type = typeOf(project);
     const kind = TYPES[type];
     const detail = detailOf(project);
@@ -555,18 +556,18 @@
       overview: () => `
         <section class="section wrap" aria-labelledby="overview-title">
           <div class="case-overview">
-            <h2 class="case-overview__title" id="overview-title">Overview</h2>
+            <h2 class="case-overview__title" id="overview-title">${isCvmap ? "01. Tổng quan dự án" : "Overview"}</h2>
             <div class="case-overview__body">
               ${overview && overview !== summary ? `<p class="case-overview__lead">${esc(overview)}</p>` : ""}
               <div class="case-overview__grid">
                 ${text(detail.problem) || painPoints.length ? `
                 <div>
-                  <h3>${esc(kind.challenge)}</h3>
+                  <h3>${esc(isCvmap ? "02. Bài toán thiết kế" : kind.challenge)}</h3>
                   ${text(detail.problem) ? `<p>${esc(detail.problem)}</p>` : ""}
                   ${painPoints.length ? `<ul class="case-points" aria-label="${isVisual ? "Problems to solve" : "Key pain points"}">${painPoints.map((item) => `<li>${esc(item)}</li>`).join("")}</ul>` : ""}
                 </div>` : ""}
                 ${concept ? `<div><h3>The idea</h3><p>${esc(concept)}</p></div>` : ""}
-                ${text(detail.goal) ? `<div><h3>The goal</h3><p>${esc(detail.goal)}</p></div>` : ""}
+                ${text(detail.goal) ? `<div><h3>${isCvmap ? "03. Mục tiêu thiết kế" : "The goal"}</h3><p>${esc(detail.goal)}</p></div>` : ""}
               </div>
               ${did.length ? `<div class="case-overview__did"><h3>What I did</h3><ul class="chips">${did.map((item) => `<li>${esc(item)}</li>`).join("")}</ul></div>` : ""}
             </div>
@@ -631,7 +632,7 @@
         logoImage || construction
           ? `
         <section class="section wrap" aria-labelledby="logo-title">
-          ${head("logo", "The logo", "")}
+          ${head("logo", isCvmap ? "07. Visual Identity — Hệ thống nhận diện" : "The logo", "")}
           ${logoImage ? plate(logoImage, `${title} logo`, "case-stage") : ""}
           ${construction ? `<figure class="case-wide">${plate(construction, `${title} logo construction`)}<figcaption>Construction</figcaption></figure>` : ""}
         </section>`
@@ -641,7 +642,7 @@
         variations.length
           ? `
         <section class="section wrap" aria-labelledby="variations-title">
-          ${head("variations", "Variations", "Versions of the logo for different places and backgrounds.")}
+          ${head("variations", isCvmap ? "Logo dọc" : "Variations", isCvmap ? "Phiên bản bố cục dọc của logo CVMAP." : "Versions of the logo for different places and backgrounds.")}
           <ul class="case-tiles">
             ${variations
               .map(
@@ -746,7 +747,7 @@
           ? `
         <section class="section wrap" aria-labelledby="outcome-title">
           <div class="case-outcome">
-            <h2 class="case-outcome__label" id="outcome-title">Outcome</h2>
+            <h2 class="case-outcome__label" id="outcome-title">${isCvmap ? "08. Kết quả thiết kế" : "Outcome"}</h2>
             ${text(detail.impact) ? `<p class="case-outcome__statement">${esc(detail.impact)}</p>` : ""}
             ${metrics.length ? `<dl class="case-metrics">${metrics.map((item) => `<div><dt>${esc(item.label)}</dt><dd>${esc(item.value)}</dd></div>`).join("")}</dl>` : ""}
             <div class="case-outcome__grid">
@@ -759,7 +760,10 @@
     };
 
     // Sections are drawn in this kind's order, so the viewer numbers images in the order they appear.
-    const body = kind.order.map((id) => sections[id]()).join("");
+    const sectionOrder = project.slug === "cvmap" && type === "logo"
+      ? ["overview", "blocks", "logo", "variations", "brand", "outcome"]
+      : kind.order;
+    const body = sectionOrder.map((id) => sections[id]()).join("");
 
     main.innerHTML = `
       <article class="case-study case-study--${type}">

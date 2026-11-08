@@ -886,6 +886,47 @@ function normalizeDashboardData(data) {
 }, ...projects],
     };
   }
+  // Apply the supplied case study once, preserving future dashboard edits.
+  if (!data.contentMigrations?.cvmapCaseStudy20261108) {
+    data = {
+      ...data,
+      contentMigrations: { ...data.contentMigrations, cvmapCaseStudy20261108: true },
+      projects: (data.projects || []).map((item) => item.slug === "cvmap" ? {
+        ...item,
+        summary: "CVMAP — Kết nối cơ hội, định vị tương lai.",
+        tags: "Brand Identity, Logo Design, Visual Identity",
+        detail: { ...item.detail, ...{
+  "role": "Brand Identity Designer",
+  "service": "Brand Identity · Logo Design · Visual Identity",
+  "overview": "CVMAP — Kết nối cơ hội, định vị tương lai. CVMAP là nền tảng công nghệ tuyển dụng (HR Technology / Recruitment Platform), kết nối người tìm việc với doanh nghiệp thông qua trải nghiệm tìm kiếm việc làm trực quan trên bản đồ. Dự án thiết kế nhận diện thương hiệu tập trung xây dựng một hình ảnh hiện đại, chuyên nghiệp và dễ nhận biết, phản ánh sự giao thoa giữa công nghệ, con người và cơ hội nghề nghiệp. Bộ nhận diện hướng đến tinh thần kết nối, tính linh hoạt và khả năng tiếp cận, đồng thời tạo sự nhất quán trên các nền tảng kỹ thuật số và trong hoạt động truyền thông thương hiệu.",
+  "problem": "Làm thế nào để thể hiện bản sắc của một nền tảng tuyển dụng kết hợp bản đồ việc làm? Thách thức là xây dựng một biểu tượng vừa phản ánh lĩnh vực tuyển dụng, vừa truyền tải đặc trưng tìm kiếm việc làm theo vị trí địa lý của CVMAP. Thiết kế cần cân bằng tính công nghệ và sự gần gũi, đảm bảo khả năng nhận diện ở nhiều kích thước và dễ ứng dụng trên website, ứng dụng di động và các phương tiện truyền thông.",
+  "concept": "",
+  "goal": "Xây dựng hệ thống nhận diện riêng biệt, có ý nghĩa, tối giản, linh hoạt và nhất quán.",
+  "painPoints": "Distinctive — Dấu ấn thị giác riêng biệt, dễ nhận biết.\nMeaningful — Kết nối ứng viên, cơ hội nghề nghiệp và vị trí địa lý.\nMinimal — Tối giản hình khối, rõ ràng và hiện đại.\nScalable — Hiển thị ở nhiều kích thước và nền tảng.\nConsistent — Hệ thống nhận diện thống nhất, linh hoạt.",
+  "responsibilities": "Brand Identity\nLogo Design\nVisual Identity",
+  "colors": "Brand Cyan #01A2B1\nDeep Teal #063B46",
+  "impact": "Một hệ thống nhận diện hiện đại, nhất quán và linh hoạt. Bộ nhận diện CVMAP được xây dựng theo định hướng tối giản, hiện đại và tập trung vào khả năng ứng dụng thực tế. Sự kết hợp ngôn ngữ hình học, màu sắc và typography hướng đến hình ảnh một nền tảng công nghệ tuyển dụng chuyên nghiệp nhưng vẫn thân thiện, dễ tiếp cận. Hệ thống logo và các thành phần thị giác được tổ chức nhằm duy trì tính nhất quán trên nhiều điểm chạm, góp phần tạo dựng hình ảnh thương hiệu rõ ràng và dễ nhận biết.",
+  "blocks": [
+    {
+      "type": "text",
+      "title": "04. Brand Positioning — Định vị thương hiệu",
+      "text": "Connecting People to Opportunities — Kết nối con người với những cơ hội nghề nghiệp phù hợp. CVMAP được định hướng là nền tảng tuyển dụng hiện đại, giúp thu hẹp khoảng cách giữa ứng viên và doanh nghiệp thông qua công nghệ và trải nghiệm tìm kiếm việc làm theo vị trí địa lý. Ngôn ngữ thiết kế dựa trên ba giá trị: Connection — cầu nối giữa ứng viên và nhà tuyển dụng; Location — tìm kiếm việc làm trên bản đồ; Opportunity — sự phát triển và những hướng đi mới trong sự nghiệp."
+    },
+    {
+      "type": "text",
+      "title": "05. Creative Direction — Định hướng sáng tạo",
+      "text": "Connecting Opportunities · People · Location · Opportunity. Ý tưởng sáng tạo hướng đến việc chuyển hóa mối liên hệ giữa con người, vị trí và cơ hội nghề nghiệp thành một ngôn ngữ hình ảnh đơn giản, dễ nhận diện và mang tính ứng dụng cao."
+    },
+    {
+      "type": "text",
+      "title": "06. Logo Concept — Ý tưởng logo",
+      "text": "Một biểu tượng cho sự kết nối và khám phá cơ hội. Ý tưởng logo CVMAP được định hướng từ CV (hồ sơ nghề nghiệp) và MAP (bản đồ vị trí). Ngôn ngữ hình học tối giản hướng đến một biểu tượng hiện đại, dễ ghi nhớ, thể hiện tinh thần kết nối và chuyển động của thị trường việc làm. Sự cân bằng giữa hình khối, đường nét và không gian âm giúp logo duy trì tính rõ ràng, linh hoạt trên các nền tảng số. Logo gợi mở hình ảnh một bản đồ cơ hội, nơi mỗi cá nhân có thể tìm thấy hướng đi phù hợp với mình."
+    }
+  ]
+} },
+      } : item),
+    };
+  }
   return {
     ...data,
     hero: (data.hero || dashboardSeed.hero).map((item) => ({
