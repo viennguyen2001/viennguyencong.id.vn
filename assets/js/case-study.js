@@ -487,6 +487,11 @@
     const prompt = type === "video" ? text(detail.prompt) : "";
     const videos = type === "video" ? unique((Array.isArray(detail.videos) ? detail.videos : []).map(text)) : [];
     const metrics = parsePairs(detail.metrics);
+    const impact = text(detail.impact);
+    // Long results read as a short statement followed by regular body copy.
+    const impactSplit = impact.length > 240 ? impact.match(/^(.+?[.!?])(?:\s+)([\s\S]+)$/) : null;
+    const impactTitle = impactSplit ? impactSplit[1] : impact;
+    const impactBody = impactSplit ? impactSplit[2] : "";
     // AI video: the main video takes the cover's place; the cover image becomes its poster.
     const film = type === "video" ? videoInfo(detail.videoMain) : null;
     // The shape of a link that does not say: the Format field for the main video, the platform's usual shape for the others.
@@ -748,12 +753,13 @@
         <section class="section wrap" aria-labelledby="outcome-title">
           <div class="case-outcome">
             <h2 class="case-outcome__label" id="outcome-title">${isCvmap ? "08. Kết quả thiết kế" : "Outcome"}</h2>
-            ${text(detail.impact) ? `<p class="case-outcome__statement">${esc(detail.impact)}</p>` : ""}
+            ${text(detail.impact) ? `<p class="case-outcome__statement">${esc(impactTitle)}</p>` : ""}
+            ${impactBody ? `<div class="case-outcome__body"><p>${esc(impactBody)}</p></div>` : ""}
             ${metrics.length ? `<dl class="case-metrics">${metrics.map((item) => `<div><dt>${esc(item.label)}</dt><dd>${esc(item.value)}</dd></div>`).join("")}</dl>` : ""}
-            <div class="case-outcome__grid">
+            ${text(detail.learned) || nextSteps.length ? `<div class="case-outcome__grid">
               ${text(detail.learned) ? `<div><h3>What I learned</h3><p>${esc(detail.learned)}</p></div>` : ""}
               ${nextSteps.length ? `<div><h3>Next steps</h3><ul>${nextSteps.map((item) => `<li>${esc(item)}</li>`).join("")}</ul></div>` : ""}
-            </div>
+            </div>` : ""}
           </div>
         </section>`
           : "",
@@ -800,7 +806,7 @@
 
         ${film && film.kind !== "link"
           ? `<figure class="case-film wrap"><div class="case-film__frame" style="--r: ${filmRatio.toFixed(4)}">${videoPlayer(detail.videoMain, `${title}, video`, cover ? cld(cover, "f_auto,q_auto,w_2000") : "")}</div></figure>`
-          : cover ? `<figure class="case-cover wrap"><img src="${esc(cld(cover, "f_auto,q_auto,w_2000"))}" alt="${esc(title)}" width="1200" height="1000" fetchpriority="high" decoding="async" /></figure>` : ""}
+          : cover ? `<figure class="case-cover wrap"><img src="${esc(cld(cover, "f_auto,q_auto,w_2000"))}" alt="${esc(title)}" fetchpriority="high" decoding="async" /></figure>` : ""}
 
         ${body}
 
