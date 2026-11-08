@@ -847,6 +847,45 @@ async function hydrateDashboardDataFromFirebase() {
 }
 
 function normalizeDashboardData(data) {
+  // Add the supplied CVMAP project once; preserve dashboard edits and later deletions.
+  if (!data.contentMigrations?.cvmapLogo20261108) {
+    const projects = data.projects || [];
+    const exists = projects.some((item) => item.slug === "cvmap" || /cvmap/i.test(item.title || ""));
+    data = {
+      ...data,
+      contentMigrations: { ...data.contentMigrations, cvmapLogo20261108: true },
+      projects: exists ? projects : [{
+  "id": 2026110801,
+  "slug": "cvmap",
+  "title": "CVMAP – Tìm việc an toàn",
+  "owner": "Vien Nguyen",
+  "status": "Active",
+  "date": "",
+  "featured": true,
+  "projectType": "logo",
+  "metric": "Logo design",
+  "tags": "Logo design",
+  "link": "",
+  "image": "/assets/projects/cvmap/logo-horizontal.png",
+  "summary": "Thiết kế logo CVMAP – Tìm việc an toàn.",
+  "detail": {
+    "client": "CVMAP",
+    "role": "Brand Designer",
+    "service": "Thiết kế logo",
+    "overview": "Logo CVMAP với thông điệp “Tìm việc an toàn”, được thể hiện qua hai bố cục ngang và dọc.",
+    "concept": "Biểu tượng kết hợp hình ghim vị trí, dấu tích và mũi tên định hướng. Tông xanh ngọc đi cùng chữ xanh đậm tạo sự đồng nhất giữa biểu tượng và tên CVMAP.",
+    "logoImage": "/assets/projects/cvmap/logo-horizontal.png",
+    "variationImages": [
+      "/assets/projects/cvmap/logo-stacked.png"
+    ],
+    "formats": "Bố cục ngang\nBố cục dọc",
+    "galleryImages": [],
+    "researchImages": [],
+    "blocks": []
+  }
+}, ...projects],
+    };
+  }
   return {
     ...data,
     hero: (data.hero || dashboardSeed.hero).map((item) => ({
