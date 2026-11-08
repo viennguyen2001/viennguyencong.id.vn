@@ -637,7 +637,7 @@
         logoImage || construction
           ? `
         <section class="section wrap" aria-labelledby="logo-title">
-          ${head("logo", isCvmap ? "07. Visual Identity — Hệ thống nhận diện" : "The logo", "")}
+          ${isCvmap ? `<div class="section__head case-identity__head"><p class="case-identity__eyebrow">07 / Visual Identity</p><h2 class="section__title" id="logo-title">Hệ thống nhận diện</h2></div>` : head("logo", "The logo", "")}
           ${logoImage ? plate(logoImage, `${title} logo`, "case-stage") : ""}
           ${construction ? `<figure class="case-wide">${plate(construction, `${title} logo construction`)}<figcaption>Construction</figcaption></figure>` : ""}
         </section>`
@@ -772,7 +772,7 @@
     const body = sectionOrder.map((id) => sections[id]()).join("");
 
     main.innerHTML = `
-      <article class="case-study case-study--${type}">
+      <article class="case-study case-study--${type}${isCvmap ? " case-study--cvmap" : ""}">
         <header class="case-hero wrap">
           <div class="case-hero__text">
             <nav class="crumbs" aria-label="Breadcrumb">

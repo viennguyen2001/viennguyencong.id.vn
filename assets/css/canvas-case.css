@@ -136,7 +136,7 @@ html:has(.viewer[open]) { overflow: hidden; }
   outline-offset: 0;
   transition: outline-color 0.15s ease;
 }
-:is(.case-plate, .case-stage, .case-tile):is(:hover, :focus-visible) { outline-color: var(--selection); }
+:is(.case-plate, .case-stage, .case-tile):focus-visible { outline-color: var(--selection); }
 .case-plate { overflow: hidden; }
 .case-plate img { width: 100%; height: auto; }
 
@@ -387,3 +387,10 @@ html:has(.viewer[open]) { overflow: hidden; }
   .case-grid > li.is-tall .case-grid__item img { transition: none; }
   .case-grid > li.is-tall .case-grid__item:is(:hover, :focus-visible) img { object-position: 50% 0%; }
 }
+
+/* CVMAP: a quiet heading and an artboard sized to the supplied logo. */
+.case-study--cvmap .case-identity__head { max-width: none; padding-bottom: 24px; }
+.case-identity__eyebrow { margin-bottom: 10px; color: var(--muted); font-size: 12px; font-weight: 500; line-height: 1.5; letter-spacing: 0.08em; text-transform: uppercase; }
+.case-study--cvmap .section__title { font-size: clamp(24px, 2.5vw, 32px); font-weight: 700; line-height: 1.3; letter-spacing: -0.02em; }
+.case-study--cvmap .case-stage { min-height: 0; padding: clamp(20px, 3vw, 40px); overflow: hidden; }
+.case-study--cvmap .case-stage img { display: block; width: 100%; max-width: 100%; height: auto; max-height: none; }
