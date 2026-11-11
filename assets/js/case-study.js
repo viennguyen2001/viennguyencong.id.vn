@@ -442,7 +442,6 @@
   let viewerImages = [];
 
   const renderProject = (project, data) => {
-    const isMathGPT = String(project.id) === "1793010364576";
     const isCvmap = project.slug === "cvmap";
     const type = typeOf(project);
     const kind = TYPES[type];
@@ -559,15 +558,6 @@
       : "";
 
     const sections = {
-      platforms: () => `
-        <section class="section wrap" aria-labelledby="platforms-title">
-          ${head("platforms", "Web & app", "")}
-          <dl class="case-platforms">
-            <div><dt>Website</dt><dd>The browser-based MathGPT experience.</dd></div>
-            <div><dt>App</dt><dd>The MathGPT application for math learning and tutoring.</dd></div>
-          </dl>
-        </section>`,
-
       overview: () => `
         <section class="section wrap" aria-labelledby="overview-title">
           <div class="case-intro">
@@ -796,7 +786,7 @@
     // Sections are drawn in this kind's order, so the viewer numbers images in the order they appear.
     const sectionOrder = project.slug === "cvmap" && type === "logo"
       ? ["overview", "blocks", "logo", "variations", "brand", "outcome"]
-      : isMathGPT ? ["platforms", ...kind.order] : kind.order;
+      : kind.order;
     const body = sectionOrder.map((id) => sections[id]()).join("");
 
     main.innerHTML = `
@@ -810,7 +800,6 @@
               </ol>
             </nav>
             <h1 class="case-hero__title">${esc(title)}</h1>
-            ${isMathGPT ? '<ul class="chips" aria-label="Platforms"><li>Website</li><li>App</li></ul>' : ""}
             ${summary ? `<p class="case-hero__lead">${esc(summary)}</p>` : ""}
           </div>
           <aside class="case-hero__panel" aria-label="Project details">
@@ -818,7 +807,6 @@
               ["Client", detail.client],
               ["Role", detail.role],
               ["Services", detail.service],
-              ...(isMathGPT ? [["Platforms", "Web & app"]] : []),
               ["Tools", tools],
               ...(type === "video"
                 ? [

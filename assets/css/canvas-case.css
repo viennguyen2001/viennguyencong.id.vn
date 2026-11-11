@@ -396,23 +396,6 @@ html:has(.viewer[open]) { overflow: hidden; }
   .case-intro__goals li { grid-template-columns: minmax(0, 1fr); gap: 4px; }
 }
 
-.case-platforms {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(min(100%, 280px), 1fr));
-  gap: 16px;
-}
-.case-platforms > div {
-  padding: clamp(20px, 3vw, 32px);
-  border: 1px solid var(--line);
-  border-radius: var(--radius-card);
-  background: var(--frame);
-}
-.case-platforms dt { font-size: 20px; font-weight: 700; }
-.case-platforms dd { margin: 8px 0 0; color: var(--muted); line-height: 1.6; }
-
-.case-intro__columns > :only-child, .case-intro__concept { grid-column: 1 / -1; }
-.case-intro__columns > section > p:not(.case-identity__eyebrow) { max-width: 80ch; }
-
 /* Keep image-led briefs compact and give video notes a single reading column. */
 .case-study--video .case-intro__columns {
   grid-template-columns: minmax(0, 1fr);
