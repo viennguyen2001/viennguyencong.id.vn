@@ -810,6 +810,7 @@
               </ol>
             </nav>
             <h1 class="case-hero__title">${esc(title)}</h1>
+            ${isMathGPT ? '<ul class="chips" aria-label="Platforms"><li>Website</li><li>App</li></ul>' : ""}
             ${summary ? `<p class="case-hero__lead">${esc(summary)}</p>` : ""}
           </div>
           <aside class="case-hero__panel" aria-label="Project details">
