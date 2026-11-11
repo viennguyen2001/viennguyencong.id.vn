@@ -412,3 +412,13 @@ html:has(.viewer[open]) { overflow: hidden; }
 
 .case-intro__columns > :only-child, .case-intro__concept { grid-column: 1 / -1; }
 .case-intro__columns > section > p:not(.case-identity__eyebrow) { max-width: 80ch; }
+
+/* Keep image-led briefs compact and give video notes a single reading column. */
+.case-study--video .case-intro__columns {
+  grid-template-columns: minmax(0, 1fr);
+}
+@media (min-width: 1000px) {
+  .case-study--packaging .case-intro__columns {
+    grid-template-columns: minmax(0, 3fr) minmax(0, 2fr);
+  }
+}

@@ -283,7 +283,7 @@
       challenge: "The challenge",
       research: ["Snapshots", "Screens from the project. Select one to see it whole."],
       gallery: ["Final design", "The finished screens. Select one to see it whole."],
-      order: ["overview", "research", "process", "gallery", "blocks", "outcome"],
+      order: ["overview", "research", "gallery", "process", "blocks", "outcome"],
     },
     packaging: {
       steps: ["Research and moodboard", "Concepts and sketches", "Dieline and structure", "Artwork and print"],
@@ -293,7 +293,7 @@
       challenge: "The brief",
       research: ["Explorations", "Moodboards, early concepts and sketches. Select one to see it whole."],
       gallery: ["The packaging", "Mockups and product photos. Select one to see it whole."],
-      order: ["overview", "process", "research", "dieline", "brand", "gallery", "blocks", "outcome"],
+      order: ["overview", "gallery", "dieline", "brand", "research", "process", "blocks", "outcome"],
     },
     logo: {
       steps: ["Research", "Sketches", "Refinement", "Brand guidelines"],
@@ -303,7 +303,7 @@
       challenge: "The brief",
       research: ["Sketches", "Where the idea started. Select one to see it whole."],
       gallery: ["In use", "The identity on real things. Select one to see it whole."],
-      order: ["overview", "process", "research", "logo", "variations", "brand", "gallery", "blocks", "outcome"],
+      order: ["overview", "logo", "variations", "brand", "gallery", "research", "process", "blocks", "outcome"],
     },
     print: {
       steps: ["Brief and research", "Concepts", "Layout and type", "Production"],
@@ -323,7 +323,7 @@
       challenge: "The brief",
       research: ["Storyboard", "Keyframes and boards that set up each shot. Select one to see it whole."],
       gallery: ["Stills", "Frames from the finished video. Select one to see it whole."],
-      order: ["overview", "process", "research", "pipeline", "videos", "gallery", "blocks", "outcome"],
+      order: ["overview", "videos", "research", "gallery", "pipeline", "process", "blocks", "outcome"],
     },
   };
 
