@@ -412,3 +412,17 @@ html:has(.viewer[open]) { overflow: hidden; }
   .cvmap-intro__columns { grid-template-columns: minmax(0, 1fr); margin-top: 28px; padding-top: 28px; }
   .cvmap-intro__goals li { grid-template-columns: minmax(0, 1fr); gap: 4px; }
 }
+
+.case-platforms {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 280px), 1fr));
+  gap: 16px;
+}
+.case-platforms > div {
+  padding: clamp(20px, 3vw, 32px);
+  border: 1px solid var(--line);
+  border-radius: var(--radius-card);
+  background: var(--frame);
+}
+.case-platforms dt { font-size: 20px; font-weight: 700; }
+.case-platforms dd { margin: 8px 0 0; color: var(--muted); line-height: 1.6; }
