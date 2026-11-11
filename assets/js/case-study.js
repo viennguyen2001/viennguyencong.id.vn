@@ -568,54 +568,42 @@
           </dl>
         </section>`,
 
-      overview: () => isCvmap ? `
+      overview: () => `
         <section class="section wrap" aria-labelledby="overview-title">
-          <div class="cvmap-intro">
-            <div class="cvmap-intro__overview">
-              <p class="case-identity__eyebrow">01 / Project Overview</p>
-              <h2 id="overview-title">Tổng quan dự án</h2>
-              <div class="cvmap-intro__copy">${overview.split(/(?<=\.)\s+/).reduce((groups, sentence, index) => {
+          <div class="case-intro">
+            <div class="case-intro__overview">
+              ${isCvmap ? '<p class="case-identity__eyebrow">01 / Project Overview</p>' : ""}
+              <h2 id="overview-title">${isCvmap ? "Tổng quan dự án" : "Project overview"}</h2>
+              ${overview ? `<div class="case-intro__copy">${overview.split(/(?<=\.)\s+/).reduce((groups, sentence, index) => {
                 if (index % 2 === 0) groups.push(sentence);
                 else groups[groups.length - 1] += " " + sentence;
                 return groups;
-              }, []).map((paragraph) => `<p>${esc(paragraph)}</p>`).join("")}</div>
-              ${did.length ? `<ul class="chips" aria-label="Hạng mục thiết kế">${did.map((item) => `<li>${esc(item)}</li>`).join("")}</ul>` : ""}
+              }, []).map((paragraph) => `<p>${esc(paragraph)}</p>`).join("")}</div>` : ""}
+              ${did.length ? `<ul class="chips" aria-label="${isCvmap ? "Hạng mục thiết kế" : "My contributions"}">${did.map((item) => `<li>${esc(item)}</li>`).join("")}</ul>` : ""}
             </div>
-            <div class="cvmap-intro__columns">
-              <section aria-labelledby="cvmap-challenge-title">
-                <p class="case-identity__eyebrow">02 / The Challenge</p>
-                <h2 id="cvmap-challenge-title">Bài toán thiết kế</h2>
-                <p>${esc(detail.problem)}</p>
-              </section>
-              <section aria-labelledby="cvmap-goals-title">
-                <p class="case-identity__eyebrow">03 / Design Objectives</p>
-                <h2 id="cvmap-goals-title">Mục tiêu thiết kế</h2>
-                <p>${esc(detail.goal)}</p>
-                ${painPoints.length ? `<ul class="cvmap-intro__goals">${painPoints.map((item) => {
+            ${text(detail.problem) || text(detail.goal) || concept || painPoints.length ? `
+            <div class="case-intro__columns">
+              ${text(detail.problem) || (!isCvmap && painPoints.length) ? `
+              <section aria-labelledby="challenge-title">
+                ${isCvmap ? '<p class="case-identity__eyebrow">02 / The Challenge</p>' : ""}
+                <h2 id="challenge-title">${esc(isCvmap ? "Bài toán thiết kế" : kind.challenge)}</h2>
+                ${text(detail.problem) ? `<p>${esc(detail.problem)}</p>` : ""}
+                ${!isCvmap && painPoints.length ? `<ul class="case-points">${painPoints.map((item) => `<li>${esc(item)}</li>`).join("")}</ul>` : ""}
+              </section>` : ""}
+              ${text(detail.goal) || (isCvmap && painPoints.length) ? `
+              <section aria-labelledby="goals-title">
+                ${isCvmap ? '<p class="case-identity__eyebrow">03 / Design Objectives</p>' : ""}
+                <h2 id="goals-title">${isCvmap ? "Mục tiêu thiết kế" : "Design objectives"}</h2>
+                ${text(detail.goal) ? `<p>${esc(detail.goal)}</p>` : ""}
+                ${isCvmap && painPoints.length ? `<ul class="case-intro__goals">${painPoints.map((item) => {
                   const [name, ...description] = item.split("—");
                   return `<li><strong>${esc(name.trim())}</strong><span>${esc(description.join("—").trim())}</span></li>`;
                 }).join("")}</ul>` : ""}
-              </section>
-            </div>
-          </div>
-        </section>` : `
-        <section class="section wrap" aria-labelledby="overview-title">
-          <div class="case-overview">
-            <h2 class="case-overview__title" id="overview-title">${isCvmap ? "01. Tổng quan dự án" : "Overview"}</h2>
-            <div class="case-overview__body">
-              ${overview && overview !== summary ? `<p class="case-overview__lead">${esc(overview)}</p>` : ""}
-              <div class="case-overview__grid">
-                ${text(detail.problem) || painPoints.length ? `
-                <div>
-                  <h3>${esc(isCvmap ? "02. Bài toán thiết kế" : kind.challenge)}</h3>
-                  ${text(detail.problem) ? `<p>${esc(detail.problem)}</p>` : ""}
-                  ${painPoints.length ? `<ul class="case-points" aria-label="${isVisual ? "Problems to solve" : "Key pain points"}">${painPoints.map((item) => `<li>${esc(item)}</li>`).join("")}</ul>` : ""}
-                </div>` : ""}
-                ${concept ? `<div><h3>The idea</h3><p>${esc(concept)}</p></div>` : ""}
-                ${text(detail.goal) ? `<div><h3>${isCvmap ? "03. Mục tiêu thiết kế" : "The goal"}</h3><p>${esc(detail.goal)}</p></div>` : ""}
-              </div>
-              ${did.length ? `<div class="case-overview__did"><h3>What I did</h3><ul class="chips">${did.map((item) => `<li>${esc(item)}</li>`).join("")}</ul></div>` : ""}
-            </div>
+              </section>` : ""}
+              ${concept ? `<section class="case-intro__concept" aria-labelledby="concept-title">
+                <h2 id="concept-title">The idea</h2><p>${esc(concept)}</p>
+              </section>` : ""}
+            </div>` : ""}
           </div>
         </section>`,
 
