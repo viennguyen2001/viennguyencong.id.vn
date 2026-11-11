@@ -18,7 +18,7 @@ html:has(.viewer[open]) { overflow: hidden; }
 .crumbs [aria-current] { color: var(--ink); font-weight: 500; }
 .case-hero__title {
   margin-top: 20px;
-  font-size: clamp(40px, 7.4vw, 88px);
+  font-size: clamp(32px, 5.4vw, 68px);
   font-weight: 800;
   line-height: 1.02;
   letter-spacing: -0.035em;
