@@ -952,6 +952,38 @@ function normalizeDashboardData(data) {
       }, ...projects],
     };
   }
+  if (!data.contentMigrations?.journeyCaseStudy20261113) {
+    data = {
+      ...data,
+      contentMigrations: { ...data.contentMigrations, journeyCaseStudy20261113: true },
+      projects: (data.projects || []).map((item) => getProjectSlug(item) === "journey" ? {
+        ...item,
+        detail: {
+          problem: "The storefront needs to introduce new products while giving shoppers who arrive with a specific need a direct route to the right category.",
+          goal: "Make the homepage work both as a product showcase and as an entry point to the catalog.",
+          ...item.detail,
+          blocks: [
+            ...(item.detail?.blocks || []),
+            {
+              type: "text",
+              title: "Navigation by shopping intent",
+              text: "Charging, Lifestyle Gear, and Trackers give shoppers clear starting points. Search, account, and cart remain grouped in the header.",
+            },
+            {
+              type: "text",
+              title: "One product in focus",
+              text: "The LOC8 Motion Key Organiser hero pairs a large product image with one Shop Now action. A separate REEVUS banner makes the pre-order offer easy to distinguish.",
+            },
+            {
+              type: "text",
+              title: "From campaign to catalog",
+              text: "Trending Products follows the campaign banners. This gives visitors a way to browse individual products after seeing the featured launches.",
+            },
+          ],
+        },
+      } : item),
+    };
+  }
   return {
     ...data,
     hero: (data.hero || dashboardSeed.hero).map((item) => ({
