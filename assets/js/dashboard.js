@@ -984,6 +984,41 @@ function normalizeDashboardData(data) {
       } : item),
     };
   }
+  if (!data.contentMigrations?.journeyDesignPerspective) {
+    data = {
+      ...data,
+      contentMigrations: { ...data.contentMigrations, journeyDesignPerspective: true },
+      projects: (data.projects || []).map((item) => getProjectSlug(item) === "journey" ? {
+        ...item,
+        owner: "Vien Nguyen",
+        summary: "My homepage UI design for Journey, an e-commerce brand for everyday tech and lifestyle accessories.",
+        detail: {
+          ...item.detail,
+          role: "UI Designer",
+          overview: "I designed the homepage interface for Journey’s online store. My direction was to present everyday tech as practical, considered lifestyle gear through product photography, a restrained palette, and a clear path from featured launches to the catalog.",
+          responsibilities: "Homepage UI Design\nVisual Direction\nE-commerce Layout",
+          blocks: [
+            {
+              type: "text",
+              title: "Brand direction",
+              text: "I wanted the storefront to feel calm, product-led, and practical. Neutral surfaces and dark typography give the brand a consistent base, while each campaign uses its own color to express the character of the product.",
+            },
+            {
+              type: "text",
+              title: "Product photography as the focal point",
+              text: "For LOC8, I used a warm backdrop and a composition that shows the key organiser alongside everyday objects. The cooler REEVUS banner creates a distinct moment for the bottle while repeating the rounded framing of the hero.",
+            },
+            {
+              type: "text",
+              title: "A hierarchy built for shopping",
+              text: "I gave the lead product one clear Shop Now action and placed Trending Products below the campaigns. The category navigation offers a direct route for shoppers who already know what they need.",
+            },
+            ...(item.detail?.blocks || []).filter((block) => !["Navigation by shopping intent", "One product in focus", "From campaign to catalog"].includes(block.title)),
+          ],
+        },
+      } : item),
+    };
+  }
   return {
     ...data,
     hero: (data.hero || dashboardSeed.hero).map((item) => ({
