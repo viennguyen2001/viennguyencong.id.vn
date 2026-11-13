@@ -558,6 +558,38 @@
       : "";
 
     const sections = {
+      journeyDiagrams: () => `
+        <section class="section wrap" aria-labelledby="journey-diagrams-title">
+          ${head("journey-diagrams", "Homepage structure & shopping paths", "How the layout connects product campaigns with the catalog.")}
+          <div class="journey-diagrams">
+            <figure>
+              <figcaption>Homepage hierarchy</figcaption>
+              <ol class="journey-diagrams__steps">
+                <li><strong>Header</strong><span>Categories, search, account and cart</span></li>
+                <li><strong>LOC8 hero</strong><span>Lead product and its Shop Now action</span></li>
+                <li><strong>REEVUS banner</strong><span>A separate pre-order campaign</span></li>
+                <li><strong>Trending Products</strong><span>Browse individual products</span></li>
+              </ol>
+            </figure>
+            <figure>
+              <figcaption>Two routes to a product</figcaption>
+              <p>Both paths start on the homepage.</p>
+              <h3>Explore a featured launch</h3>
+              <ol class="journey-diagrams__steps">
+                <li>Featured product campaign</li>
+                <li>Shop Now</li>
+                <li>Product page</li>
+              </ol>
+              <h3>Shop by category</h3>
+              <ol class="journey-diagrams__steps">
+                <li>Category navigation</li>
+                <li>Collection</li>
+                <li>Product page</li>
+              </ol>
+            </figure>
+          </div>
+        </section>`,
+
       overview: () => `
         <section class="section wrap" aria-labelledby="overview-title">
           <div class="case-intro">
@@ -786,7 +818,9 @@
     // Sections are drawn in this kind's order, so the viewer numbers images in the order they appear.
     const sectionOrder = project.slug === "cvmap" && type === "logo"
       ? ["overview", "blocks", "logo", "variations", "brand", "outcome"]
-      : kind.order;
+      : slugOf(project) === "journey"
+        ? ["overview", "journeyDiagrams", ...kind.order.filter((section) => section !== "overview")]
+        : kind.order;
     const body = sectionOrder.map((id) => sections[id]()).join("");
 
     main.innerHTML = `
