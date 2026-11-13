@@ -927,6 +927,31 @@ function normalizeDashboardData(data) {
       } : item),
     };
   }
+  if (!data.contentMigrations?.journey20261113) {
+    const projects = data.projects || [];
+    const exists = projects.some((item) => getProjectSlug(item) === "journey" || /^https?:\/\/(?:www\.)?journeyofficial\.com(?:[/?#]|$)/i.test(item.link || ""));
+    data = {
+      ...data,
+      contentMigrations: { ...data.contentMigrations, journey20261113: true },
+      projects: exists ? projects : [{
+        id: 2026111301,
+        slug: "journey",
+        title: "Journey",
+        status: "Active",
+        projectType: "uiux",
+        featured: false,
+        link: "https://journeyofficial.com/",
+        image: "/assets/projects/journey/cover.jpg",
+        summary: "An e-commerce website for everyday tech and lifestyle accessories.",
+        detail: {
+          client: "Journey",
+          service: "E-commerce Website",
+          overview: "Journey’s online store brings together charging accessories, lifestyle gear, and trackers. The homepage highlights featured products and gives shoppers direct paths into each collection.",
+          galleryImages: ["/assets/projects/journey/homepage.jpg"],
+        },
+      }, ...projects],
+    };
+  }
   return {
     ...data,
     hero: (data.hero || dashboardSeed.hero).map((item) => ({
@@ -1334,12 +1359,13 @@ function uploadVideoToCloudinary(file, onProgress) {
 function getProjectDetailDefaults(item = {}) {
   const type = getProjectType(item);
   const saved = item.detail || {};
-  const sample = (field) => saved[field] || (type === "uiux" ? UIUX_SAMPLE_TEXT[field] : "");
+  const isJourney = item.id === 2026111301;
+  const sample = (field) => saved[field] || (type === "uiux" && !isJourney ? UIUX_SAMPLE_TEXT[field] : "");
   const images = (field) => (Array.isArray(saved[field]) ? saved[field].filter(Boolean) : []);
   return {
-    region: saved.region || "Vietnam",
-    year: saved.year || item.date?.slice(0, 4) || "2024",
-    role: saved.role || (type === "uiux" ? item.owner || "UI/UX Designer" : PROJECT_TYPES[type].role),
+    region: saved.region || (isJourney ? "" : "Vietnam"),
+    year: saved.year || item.date?.slice(0, 4) || (isJourney ? "" : "2024"),
+    role: saved.role || (isJourney ? "" : type === "uiux" ? item.owner || "UI/UX Designer" : PROJECT_TYPES[type].role),
     service: saved.service || (type === "uiux" ? item.tags || "Product Design" : PROJECT_TYPES[type].service),
     client: saved.client || "",
     overview: saved.overview || item.summary || (type === "uiux" ? UIUX_SAMPLE_TEXT.overview : ""),
