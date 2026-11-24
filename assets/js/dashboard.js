@@ -1019,6 +1019,30 @@ function normalizeDashboardData(data) {
       } : item),
     };
   }
+  if (!data.contentMigrations?.internalAccounting20261124) {
+    const projects = data.projects || [];
+    const exists = projects.some((item) => item.slug === "internal-accounting");
+    data = {
+      ...data,
+      contentMigrations: { ...data.contentMigrations, internalAccounting20261124: true },
+      projects: exists ? projects : [{
+  "id": 2026112401,
+  "slug": "internal-accounting",
+  "title": "Hệ thống kế toán nội bộ",
+  "status": "Draft",
+  "projectType": "uiux",
+  "featured": false,
+  "image": "",
+  "link": "",
+  "summary": "Ứng dụng web kế toán phục vụ riêng cho hoạt động nội bộ của công ty.",
+  "detail": {
+    "client": "Nội bộ công ty",
+    "overview": "Dự án giao diện hệ thống kế toán nội bộ, được xây dựng để phục vụ riêng cho công ty và những người dùng được cấp quyền.",
+    "service": "Internal Web Application"
+  }
+}, ...projects],
+    };
+  }
   return {
     ...data,
     hero: (data.hero || dashboardSeed.hero).map((item) => ({
@@ -1426,7 +1450,7 @@ function uploadVideoToCloudinary(file, onProgress) {
 function getProjectDetailDefaults(item = {}) {
   const type = getProjectType(item);
   const saved = item.detail || {};
-  const isJourney = item.id === 2026111301;
+  const isJourney = item.id === 2026111301 || item.id === 2026112401;
   const sample = (field) => saved[field] || (type === "uiux" && !isJourney ? UIUX_SAMPLE_TEXT[field] : "");
   const images = (field) => (Array.isArray(saved[field]) ? saved[field].filter(Boolean) : []);
   return {
