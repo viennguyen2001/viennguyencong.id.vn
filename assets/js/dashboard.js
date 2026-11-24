@@ -1043,6 +1043,23 @@ function normalizeDashboardData(data) {
 }, ...projects],
     };
   }
+  if (!data.contentMigrations?.attendanceSheets20261124) {
+    data = {
+      ...data,
+      contentMigrations: { ...data.contentMigrations, attendanceSheets20261124: true },
+      projects: (data.projects || []).map((item) => Number(item.id) === 2026112401 ? {
+        ...item,
+        slug: "google-sheets-attendance",
+        title: "Quản lý chấm công bằng Google Sheets",
+        summary: "Công cụ quản lý chấm công trên Google Sheets, phục vụ nhu cầu nội bộ của công ty.",
+        detail: {
+          ...item.detail,
+          service: "Google Sheets · Internal Tool",
+          overview: "Dự án quản lý chấm công bằng Google Sheets được thực hiện để phục vụ riêng cho hoạt động nội bộ của công ty.",
+        },
+      } : item),
+    };
+  }
   return {
     ...data,
     hero: (data.hero || dashboardSeed.hero).map((item) => ({
