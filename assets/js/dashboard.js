@@ -1060,6 +1060,62 @@ function normalizeDashboardData(data) {
       } : item),
     };
   }
+  if (!data.contentMigrations?.attendanceCaseStudySource20261124) {
+    data = {
+      ...data,
+      contentMigrations: { ...data.contentMigrations, attendanceCaseStudySource20261124: true },
+      projects: (data.projects || []).map((item) => Number(item.id) === 2026112401 ? {
+        ...item,
+        title: "Chấm công & Tính lương nội bộ",
+        image: "/assets/projects/attendance/sample-import.png",
+        summary: "Ứng dụng nội bộ quản lý chấm công, nghỉ phép và lương trên nền Google Sheets.",
+        detail: {
+  "role": "UI Designer",
+  "service": "Internal Web App · Google Sheets · Apps Script",
+  "client": "Nội bộ công ty",
+  "overview": "Hệ thống chấm công và tính lương nội bộ, sử dụng Google Sheets làm nơi lưu trữ dữ liệu và Google Apps Script để cung cấp giao diện web. Giao diện tổ chức nghiệp vụ theo vai trò kế toán, quản lý và nhân viên.",
+  "problem": "Dữ liệu giờ làm, nghỉ phép và tiền lương cần được đối chiếu theo tháng. Người sử dụng cần thấy rõ trạng thái thiếu dữ liệu và có cách gửi bổ sung để người phụ trách kiểm tra.",
+  "goal": "Tập trung thao tác chấm công, đối chiếu và xem lương trong một giao diện nội bộ với quyền truy cập theo vai trò.",
+  "responsibilities": "Giao diện nghiệp vụ nội bộ\nBảng dữ liệu và trạng thái\nLuồng yêu cầu và phê duyệt",
+  "galleryImages": [
+    "/assets/projects/attendance/sample-import.png"
+  ],
+  "blocks": [
+    {
+      "type": "text",
+      "title": "Bảng công theo giờ thực tế",
+      "text": "Ghi nhận số giờ làm theo ngày, như 8 giờ cả ngày, 3 giờ buổi sáng hoặc 5 giờ buổi chiều. Nghỉ phép được thể hiện bằng P, PS, PC để phân biệt phép cả ngày và từng buổi."
+    },
+    {
+      "type": "text",
+      "title": "Đối chiếu dữ liệu máy chấm công",
+      "text": "Lấy giờ vào đầu tiên và giờ ra cuối cùng trong ngày. Dữ liệu nhập được tổ chức theo nhân viên và tháng, kèm ghi chú để kiểm tra các trường hợp thiếu lượt chấm công."
+    },
+    {
+      "type": "text",
+      "title": "Lịch cá nhân và bổ sung minh chứng",
+      "text": "Nhân viên xem lịch chấm công theo tháng. Màu trạng thái giúp phân biệt ngày đủ giờ, ngày nghỉ, phép và ngày thiếu dữ liệu. Yêu cầu bổ sung giờ vào/ra có minh chứng được gửi để duyệt."
+    },
+    {
+      "type": "text",
+      "title": "Bảng lương và lịch sử theo tháng",
+      "text": "Nghiệp vụ kế toán gồm bảng lương, thuế TNCN, BHXH và phiếu lương. Nhân viên xem lịch sử phiếu lương đã phát hành theo tháng."
+    },
+    {
+      "type": "text",
+      "title": "Phân quyền theo công việc",
+      "text": "Các vai trò kế toán, giám đốc và nhân viên có phạm vi thao tác riêng. Quy trình yêu cầu và phê duyệt kết nối thông tin từ nhân viên đến người phụ trách."
+    },
+    {
+      "type": "text",
+      "title": "Hình ảnh dữ liệu minh họa",
+      "text": "Ảnh bên dưới là mẫu nhập dữ liệu máy chấm công từ dự án. Đây là dữ liệu minh họa, dùng để giải thích cấu trúc mã nhân viên, ngày, giờ vào và giờ ra."
+    }
+  ]
+},
+      } : item),
+    };
+  }
   return {
     ...data,
     hero: (data.hero || dashboardSeed.hero).map((item) => ({
